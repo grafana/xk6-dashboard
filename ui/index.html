@@ -1,0 +1,30 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uplot@1.6.12/dist/uPlot.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uplot@1.6.12/dist/uPlot.iife.min.js"></script>
+    <script src="main.js"></script>
+    <title>k6 dashboard</title>
+  </head>
+  <body>
+    <div class="navbar-fixed">
+      <nav>
+        <div class="nav-wrapper">
+          <a class="brand-logo center">k6 dashboard</a>
+        </div>
+      </nav>
+    </div>
+    <section>
+      <div class="row">
+        <div class="col s12">
+          <div id="vus" class="card"></div>
+          <div id="durations" class="card"></div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

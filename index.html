@@ -1,0 +1,11 @@
+<html>
+  <head>
+    <script>
+      let ui = new URL("{{.ui}}");
+      let params = new URLSearchParams(ui.search);
+      params.append("endpoint", window.location.href);
+      ui.search = "?" + params.toString();
+      window.location.replace(ui.href);
+    </script>
+  </head>
+</html>

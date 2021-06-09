@@ -1,0 +1,19 @@
+nav .brand-logo {
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  line-height: 40px;
+}
+
+nav {
+  background: #7b65fa;
+  height: 40px;
+}
+
+body {
+  background: #f0f0f0;
+}
+
+.navbar-fixed {
+  height: 45px;
+}
