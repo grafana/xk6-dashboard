@@ -64,7 +64,7 @@ Then:
 Without parameters the dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ```plain
-$ ./k6 run -d 1m --out dashboard script.js
+$ ./k6 run --out dashboard script.js
 
           /\      |‾‾| /‾‾/   /‾‾/   
      /\  /  \     |  |/  /   /  /    
@@ -93,19 +93,19 @@ parameter | description
 ----------|------------
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
 port      | TCP port for HTTP endoint (default: 5665)
-ui        | URL of web based UI (default: https://xk6-dashboard.netlify.com)
+ui        | URL of web based UI (default: https://xk6-dashboard.netlify.app/)
 period    | Event emiting frequency in seconds (default: 10)
 
 *You can ommit the `https://` part from the begining of the `ui` parameter since it is the default.*
 
 ## UI
 
-The default UI is https://xk6-dashboard.netlify.com which can be overwritten with `ui` parameter. You can specify any URL accessible from your browser, even URL accessible only from your internal network.
+The default UI is https://xk6-dashboard.netlify.app/ which can be overwritten with `ui` parameter. You can specify any URL accessible from your browser, even URL accessible only from your internal network.
 
 When you open the dashboard (default at http://127.0.0.1:5665) then it will redirect to URL specified in `ui` parameter. The actual dashboard URL will be passed to UI as `endpoint` query parameter. For example with default UI, your browser will be redirected to:
 
 ```plain
-https://xk6-dashboard.netlify.com/?endpoint=http%3A%2F%2F127.0.0.1%3A5665%2F
+https://xk6-dashboard.netlify.app/?endpoint=http%3A%2F%2F127.0.0.1%3A5665%2F
 ```
 
 You can create your own dashboard UI and pass it's URL in `ui` parameter. The source code for default UI can be found in [ui](ui) directory. It is a simple static web page, can be hosted at any web hosting provider.

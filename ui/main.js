@@ -1,7 +1,7 @@
 window.addEventListener("DOMContentLoaded", onInit);
 
 class SampleSource {
-  constructor(location = "/api/events", maxSampleNum = 1000) {
+  constructor(location = "http://127.0.0.1:5665/events/sample", maxSampleNum = 1000) {
     this.time = [];
     this.sample = {};
     this.maxSampleNum = maxSampleNum;

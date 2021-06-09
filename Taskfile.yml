@@ -49,4 +49,9 @@ tasks:
   test:
     deps: [build]
     cmds:
+      - ./k6 run --out dashboard --no-usage-report script.js
+
+  ui:
+    deps: [build]
+    cmds:
       - ./k6 run --out dashboard='period=5&ui=http://localhost:8080' --no-usage-report script.js
