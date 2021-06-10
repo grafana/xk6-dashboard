@@ -10,7 +10,9 @@ export let options = {
       stages: [
         { duration: "1m", target: 2 },
         { duration: "3m", target: 10 },
-        { duration: "5m", target: 2 },
+        { duration: "2m", target: 2 },
+        { duration: "3m", target: 10 },
+        { duration: "2m", target: 3 },
         { duration: "1m", target: 1 },
       ],
       gracefulRampDown: "0s",

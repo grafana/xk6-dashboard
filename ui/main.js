@@ -1,93 +1,99 @@
-window.addEventListener("DOMContentLoaded", onInit);
+import uPlot from "https://cdn.jsdelivr.net/npm/uplot@1.6.12/dist/uPlot.esm.min.js";
+import { SampleSource } from "./index.js";
 
-class SampleSource {
-  constructor(location = "http://127.0.0.1:5665/events/sample", maxSampleNum = 1000) {
-    this.time = [];
-    this.sample = {};
-    this.maxSampleNum = maxSampleNum;
-    this.eventSource = new EventSource(location);
-    this.eventSource.onmessage = (event) => this.update(JSON.parse(event.data));
-  }
-
-  update(data) {
-    const now = Math.floor(Date.now() / 1000);
-
-    for (const key of Object.keys(data)) {
-      if (!this.sample[key]) {
-        this.sample[key] = new Array(this.time.length);
-      }
-      this.sample[key].push(data[key]);
-    }
-
-    this.time.push(now);
-
-    if (this.time.length > this.maxSampleNum) {
-      this.time.shift();
-      for (const key of Object.keys(this.sample)) {
-        this.sample[key].shift();
-      }
-    }
-
-    window.dispatchEvent(new CustomEvent("sample", { detail: this }));
-  }
-}
-
-function onInit() {
-  M.AutoInit();
+window.addEventListener("DOMContentLoaded", () => {
   const endpoint = new URLSearchParams(window.location.search).get("endpoint") || "http://127.0.0.1:5665/";
+  const src = new SampleSource(`${endpoint}events/sample`);
 
-  const sampleSource = new SampleSource(`${endpoint}events/sample`);
-  window.addEventListener("sample", vus);
-  window.addEventListener("sample", durations);
-}
+  src.addEventListener("sample", vus);
+  src.addEventListener("sample", duration);
+  src.addEventListener("sample", rate);
+});
 
-const chart = {};
+function rate({ target }) {
+  const self = rate;
 
-function durations({ detail: { time, sample } }) {
-  const vars = ["http_req_duration_90", "http_req_duration_current"];
-  if (!sample[vars[0]] || !sample[vars[1]]) {
+  const data = target.view("http_reqs");
+
+  if (!data) {
     return;
   }
-  const data = [time, sample[vars[0]], sample[vars[1]]];
-  if (chart.durations) {
-    chart.durations.setData(data);
+
+  const rps = [undefined];
+  data.series[1].label = "http_reqs_rate";
+  for (let i = 1; i < data.http_reqs.length; i++) {
+    if (typeof data.http_reqs[i] == "undefined" || typeof data.http_reqs[i - 1] == "undefined") {
+      continue;
+    }
+    rps[i] = Math.abs(data.http_reqs[i] - data.http_reqs[i - 1]) / (data.time[i] - data.time[i - 1]);
+  }
+  data[1] = rps;
+
+  if (self.chart) {
+    self.chart.setData(data);
     return;
   }
 
   let opts = {
-    title: "Request Durations",
-    id: "duration",
-    width: window.innerWidth - 40,
-    height: 320,
-    series: [
-      {},
-      { label: vars[0], stroke: "green", width: 1, fill: "rgba(0, 255, 0, 0.1)" },
-      { label: vars[1], stroke: "red", width: 1, fill: "rgba(255, 0, 0, 0.1)" },
-    ],
+    title: "Request Rate (1/s)",
+    class: "card",
+    id: self.name,
+    width: window.innerWidth - 20,
+    height: 240,
+    series: data.series,
   };
 
-  chart.durations = new uPlot(opts, data, document.querySelector("#durations"));
+  self.chart = new uPlot(opts, data, document.querySelector("#charts"));
 }
 
-function vus({ detail: { time, sample } }) {
-  const vars = ["vus", "vus_max"];
-  const data = [time, sample[vars[0]], sample[vars[1]]];
-  if (chart.vus) {
-    chart.vus.setData(data);
+function duration({ target }) {
+  const self = duration;
+
+  const data = target.view("http_req_duration_90", "http_req_duration_current");
+
+  if (!data) {
+    return;
+  }
+
+  if (self.chart) {
+    self.chart.setData(data);
+    return;
+  }
+
+  let opts = {
+    title: "Request Duration (ms)",
+    class: "card",
+    id: self.name,
+    width: window.innerWidth - 20,
+    height: 240,
+    series: data.series,
+  };
+
+  self.chart = new uPlot(opts, data, document.querySelector("#charts"));
+}
+
+function vus({ target }) {
+  const self = vus;
+
+  const data = target.view("vus");
+
+  if (!data) {
+    return;
+  }
+
+  if (self.chart) {
+    self.chart.setData(data);
     return;
   }
 
   let opts = {
     title: "Virtual Users",
-    id: "vus",
-    width: window.innerWidth - 40,
-    height: 320,
-    series: [
-      {},
-      { label: vars[0], stroke: "blue", width: 1, fill: "rgba(0, 0, 255, 0.1)" },
-      { label: vars[1], show: false, stroke: "green", width: 1 },
-    ],
+    class: "card",
+    id: self.name,
+    width: window.innerWidth - 20,
+    height: 240,
+    series: data.series,
   };
 
-  chart.vus = new uPlot(opts, data, document.querySelector("#vus"));
+  self.chart = new uPlot(opts, data, document.querySelector("#charts"));
 }
