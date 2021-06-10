@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
-    <script src="main.js" type="module"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
   </head>
   <body onload="M.AutoInit();">
     <div class="navbar-fixed">
@@ -20,5 +19,36 @@
         <div id="charts" class="col s12"></div>
       </div>
     </section>
+    <script type="module">
+      import { SampleSource, SimpleChart } from "./index.js";
+
+      addEventListener("DOMContentLoaded", () => {
+        const endpoint = new URLSearchParams(window.location.search).get("endpoint") || "http://127.0.0.1:5665/";
+        const src = new SampleSource(`${endpoint}events/sample`);
+        new SimpleChart(src, { title: "Virtual Users" }, "vus");
+        new SimpleChart(src, { title: "Request Duration (ms)" }, "http_req_duration_90", "http_req_duration_current");
+        new SimpleChart(src, { title: "Request Rate (1/s)" }, "http_reqs_rate");
+      });
+    </script>
+    <style>
+      /* css */
+      nav .brand-logo {
+        font-size: 20px;
+        line-height: 40px;
+      }
+
+      nav {
+        background: #7b65fa;
+        height: 40px;
+      }
+
+      body {
+        background: #f0f0f0;
+      }
+
+      .navbar-fixed {
+        height: 45px;
+      }
+    </style>
   </body>
 </html>
