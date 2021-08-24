@@ -18,7 +18,7 @@ Using **xk6-dashboard** output extension you can access metrics from k6 process 
 
 ![screenshot](screenshot.png)
 
-Built for [k6](https://go.k6.io/k6) using [xk6](https://github.com/k6io/xk6).
+Built for [k6](https://go.k6.io/k6) using [xk6](https://github.com/grafana/xk6).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO U PDATE -->
@@ -47,7 +47,7 @@ Then:
 
 1. Download `xk6`:
   ```bash
-  $ go install github.com/k6io/xk6/cmd/xk6@latest
+  $ go install go.k6.io/xk6/cmd/xk6@latest
   ```
 
 2. Build the binary:
