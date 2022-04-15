@@ -2,7 +2,7 @@
 
 A k6 extension that enables creating web based metrics dashboard for k6.
 
-Using **xk6-dashboard** output extension you can access metrics from k6 process via [Server-sent events (sse)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom k6 metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in event stream.
+Using **xk6-dashboard** output extension you can access metrics from k6 process via [Server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom k6 metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in event stream.
 
 ## Features
 
@@ -87,16 +87,16 @@ k6 run --out 'dashboard=param1=value1&param2=value2&param3=value3'
 
 > Note apostrophe (`'`) characters around the `--out` parameter! You should use it for escape `&` characters from shell (or use backslash before `&` characters).
 
-The following paremeters are recognized:
+The following parameters are recognized:
 
 parameter | description
 ----------|------------
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
-port      | TCP port for HTTP endoint (default: 5665)
+port      | TCP port for HTTP endpoint (default: 5665)
 ui        | URL of web based UI (default: https://xk6-dashboard.netlify.app/)
-period    | Event emiting frequency in seconds (default: 10)
+period    | Event emitting frequency in seconds (default: 10)
 
-*You can ommit the `https://` part from the begining of the `ui` parameter since it is the default.*
+*You can omit the `https://` part from the beginning of the `ui` parameter since it is the default.*
 
 ## UI
 
@@ -108,7 +108,7 @@ When you open the dashboard (default at http://127.0.0.1:5665) then it will redi
 https://xk6-dashboard.netlify.app/?endpoint=http%3A%2F%2F127.0.0.1%3A5665%2F
 ```
 
-You can create your own dashboard UI and pass it's URL in `ui` parameter. The source code for default UI can be found in [ui](ui) directory. It is a simple static web page, can be hosted at any web hosting provider.
+You can create your own dashboard UI and pass its URL in `ui` parameter. The source code for default UI can be found in [ui](ui) directory. It is a simple static web page, can be hosted at any web hosting provider.
 
 > The default UI currently in very early state, will be improved soon. Since UI is not bundled into extension, you do not need to recompile k6 binary to get new UI version.
 
