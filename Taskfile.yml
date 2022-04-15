@@ -23,7 +23,7 @@
 version: "3"
 
 env:
-  K6_VERSION: v0.32.0
+  K6_VERSION: v0.37.0
 
 silent: true
 
