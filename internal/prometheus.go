@@ -29,7 +29,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
-	"go.k6.io/k6/stats"
+	"go.k6.io/k6/metrics"
 )
 
 type PrometheusAdapter struct {
@@ -50,7 +50,7 @@ func NewPrometheusAdapter(registry *prometheus.Registry, logger logrus.FieldLogg
 	}
 }
 
-func (a *PrometheusAdapter) AddMetricSamples(samples []stats.SampleContainer) {
+func (a *PrometheusAdapter) AddMetricSamples(samples []metrics.SampleContainer) {
 	for i := range samples {
 		all := samples[i].GetSamples()
 		for j := range all {
@@ -63,17 +63,17 @@ func (a *PrometheusAdapter) Handler() http.Handler {
 	return promhttp.HandlerFor(a.registry, promhttp.HandlerOpts{}) // nolint:exhaustivestruct
 }
 
-func (a *PrometheusAdapter) handleSample(sample *stats.Sample) {
-	var handler func(*stats.Sample)
+func (a *PrometheusAdapter) handleSample(sample *metrics.Sample) {
+	var handler func(*metrics.Sample)
 
 	switch sample.Metric.Type {
-	case stats.Counter:
+	case metrics.Counter:
 		handler = a.handleCounter
-	case stats.Gauge:
+	case metrics.Gauge:
 		handler = a.handleGauge
-	case stats.Rate:
+	case metrics.Rate:
 		handler = a.handleRate
-	case stats.Trend:
+	case metrics.Trend:
 		handler = a.handleTrend
 	default:
 		a.logger.Warnf("Unknown metric type: %v", sample.Metric.Type)
@@ -84,25 +84,25 @@ func (a *PrometheusAdapter) handleSample(sample *stats.Sample) {
 	handler(sample)
 }
 
-func (a *PrometheusAdapter) handleCounter(sample *stats.Sample) {
+func (a *PrometheusAdapter) handleCounter(sample *metrics.Sample) {
 	if counter := a.getCounter(sample.Metric.Name, "k6 counter"); counter != nil {
 		counter.Add(sample.Value)
 	}
 }
 
-func (a *PrometheusAdapter) handleGauge(sample *stats.Sample) {
+func (a *PrometheusAdapter) handleGauge(sample *metrics.Sample) {
 	if gauge := a.getGauge(sample.Metric.Name, "k6 gauge"); gauge != nil {
 		gauge.Set(sample.Value)
 	}
 }
 
-func (a *PrometheusAdapter) handleRate(sample *stats.Sample) {
+func (a *PrometheusAdapter) handleRate(sample *metrics.Sample) {
 	if histogram := a.getHistogram(sample.Metric.Name, "k6 rate", []float64{0}); histogram != nil {
 		histogram.Observe(sample.Value)
 	}
 }
 
-func (a *PrometheusAdapter) handleTrend(sample *stats.Sample) {
+func (a *PrometheusAdapter) handleTrend(sample *metrics.Sample) {
 	if summary := a.getSummary(sample.Metric.Name, "k6 trend"); summary != nil {
 		summary.Observe(sample.Value)
 	}
