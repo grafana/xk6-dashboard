@@ -24,15 +24,17 @@ Built for [k6](https://go.k6.io/k6) using [xk6](https://github.com/grafana/xk6).
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO U PDATE -->
 **Table of Contents**
 
-- [Build](#build)
-- [Usage](#usage)
-  - [With defaults](#with-defaults)
-  - [Parameters](#parameters)
-- [UI](#ui)
-- [Endpoints](#endpoints)
-  - [Events](#events)
-  - [Metrics](#metrics)
-  - [Prometheus](#prometheus)
+- [xk6-dashboard](#xk6-dashboard)
+  - [Features](#features)
+  - [Build](#build)
+  - [Usage](#usage)
+    - [With defaults](#with-defaults)
+    - [Parameters](#parameters)
+  - [UI](#ui)
+  - [Endpoints](#endpoints)
+    - [Events](#events)
+    - [Metrics](#metrics)
+    - [Prometheus](#prometheus)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -55,8 +57,6 @@ Then:
   $ xk6 build --with github.com/szkiba/xk6-dashboard@latest
   ```
 
-> You should use at least `v0.31.0` version because xk6-dashboard extension registers itself as output extension. This feature introduced in the `v0.31.0` version of k6.
-
 ## Usage
 
 ### With defaults
@@ -74,7 +74,7 @@ $ ./k6 run --out dashboard script.js
 
   execution: local
      script: script.js
-     output: dashboard (:5665)
+     output: dashboard (:5665) http://localhost:5665
 ```
 
 ### Parameters
@@ -93,14 +93,14 @@ parameter | description
 ----------|------------
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
 port      | TCP port for HTTP endpoint (default: 5665)
-ui        | URL of web based UI (default: https://xk6-dashboard.netlify.app/)
+ui        | URL of web based UI (default: embedded UI, sample: https://xk6-dashboard.netlify.app/)
 period    | Event emitting frequency in seconds (default: 10)
-
-*You can omit the `https://` part from the beginning of the `ui` parameter since it is the default.*
 
 ## UI
 
-The default UI is https://xk6-dashboard.netlify.app/ which can be overwritten with `ui` parameter. You can specify any URL accessible from your browser, even URL accessible only from your internal network.
+The default UI is an embedded UI, which can be overwritten with `ui` parameter. You can specify any URL accessible from your browser, even URL accessible only from your internal network. Example UI can be found at https://xk6-dashboard.netlify.app/ (source code in [ui](ui) directory).
+
+You can use UI from local filesystem if you pass directory name as `ui` parameter (instead of http/https URL). In this case embedded web server will used to serve pages (under `/ui` path, default at http://127.0.0.1:5665/ui).
 
 When you open the dashboard (default at http://127.0.0.1:5665) then it will redirect to URL specified in `ui` parameter. The actual dashboard URL will be passed to UI as `endpoint` query parameter. For example with default UI, your browser will be redirected to:
 
@@ -108,9 +108,9 @@ When you open the dashboard (default at http://127.0.0.1:5665) then it will redi
 https://xk6-dashboard.netlify.app/?endpoint=http%3A%2F%2F127.0.0.1%3A5665%2F
 ```
 
-You can create your own dashboard UI and pass its URL in `ui` parameter. The source code for default UI can be found in [ui](ui) directory. It is a simple static web page, can be hosted at any web hosting provider.
+You can create your own dashboard UI and pass its URL in `ui` parameter. The source code for default UI can be found in [assets/ui](assets/ui) directory. It is a simple static web page, can be hosted at any web hosting provider.
 
-> The default UI currently in very early state, will be improved soon. Since UI is not bundled into extension, you do not need to recompile k6 binary to get new UI version.
+> The default UI currently in very early state, will be improved soon.
 
 ## Endpoints
 

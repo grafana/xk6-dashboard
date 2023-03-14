@@ -23,13 +23,13 @@
 package dashboard
 
 import (
-	"bytes"
-	_ "embed" // nolint
+	"embed"
 	"fmt"
-	"html/template"
+	"io/fs"
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/gorilla/schema"
@@ -48,9 +48,13 @@ const (
 	pathEvents     = "/events/sample"
 	pathMetrics    = "/api/metrics"
 	pathPrometheus = "/api/prometheus"
+	dirUI          = "assets/ui"
+	pathUI         = "/ui/"
+	defaultHost    = ""
 	defaultPort    = 5665
 	defaultPeriod  = 10
-	defaultUI      = "https://xk6-dashboard.netlify.app/"
+	defaultUI      = ""
+	paramEndpoint  = "endpoint"
 )
 
 type options struct {
@@ -60,6 +64,14 @@ type options struct {
 	UI     string
 }
 
+func (o *options) isDefaultUI() bool {
+	return o.UI == defaultUI
+}
+
+func (o *options) isLocalUI() bool {
+	return !strings.HasPrefix(o.UI, "http://") && !strings.HasPrefix(o.UI, "https://")
+}
+
 type Output struct {
 	*internal.PrometheusAdapter
 	*internal.EventExporter
@@ -67,47 +79,49 @@ type Output struct {
 	flusher *output.PeriodicFlusher
 	addr    string
 	arg     string
+	url     string
 	logger  logrus.FieldLogger
 }
 
-func New(params output.Params) (output.Output, error) {
+func New(params output.Params) (output.Output, error) { //nolint:ireturn
 	registry := prometheus.NewRegistry()
-	o := &Output{
+	instance := &Output{
 		PrometheusAdapter: internal.NewPrometheusAdapter(registry, params.Logger, "", ""),
 		EventExporter:     internal.NewEvenExporter(registry, pathEvents, params.Logger),
 		arg:               params.ConfigArgument,
 		logger:            params.Logger,
 		flusher:           nil,
 		addr:              "",
+		url:               "",
 	}
 
-	return o, nil
+	return instance, nil
 }
 
 func (o *Output) Description() string {
-	return fmt.Sprintf("dashboard (%s)", o.addr)
+	return fmt.Sprintf("dashboard (%s) %s", o.addr, o.url)
 }
 
-func getopts(qs string) (*options, error) {
+func getopts(query string) (*options, error) {
 	opts := &options{
 		Port:   defaultPort,
-		Host:   "",
+		Host:   defaultHost,
 		Period: defaultPeriod,
 		UI:     defaultUI,
 	}
 
-	if qs == "" {
+	if query == "" {
 		return opts, nil
 	}
 
-	v, err := url.ParseQuery(qs)
+	value, err := url.ParseQuery(query)
 	if err != nil {
 		return nil, err
 	}
 
 	decoder := schema.NewDecoder()
 
-	if err = decoder.Decode(opts, v); err != nil {
+	if err = decoder.Decode(opts, value); err != nil {
 		return nil, err
 	}
 
@@ -115,43 +129,18 @@ func getopts(qs string) (*options, error) {
 }
 
 func (o *Output) handler(opts *options) (http.Handler, error) {
-	tmpl, err := template.New("index.html").Parse(index)
-	if err != nil {
-		return nil, err
-	}
-
 	mux := http.NewServeMux()
 	mux.Handle(pathEvents, o.EventExporter.Handler())
 	mux.HandleFunc(pathMetrics, o.EventExporter.MetricsHandlerFunc())
 	mux.Handle(pathPrometheus, o.PrometheusAdapter.Handler())
 
-	u, err := url.Parse(opts.UI)
+	handler, err := uiHandler(opts)
 	if err != nil {
 		return nil, err
 	}
 
-	if u.Scheme == "" {
-		u.Scheme = "https"
-	}
-
-	var buff bytes.Buffer
-
-	err = tmpl.Execute(&buff, map[string]string{"ui": u.String()})
-	if err != nil {
-		return nil, err
-	}
-
-	page := buff.Bytes()
-
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/" {
-			http.NotFound(w, r)
-
-			return
-		}
-
-		w.Write(page) // nolint:errcheck
-	})
+	mux.Handle(pathUI, handler)
+	mux.HandleFunc("/", rootHandler(opts))
 
 	return mux, nil
 }
@@ -163,6 +152,13 @@ func (o *Output) Start() error {
 	}
 
 	o.addr = fmt.Sprintf("%s:%d", opts.Host, opts.Port)
+
+	host := opts.Host
+	if host == "" {
+		host = "localhost"
+	}
+
+	o.url = fmt.Sprintf("http://%s:%d", host, opts.Port) // nolint:nosprintfhostport
 
 	listener, err := net.Listen("tcp", o.addr)
 	if err != nil {
@@ -194,5 +190,73 @@ func (o *Output) Stop() error {
 	return nil
 }
 
-//go:embed index.html
-var index string
+//go:embed assets/ui
+var ui embed.FS
+
+func defaultUIHandler() (http.Handler, error) {
+	uiFS, err := fs.Sub(ui, dirUI)
+	if err != nil {
+		return nil, err
+	}
+
+	return http.StripPrefix(pathUI, http.FileServer(http.FS(uiFS))), nil
+}
+
+func fileServer(dir string) (http.Handler, error) {
+	return http.FileServer(http.Dir(dir)), nil
+}
+
+func uiHandler(opts *options) (http.Handler, error) {
+	if opts.isDefaultUI() {
+		return defaultUIHandler()
+	}
+
+	if opts.isLocalUI() {
+		return fileServer(opts.UI)
+	}
+
+	uiURL, err := url.Parse(opts.UI)
+	if err != nil {
+		return nil, err
+	}
+
+	if uiURL.Scheme == "" {
+		return http.FileServer(http.Dir(opts.UI)), nil
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+		location, err := url.Parse(opts.UI)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+
+			return
+		}
+
+		values := location.Query()
+
+		scheme := "http"
+		if r.TLS != nil {
+			scheme = "https"
+		}
+
+		path := strings.TrimSuffix(r.URL.Path, pathUI)
+
+		values.Add(paramEndpoint, fmt.Sprintf("%s://%s%s/", scheme, r.Host, path))
+
+		location.RawQuery = values.Encode()
+
+		http.Redirect(w, r, location.String(), http.StatusTemporaryRedirect)
+	}), nil
+}
+
+func rootHandler(opts *options) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+
+			return
+		}
+
+		http.Redirect(w, r, pathUI, http.StatusTemporaryRedirect)
+	}
+}
