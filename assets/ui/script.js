@@ -1,7 +1,7 @@
 import uPlot from "./uPlot.esm.min.js";
 
 addEventListener("DOMContentLoaded", () => {
-  const endpoint = new URLSearchParams(window.location.search).get("endpoint") || "http://127.0.0.1:5665/";
+  const endpoint = new URLSearchParams(window.location.search).get("endpoint") || "/";
   const src = new SampleSource(`${endpoint}events/sample`);
   new SimpleChart(src, { title: "Virtual Users" }, "vus");
   new SimpleChart(
