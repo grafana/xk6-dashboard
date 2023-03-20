@@ -7,7 +7,6 @@ Using **xk6-dashboard** output extension you can access metrics from k6 process 
 ## Features
 
 - customizable web based UI
-- UI is updatable without recompiling k6 binary
 - customizable event frequency
 - metrics description endpoint
 - SSE event stream endpoint
@@ -74,7 +73,7 @@ $ ./k6 run --out dashboard script.js
 
   execution: local
      script: script.js
-     output: dashboard (:5665) http://localhost:5665
+     output: dashboard (:5665) http://127.0.0.1:5665
 ```
 
 ### Parameters
@@ -93,24 +92,15 @@ parameter | description
 ----------|------------
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
 port      | TCP port for HTTP endpoint (default: 5665)
-ui        | URL of web based UI (default: embedded UI, sample: https://xk6-dashboard.netlify.app/)
 period    | Event emitting frequency in seconds (default: 10)
 
 ## UI
 
-The default UI is an embedded UI, which can be overwritten with `ui` parameter. You can specify any URL accessible from your browser, even URL accessible only from your internal network. Example UI can be found at https://xk6-dashboard.netlify.app/ (source code in [ui](ui) directory).
+The default UI is in [assets/ui](assets/ui) folder. It is embedded to k6 binary at build time. The UI is served under the `/ui` relative path. When you open the dashboard (default at http://127.0.0.1:5665) it will redirect to this path (default to http://127.0.0.1:5665/ui/).
 
-You can use UI from local filesystem if you pass directory name as `ui` parameter (instead of http/https URL). In this case embedded web server will used to serve pages (under `/ui` path, default at http://127.0.0.1:5665/ui).
+You can replace the default UI with xk6-dashboard addon, see [xk6-dashboard-ui-tmpl](https://github.com/szkiba/xk6-dashboard-ui-tmpl). Technically addon is a dummy xk6 extension without calling any xk6 registration function. The main purpose of addon is to embed UI assets and mount it to go net/http DefaultServeMux under the `/ui/` pattern. It will overwrite the default xk6-dashboard UI. You can find example and detailed instructions in [xk6-dashboard-ui-tmpl](https://github.com/szkiba/xk6-dashboard-ui-tmpl) GitHub template repository.
 
-When you open the dashboard (default at http://127.0.0.1:5665) then it will redirect to URL specified in `ui` parameter. The actual dashboard URL will be passed to UI as `endpoint` query parameter. For example with default UI, your browser will be redirected to:
-
-```plain
-https://xk6-dashboard.netlify.app/?endpoint=http%3A%2F%2F127.0.0.1%3A5665%2F
-```
-
-You can create your own dashboard UI and pass its URL in `ui` parameter. The source code for default UI can be found in [assets/ui](assets/ui) directory. It is a simple static web page, can be hosted at any web hosting provider.
-
-> The default UI currently in very early state, will be improved soon.
+You can use your favorite JavaScript/CSS framework to create UI, it is just a set of static assets for xk6-dashboard. You can create your custom UI without a line of golang code.
 
 ## Endpoints
 
