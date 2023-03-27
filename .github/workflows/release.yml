@@ -53,7 +53,6 @@ jobs:
         uses: szkiba/xk6bundler@v0
         with:
           with: github.com/szkiba/xk6-dashboard=/github/workspace
-          name: ${{ github.event.repository.name }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
