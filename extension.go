@@ -30,21 +30,21 @@ import (
 	"go.k6.io/k6/output"
 )
 
-const dirUI = "assets/ui"
+const distDir = "assets/ui/dist"
 
-//go:embed assets/ui
-var ui embed.FS
+//go:embed assets/ui/dist
+var distFS embed.FS
 
 // Register the extensions on module initialization.
 func init() {
 	output.RegisterExtension("dashboard", New)
 }
 
-func New(params output.Params) (output.Output, error) {
-	uiFS, err := fs.Sub(ui, dirUI)
+func New(params output.Params) (output.Output, error) { //nolint:ireturn
+	uiFS, err := fs.Sub(distFS, distDir)
 	if err != nil {
 		return nil, err
 	}
 
-	return internal.New(params, uiFS)
+	return internal.NewDashboard(params, uiFS)
 }

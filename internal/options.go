@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2021 Iván Szkiba
+// Copyright (c) 2023 Iván Szkiba
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,47 +23,70 @@
 package internal
 
 import (
-	"encoding/json"
-	"net/http"
+	"net"
+	"net/url"
+	"reflect"
+	"strconv"
+	"time"
 
-	"github.com/alexandrevicenzi/go-sse"
-	"github.com/sirupsen/logrus"
+	"github.com/gorilla/schema"
 )
 
-type EventSource struct {
-	*sse.Server
-	logger  logrus.FieldLogger
-	channel string
+const (
+	defaultHost   = ""
+	defaultPort   = 5665
+	defaultPeriod = time.Second * 10
+)
+
+type Options struct {
+	Port   int
+	Host   string
+	Period time.Duration
 }
 
-func NewEventSource(channel string, logger logrus.FieldLogger) *EventSource {
-	esrc := &EventSource{
-		channel: channel,
-		logger:  logger,
-		Server: sse.NewServer(&sse.Options{
-			Headers: map[string]string{
-				"Access-Control-Allow-Origin": "*",
-			},
-			RetryInterval:   0,
-			ChannelNameFunc: func(r *http.Request) string { return channel },
-			Logger:          nil,
-		}),
+func ParseOptions(query string) (*Options, error) {
+	opts := &Options{
+		Port:   defaultPort,
+		Host:   defaultHost,
+		Period: defaultPeriod,
 	}
 
-	return esrc
-}
-
-func (esrc *EventSource) SendEvent(name string, data interface{}) {
-	if !esrc.HasChannel(esrc.channel) {
-		return
+	if query == "" {
+		return opts, nil
 	}
 
-	buff, err := json.Marshal(data)
+	value, err := url.ParseQuery(query)
 	if err != nil {
-		esrc.logger.Error(err)
-
-		return
+		return nil, err
 	}
 
-	esrc.SendMessage(esrc.channel, sse.NewMessage("", string(buff), name))
+	decoder := schema.NewDecoder()
+
+	decoder.RegisterConverter(time.Second, func(s string) reflect.Value {
+		v, err := time.ParseDuration(s)
+		if err != nil {
+			return reflect.ValueOf(err)
+		}
+
+		return reflect.ValueOf(v)
+	})
+
+	if err = decoder.Decode(opts, value); err != nil {
+		return nil, err
+	}
+
+	return opts, nil
+}
+
+func (opts *Options) Addr() string {
+	return net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
+}
+
+func (opts *Options) URL() string {
+	host := opts.Host
+	if host == "" {
+		host = "127.0.0.1"
+	}
+
+	return "http://" + net.JoinHostPort(host, strconv.Itoa(opts.Port))
 }

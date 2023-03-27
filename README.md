@@ -1,41 +1,22 @@
-# xk6-dashboard
+# xk6-dashboard <!-- omit in toc -->
 
-A k6 extension that enables creating web based metrics dashboard for k6.
+A [k6 extension](https://k6.io/docs/extensions/) that enables creating web based metrics dashboard for [k6](https://k6.io).
 
-Using **xk6-dashboard** output extension you can access metrics from k6 process via [Server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom k6 metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in event stream.
+Using **xk6-dashboard** output extension you can access metrics from [k6](https://k6.io) process via [Server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom [k6](https://k6.io) metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in event stream.
 
-## Features
+**Screenshots**
 
-- customizable web based UI
-- customizable event frequency
-- metrics description endpoint
-- SSE event stream endpoint
-- Prometheus HTTP exporter endpoint
-- reasonable defaults
+![k6 dashboard snapshot](screenshots/../screenshot/k6-dashboard-snapshot.png)
 
-**Example screenshot**
+![k6 dashboard cumulative](screenshots/../screenshot/k6-dashboard-cumulative.png)
 
-![screenshot](screenshot.png)
 
-Built for [k6](https://go.k6.io/k6) using [xk6](https://github.com/grafana/xk6).
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO U PDATE -->
 **Table of Contents**
 
-- [xk6-dashboard](#xk6-dashboard)
-  - [Features](#features)
-  - [Build](#build)
-  - [Usage](#usage)
-    - [With defaults](#with-defaults)
-    - [Parameters](#parameters)
-  - [UI](#ui)
-  - [Endpoints](#endpoints)
-    - [Events](#events)
-    - [Metrics](#metrics)
-    - [Prometheus](#prometheus)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+- [Build](#build)
+- [Usage](#usage)
+- [Parameters](#parameters)
+- [Events](#events)
 
 ## Build
 
@@ -58,8 +39,6 @@ Then:
 
 ## Usage
 
-### With defaults
-
 Without parameters the dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ```plain
@@ -76,7 +55,7 @@ $ ./k6 run --out dashboard script.js
      output: dashboard (:5665) http://127.0.0.1:5665
 ```
 
-### Parameters
+## Parameters
 
 The output extension accept parameters in a standard query string format:
 
@@ -91,174 +70,26 @@ The following parameters are recognized:
 parameter | description
 ----------|------------
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
-port      | TCP port for HTTP endpoint (default: 5665)
-period    | Event emitting frequency in seconds (default: 10)
+port      | TCP port for HTTP endpoint (default: `5665`), example: `8080`
+period    | Event emitting frequency (default: `10s`), example: `1m`
 
-## UI
+## Events
 
-The default UI is in [assets/ui](assets/ui) folder. It is embedded to k6 binary at build time. The UI is served under the `/ui` relative path. When you open the dashboard (default at http://127.0.0.1:5665) it will redirect to this path (default to http://127.0.0.1:5665/ui/).
+The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE event source endpoint. Using this event source you can create your own dashboard UI.
 
-You can replace the default UI with xk6-dashboard addon, see [xk6-dashboard-ui-tmpl](https://github.com/szkiba/xk6-dashboard-ui-tmpl). Technically addon is a dummy xk6 extension without calling any xk6 registration function. The main purpose of addon is to embed UI assets and mount it to go net/http DefaultServeMux under the `/ui/` pattern. It will overwrite the default xk6-dashboard UI. You can find example and detailed instructions in [xk6-dashboard-ui-tmpl](https://github.com/szkiba/xk6-dashboard-ui-tmpl) GitHub template repository.
+Events will be emitted periodically, based on `period` parameter (default: `10s`). The event's `data` is a JSON object, with metric names as property names and metric values as property values. The format is similar to [List Metrics](https://k6.io/docs/misc/k6-rest-api/#list-metrics) response format from [k6 REST API](https://k6.io/docs/misc/k6-rest-api/).
 
-You can use your favorite JavaScript/CSS framework to create UI, it is just a set of static assets for xk6-dashboard. You can create your custom UI without a line of golang code.
+Two kind of events emitted:
+  - `snapshot` contains metric values from last period
+  - `cumulative` contains cumulative metric values from the test start
 
-## Endpoints
-
-### Events
-
-The `/events/sample` endpoint is a standard SSE event source endpoint. Events will be emitted periodically. The event's `data` is a JSON object, with metric names as property names and metric values as property values.
+**Example events**
 
 ```plain
-data: {"data_received":1121204,"data_sent":7524,"http_req_blocked":178.923243,"http_req_blocked_50":0.003447,"http_req_blocked_90":0.019837,"http_req_blocked_95":118.012118,"http_req_blocked_current":0.003012,"http_req_connecting":124.836208,"http_req_connecting_95":117.970892,"http_req_connecting_current":0,"http_req_duration":130.294312,"http_req_duration_50":119.659944,"http_req_duration_90":122.807487,"http_req_duration_95":123.13075,"http_req_duration_current":119.954027,"http_req_receiving":1.771721,"http_req_receiving_50":0.806023,"http_req_receiving_90":0.881438,"http_req_receiving_95":0.896281,"http_req_receiving_current":0.839794,"http_req_sending":0.107586,"http_req_sending_50":0.013284,"http_req_sending_90":0.051893,"http_req_sending_95":0.073421,"http_req_sending_current":0.007599,"http_req_tls_handshaking_current":0,"http_req_waiting":129.402686,"http_req_waiting_50":118.842085,"http_req_waiting_90":121.965269,"http_req_waiting_95":122.309601,"http_req_waiting_current":119.106634,"http_reqs":109,"iteration_duration":3310.509552,"iteration_duration_50":3120.80346,"iteration_duration_90":3229.442573,"iteration_duration_95":3241.943796,"iteration_duration_current":3120.28348,"iterations":99,"vus":10,"vus_max":10}
+event: snapshot
+data: {"checks":{"type":"rate","contains":"default","tainted":null,"sample":{"rate":0}},"data_received":{"type":"counter","contains":"data","tainted":null,"sample":{"count":11839,"rate":5919.5}},"data_sent":{"type":"counter","contains":"data","tainted":null,"sample":{"count":202,"rate":101}},"http_req_blocked":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.0037155,"max":0.00485,"med":0.0037155,"min":0.002581,"p(90)":0.0046231,"p(95)":0.00473655}},"http_req_connecting":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0,"max":0,"med":0,"min":0,"p(90)":0,"p(95)":0}},"http_req_duration":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":120.917558,"max":120.928988,"med":120.917558,"min":120.906128,"p(90)":120.926702,"p(95)":120.927845}},"http_req_failed":{"type":"rate","contains":"default","tainted":null,"sample":{"rate":0}},"http_req_receiving":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.0709745,"max":0.088966,"med":0.0709745,"min":0.052983,"p(90)":0.0853677,"p(95)":0.08716685}},"http_req_sending":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.022489500000000003,"max":0.033272,"med":0.022489500000000003,"min":0.011707,"p(90)":0.031115500000000004,"p(95)":0.03219375}},"http_req_tls_handshaking":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0,"max":0,"med":0,"min":0,"p(90)":0,"p(95)":0}},"http_req_waiting":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":120.824094,"max":120.841438,"med":120.824094,"min":120.80675,"p(90)":120.8379692,"p(95)":120.83970359999999}},"http_reqs":{"type":"counter","contains":"default","tainted":null,"sample":{"count":2,"rate":1}},"iteration_duration":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":3244.614784,"max":3244.614784,"med":3244.614784,"min":3244.614784,"p(90)":3244.614784,"p(95)":3244.614784}},"iterations":{"type":"counter","contains":"default","tainted":null,"sample":{"count":1,"rate":0.5}},"time":{"type":"gauge","contains":"time","tainted":null,"sample":{"value":1679907081015}},"vus":{"type":"gauge","contains":"default","tainted":null,"sample":{"value":1}},"vus_max":{"type":"gauge","contains":"default","tainted":null,"sample":{"value":2}}}
+
+event: cumulative
+data: {"checks":{"type":"rate","contains":"default","tainted":null,"sample":{"rate":0}},"data_received":{"type":"counter","contains":"data","tainted":null,"sample":{"count":46837,"rate":1115.1362807429666}},"data_sent":{"type":"counter","contains":"data","tainted":null,"sample":{"count":1653,"rate":39.35607045857172}},"http_req_blocked":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":88.12648020000002,"max":456.345376,"med":0.0056419999999999994,"min":0.00219,"p(90)":262.8713841999999,"p(95)":359.60838009999975}},"http_req_connecting":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":37.2988213,"max":131.097342,"med":0,"min":0,"p(90)":122.40998579999999,"p(95)":126.75366389999999}},"http_req_duration":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":123.92543040000001,"max":133.508481,"med":121.77833150000001,"min":120.412089,"p(90)":132.29845799999998,"p(95)":132.9034695}},"http_req_failed":{"type":"rate","contains":"default","tainted":null,"sample":{"rate":0.2}},"http_req_receiving":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.10157959999999999,"max":0.337678,"med":0.0826445,"min":0.052983,"p(90)":0.11383719999999992,"p(95)":0.22575759999999973}},"http_req_sending":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.035149900000000005,"max":0.096238,"med":0.0272325,"min":0.011707,"p(90)":0.06422679999999999,"p(95)":0.08023239999999997}},"http_req_tls_handshaking":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":38.9789687,"max":268.92473,"med":0,"min":0,"p(90)":135.67093429999994,"p(95)":202.29783214999986}},"http_req_waiting":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":123.78870090000001,"max":133.411013,"med":121.5094465,"min":120.326814,"p(90)":132.15912649999999,"p(95)":132.78506975}},"http_reqs":{"type":"counter","contains":"default","tainted":null,"sample":{"count":10,"rate":0.23808875050557607}},"iteration_duration":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":3626.924762,"max":4258.763721,"med":3377.395781,"min":3244.614784,"p(90)":4082.4901330000002,"p(95)":4170.626927}},"iterations":{"type":"counter","contains":"default","tainted":null,"sample":{"count":3,"rate":0.07142662515167282}},"time":{"type":"gauge","contains":"time","tainted":null,"sample":{"value":1679907081015}},"vus":{"type":"gauge","contains":"default","tainted":null,"sample":{"value":1}},"vus_max":{"type":"gauge","contains":"default","tainted":null,"sample":{"value":2}}}
 ```
 
-### Metrics
-
-The `/api/metrics` returns the metrics descriptions in JSON format.
-
-```json
-{
-  "data_received": { "type": "counter", "help": "The amount of received data" },
-  "data_sent": { "type": "counter", "help": "The amount of data sent" },
-  "http_req_blocked": { "type": "summary", "help": "Time spent blocked  before initiating the request" },
-  "http_req_blocked_current": { "type": "gauge", "help": "Time spent blocked  before initiating the request (current)" },
-  "http_req_connecting": { "type": "summary", "help": "Time spent establishing TCP connection" },
-  "http_req_connecting_current": { "type": "gauge", "help": "Time spent establishing TCP connection (current)" },
-  "http_req_duration": { "type": "summary", "help": "Total time for the request" },
-  "http_req_duration_current": { "type": "gauge", "help": "Total time for the request (current)" },
-  "http_req_failed": { "type": "histogram", "help": "The rate of failed requests" },
-  "http_req_receiving": { "type": "summary", "help": "Time spent receiving response data" },
-  "http_req_receiving_current": { "type": "gauge", "help": "Time spent receiving response data (current)" },
-  "http_req_sending": { "type": "summary", "help": "Time spent sending data" },
-  "http_req_sending_current": { "type": "gauge", "help": "Time spent sending data (current)" },
-  "http_req_tls_handshaking": { "type": "summary", "help": "Time spent handshaking TLS session" },
-  "http_req_tls_handshaking_current": { "type": "gauge", "help": "Time spent handshaking TLS session (current)" },
-  "http_req_waiting": { "type": "summary", "help": "Time spent waiting for response" },
-  "http_req_waiting_current": { "type": "gauge", "help": "Time spent waiting for response (current)" },
-  "http_reqs": { "type": "counter", "help": "How many HTTP requests has k6 generated, in total" },
-  "iteration_duration": { "type": "summary", "help": "The time it took to complete one full iteration" },
-  "iteration_duration_current": { "type": "gauge", "help": "The time it took to complete one full iteration (current)" },
-  "iterations": { "type": "counter", "help": "The aggregate number of times the VUs in the test have executed" },
-  "vus": { "type": "gauge", "help": "Current number of active virtual users" },
-  "vus_max": { "type": "gauge", "help": "Max possible number of virtual users" }
-}
-```
-
-### Prometheus
-
-The `/api/prometheus` endpoint is a standard Prometheus HTTP exporter endpoint.
-
-```plain
-# HELP data_received The amount of received data
-# TYPE data_received counter
-data_received 1.00803e+06
-# HELP data_sent The amount of data sent
-# TYPE data_sent counter
-data_sent 6764
-# HELP http_req_blocked Time spent blocked  before initiating the request
-# TYPE http_req_blocked summary
-http_req_blocked{quantile="0.5"} 0.003389
-http_req_blocked{quantile="0.9"} 137.227212
-http_req_blocked{quantile="0.95"} 154.179003
-http_req_blocked{quantile="1"} 199.453901
-http_req_blocked_sum 1560.8951499999996
-http_req_blocked_count 99
-# HELP http_req_blocked_current Time spent blocked  before initiating the request (current)
-# TYPE http_req_blocked_current gauge
-http_req_blocked_current 0.002103
-# HELP http_req_connecting Time spent establishing TCP connection
-# TYPE http_req_connecting summary
-http_req_connecting{quantile="0.5"} 0
-http_req_connecting{quantile="0.9"} 137.187094
-http_req_connecting{quantile="0.95"} 152.076758
-http_req_connecting{quantile="1"} 159.766749
-http_req_connecting_sum 1510.590024
-http_req_connecting_count 99
-# HELP http_req_connecting_current Time spent establishing TCP connection (current)
-# TYPE http_req_connecting_current gauge
-http_req_connecting_current 0
-# HELP http_req_duration Total time for the request
-# TYPE http_req_duration summary
-http_req_duration{quantile="0.5"} 147.955703
-http_req_duration{quantile="0.9"} 164.45893
-http_req_duration{quantile="0.95"} 165.382749
-http_req_duration{quantile="1"} 174.141232
-http_req_duration_sum 14891.903182000002
-http_req_duration_count 99
-# HELP http_req_duration_current Total time for the request (current)
-# TYPE http_req_duration_current gauge
-http_req_duration_current 146.537304
-# HELP http_req_failed The rate of failed requests
-# TYPE http_req_failed histogram
-http_req_failed_bucket{le="0"} 99
-http_req_failed_bucket{le="+Inf"} 99
-http_req_failed_sum 0
-http_req_failed_count 99
-# HELP http_req_receiving Time spent receiving response data
-# TYPE http_req_receiving summary
-http_req_receiving{quantile="0.5"} 0.79247
-http_req_receiving{quantile="0.9"} 0.849454
-http_req_receiving{quantile="0.95"} 0.858977
-http_req_receiving{quantile="1"} 0.883411
-http_req_receiving_sum 78.37099299999998
-http_req_receiving_count 99
-# HELP http_req_receiving_current Time spent receiving response data (current)
-# TYPE http_req_receiving_current gauge
-http_req_receiving_current 0.834642
-# HELP http_req_sending Time spent sending data
-# TYPE http_req_sending summary
-http_req_sending{quantile="0.5"} 0.013691
-http_req_sending{quantile="0.9"} 0.042305
-http_req_sending{quantile="0.95"} 0.058907
-http_req_sending{quantile="1"} 0.090475
-http_req_sending_sum 1.8473540000000006
-http_req_sending_count 99
-# HELP http_req_sending_current Time spent sending data (current)
-# TYPE http_req_sending_current gauge
-http_req_sending_current 0.008169
-# HELP http_req_tls_handshaking Time spent handshaking TLS session
-# TYPE http_req_tls_handshaking summary
-http_req_tls_handshaking{quantile="0.5"} 0
-http_req_tls_handshaking{quantile="0.9"} 0
-http_req_tls_handshaking{quantile="0.95"} 0
-http_req_tls_handshaking{quantile="1"} 0
-http_req_tls_handshaking_sum 0
-http_req_tls_handshaking_count 99
-# HELP http_req_tls_handshaking_current Time spent handshaking TLS session (current)
-# TYPE http_req_tls_handshaking_current gauge
-http_req_tls_handshaking_current 0
-# HELP http_req_waiting Time spent waiting for response
-# TYPE http_req_waiting summary
-http_req_waiting{quantile="0.5"} 147.199375
-http_req_waiting{quantile="0.9"} 163.664925
-http_req_waiting{quantile="0.95"} 164.613257
-http_req_waiting{quantile="1"} 173.261477
-http_req_waiting_sum 14811.684835000007
-http_req_waiting_count 99
-# HELP http_req_waiting_current Time spent waiting for response (current)
-# TYPE http_req_waiting_current gauge
-http_req_waiting_current 145.694493
-# HELP http_reqs How many HTTP requests has k6 generated, in total
-# TYPE http_reqs counter
-http_reqs 99
-# HELP iteration_duration The time it took to complete one full iteration
-# TYPE iteration_duration summary
-iteration_duration{quantile="0.5"} 3150.669295
-iteration_duration{quantile="0.9"} 3291.149615
-iteration_duration{quantile="0.95"} 3315.50851
-iteration_duration{quantile="1"} 3341.782155
-iteration_duration_sum 282016.458391
-iteration_duration_count 89
-# HELP iteration_duration_current The time it took to complete one full iteration (current)
-# TYPE iteration_duration_current gauge
-iteration_duration_current 3166.87982
-# HELP iterations The aggregate number of times the VUs in the test have executed
-# TYPE iterations counter
-iterations 89
-# HELP vus Current number of active virtual users
-# TYPE vus gauge
-vus 10
-# HELP vus_max Max possible number of virtual users
-# TYPE vus_max gauge
-vus_max 10
-```

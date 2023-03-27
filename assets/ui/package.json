@@ -1,0 +1,32 @@
+{
+  "name": "xk6-dashboard",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@cutting/use-get-parent-size": "^1.26.2",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@mui/material": "^5.11.13",
+    "numeral": "^2.0.6",
+    "pretty-bytes": "^6.1.0",
+    "pretty-ms": "^8.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hooks-sse": "^2.1.0",
+    "round-to": "^6.0.0",
+    "uplot": "^1.6.24",
+    "uplot-react": "^1.1.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vitejs/plugin-react-swc": "^3.0.0",
+    "vite": "^4.1.0"
+  }
+}

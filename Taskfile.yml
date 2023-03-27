@@ -37,10 +37,35 @@ tasks:
     cmds:
       - rm -f k6
 
-  build:
+  license:
+    cmds:
+      - addlicense -ignore '**/node_modules/**' -ignore '.task/**' -ignore '**/dist/**' -f LICENSE  . internal assets
+
+  lint:
+    desc: Run linter
     sources:
       - "**/*.go"
-      - index.html
+      - "*.go"
+    cmds:
+      - golangci-lint run
+
+  ui:
+    sources:
+      - "src/**"
+      - "public/**"
+      - "index.html"
+      - "vite.config.js"
+      - "package.json"
+      - "yarn.lock"
+    dir: assets/ui
+    cmds:
+      - yarn build
+
+  build:
+    deps: [lint, ui]
+    sources:
+      - "**/*.go"
+      - "*.go"
     generates:
       - k6
     cmds:
@@ -49,9 +74,10 @@ tasks:
   test:
     deps: [build]
     cmds:
-      - ./k6 run --out dashboard --no-usage-report script.js
+      - ./k6 run --out dashboard='period=10s' --no-usage-report script.js
 
-  ui:
-    deps: [build]
+  exif:
+    dir: screenshot
     cmds:
-      - ./k6 run --out dashboard='period=5&ui=http://localhost:8080' --no-usage-report script.js
+      - exiftool -all= -overwrite_original -ext png .
+      - exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" .
