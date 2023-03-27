@@ -25,150 +25,106 @@ package internal
 import (
 	"fmt"
 	"io/fs"
-	"net"
-	"net/http"
-	"net/url"
-	"path"
-	"strings"
-	"time"
 
-	"github.com/gorilla/schema"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
 
-const (
-	pathEvents     = "/events/sample"
-	pathMetrics    = "/api/metrics"
-	pathPrometheus = "/api/prometheus"
-	pathUI         = "/ui/"
-	defaultHost    = ""
-	defaultPort    = 5665
-	defaultPeriod  = 10
-	defaultUI      = ""
-)
-
-type options struct {
-	Port   int
-	Host   string
-	Period int
-}
-
-type Output struct {
-	*PrometheusAdapter
-	*EventExporter
-	*http.ServeMux
+type Dashboard struct {
+	buffer *output.SampleBuffer
 
 	flusher *output.PeriodicFlusher
+	logger  logrus.FieldLogger
 
-	params output.Params
+	uiFS   fs.FS
+	server *WebServer
+
+	options *Options
+
+	cumulative *Meter
 
 	description string
 }
 
-func New(params output.Params, uiFS fs.FS) (output.Output, error) { //nolint:ireturn
-	registry := prometheus.NewRegistry()
-	instance := &Output{
-		PrometheusAdapter: NewPrometheusAdapter(registry, params.Logger, "", ""),
-		EventExporter:     NewEvenExporter(registry, pathEvents, params.Logger),
-		ServeMux:          http.DefaultServeMux,
-		params:            params,
-		flusher:           nil,
-	}
+var _ output.Output = (*Dashboard)(nil)
 
-	instance.Handle(pathEvents, instance.EventExporter.Handler())
-	instance.HandleFunc(pathMetrics, instance.EventExporter.MetricsHandlerFunc())
-	instance.Handle(pathPrometheus, instance.PrometheusAdapter.Handler())
-	instance.HandleFunc("/", rootHandler(pathUI, uiFS))
-
-	return instance, nil
-}
-
-func (o *Output) Description() string {
-	return o.description
-}
-
-func getopts(query string) (*options, error) {
-	opts := &options{
-		Port:   defaultPort,
-		Host:   defaultHost,
-		Period: defaultPeriod,
-	}
-
-	if query == "" {
-		return opts, nil
-	}
-
-	value, err := url.ParseQuery(query)
+func NewDashboard(params output.Params, uiFS fs.FS) (*Dashboard, error) { //nolint:ireturn
+	opts, err := ParseOptions(params.ConfigArgument)
 	if err != nil {
 		return nil, err
 	}
 
-	decoder := schema.NewDecoder()
-
-	if err = decoder.Decode(opts, value); err != nil {
-		return nil, err
+	dash := &Dashboard{
+		uiFS:        uiFS,
+		logger:      params.Logger,
+		options:     opts,
+		description: fmt.Sprintf("%s (%s) %s", params.OutputType, opts.Addr(), opts.URL()),
+		buffer:      nil,
+		server:      nil,
+		flusher:     nil,
+		cumulative:  nil,
 	}
 
-	return opts, nil
+	return dash, nil
 }
 
-func (o *Output) Start() error {
-	opts, err := getopts(o.params.ConfigArgument)
-	if err != nil {
-		return err
-	}
+func (dash *Dashboard) Description() string {
+	return dash.description
+}
 
-	addr := fmt.Sprintf("%s:%d", opts.Host, opts.Port)
+func (dash *Dashboard) Start() error {
+	var err error
 
-	host := opts.Host
-	if host == "" {
-		host = "127.0.0.1"
-	}
+	dash.cumulative = NewMeter(0)
 
-	o.description = fmt.Sprintf("dashboard (%s) http://%s:%d", addr, host, opts.Port) // nolint:nosprintfhostport
-
-	listener, err := net.Listen("tcp", addr)
+	dash.server, err = NewWebServer(dash.uiFS, dash.logger)
 	if err != nil {
 		return err
 	}
 
 	go func() {
-		if err := http.Serve(listener, o); err != nil {
-			o.params.Logger.Error(err)
+		if err := dash.server.ListenAndServe(dash.options.Addr()); err != nil {
+			dash.logger.Error(err)
 		}
 	}()
 
-	o.flusher, err = output.NewPeriodicFlusher(time.Duration(opts.Period)*time.Second, o.EventExporter.Flush)
+	dash.buffer = new(output.SampleBuffer)
+
+	flusher, err := output.NewPeriodicFlusher(dash.options.Period, dash.flush)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (o *Output) Stop() error {
-	o.flusher.Stop()
+	dash.flusher = flusher
 
 	return nil
 }
 
-func rootHandler(uiPath string, uiFS fs.FS) http.HandlerFunc {
-	uiHandler := http.StripPrefix(uiPath, http.FileServer(http.FS(uiFS)))
+func (dash *Dashboard) Stop() error {
+	dash.flusher.Stop()
 
-	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-		if r.URL.Path == "/" || r.URL.Path == "/favicon.ico" {
-			http.Redirect(w, r, path.Join(uiPath, r.URL.Path), http.StatusTemporaryRedirect)
+	return nil
+}
 
-			return
-		}
+func (dash *Dashboard) AddMetricSamples(samples []metrics.SampleContainer) {
+	dash.buffer.AddMetricSamples(samples)
+}
 
-		if strings.HasPrefix(r.URL.Path, uiPath) {
-			uiHandler.ServeHTTP(w, r)
+func (dash *Dashboard) flush() {
+	samples := dash.buffer.GetBufferedSamples()
 
-			return
-		}
+	dash.updateAndSend(samples, NewMeter(dash.options.Period), snapshotEvent)
+	dash.updateAndSend(samples, dash.cumulative, cumulativeEvent)
+}
 
-		http.NotFound(w, r)
+func (dash *Dashboard) updateAndSend(containers []metrics.SampleContainer, meter *Meter, event string) {
+	data, err := meter.Update(containers)
+	if err != nil {
+		dash.logger.WithError(err).Warn("Error while processing samples")
+
+		return
 	}
+
+	dash.server.SendEvent(event, data)
 }

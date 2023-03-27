@@ -22,29 +22,34 @@
  * SOFTWARE.
  */
 
-import http from "k6/http";
-import { sleep } from "k6";
+import { Panel } from './Panel';
 
-export let options = {
-  discardResponseBodies: true,
-  scenarios: {
-    contacts: {
-      executor: "ramping-vus",
-      startVUs: 1,
-      stages: [
-        { duration: "1m", target: 2 },
-        { duration: "3m", target: 10 },
-        { duration: "2m", target: 2 },
-        { duration: "3m", target: 10 },
-        { duration: "2m", target: 3 },
-        { duration: "1m", target: 1 },
-      ],
-      gracefulRampDown: "0s",
-    },
-  },
-};
-
-export default function () {
-  http.get("http://test.k6.io");
-  sleep(3);
+function VusPanel() {
+  return (<Panel title="Virtual Users" metric="vus_gauge_value" format="counter" />)
 }
+
+function RequestPanel() {
+  return (<Panel title="Request Rate" metric="http_reqs_counter_rate" format="rps" />)
+}
+
+function DurationPanel() {
+  return (<Panel title="Request Duration" metric="http_req_duration_trend_avg" format="duration" />)
+}
+
+function IterationPanel() {
+  return (<Panel title="Iterations" metric="iterations_counter_count" format="counter" />)
+}
+
+function DataSentPanel() {
+  return (<Panel title="Sent Rate" metric="data_sent_counter_rate" format="bps" />)
+}
+
+function DataReceivedPanel() {
+  return (<Panel title="Received Rate" metric="data_received_counter_rate" format="bps" />)
+}
+
+function FailurePanel() {
+  return (<Panel title="Failure Rate" metric="http_req_failed_rate_rate" format="rps" failure />)
+}
+
+export { IterationPanel, VusPanel, RequestPanel, DurationPanel, DataReceivedPanel, DataSentPanel, FailurePanel }

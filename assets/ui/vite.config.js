@@ -22,29 +22,11 @@
  * SOFTWARE.
  */
 
-import http from "k6/http";
-import { sleep } from "k6";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
 
-export let options = {
-  discardResponseBodies: true,
-  scenarios: {
-    contacts: {
-      executor: "ramping-vus",
-      startVUs: 1,
-      stages: [
-        { duration: "1m", target: 2 },
-        { duration: "3m", target: 10 },
-        { duration: "2m", target: 2 },
-        { duration: "3m", target: 10 },
-        { duration: "2m", target: 3 },
-        { duration: "1m", target: 1 },
-      ],
-      gracefulRampDown: "0s",
-    },
-  },
-};
-
-export default function () {
-  http.get("http://test.k6.io");
-  sleep(3);
-}
+export default defineConfig({
+  plugins: [react()],
+  build: { chunkSizeWarningLimit: 1024 },
+  base: ''
+})

@@ -22,29 +22,33 @@
  * SOFTWARE.
  */
 
-import http from "k6/http";
-import { sleep } from "k6";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import { SSEProvider } from 'react-hooks-sse';
+import { ThemeProvider, createTheme } from '@mui/material'
+import App from './App'
+import './index.css'
 
-export let options = {
-  discardResponseBodies: true,
-  scenarios: {
-    contacts: {
-      executor: "ramping-vus",
-      startVUs: 1,
-      stages: [
-        { duration: "1m", target: 2 },
-        { duration: "3m", target: 10 },
-        { duration: "2m", target: 2 },
-        { duration: "3m", target: 10 },
-        { duration: "2m", target: 3 },
-        { duration: "1m", target: 1 },
-      ],
-      gracefulRampDown: "0s",
+const base = new URLSearchParams(window.location.search).get("endpoint") || "http://localhost:5665/";
+
+const theme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#7b65fa',
     },
-  },
-};
+    secondary: {
+      main: '#A47D4F',
+    },
+  }
+});
 
-export default function () {
-  http.get("http://test.k6.io");
-  sleep(3);
-}
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <SSEProvider endpoint={base + "events"}>
+      <ThemeProvider theme={theme}>
+        <App />
+      </ThemeProvider>
+    </SSEProvider>
+  </React.StrictMode>,
+)

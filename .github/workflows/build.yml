@@ -20,35 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-linters:
-  presets:
-    - bugs
-    - style
-    - unused
-    - complexity
-    - format
-    - performance
-  enable:
-    - exportloopref
-  disable:
-    - nolintlint
-    - gochecknoglobals
-    - gochecknoinits
-    - lll
-    - maligned
-    - interfacer
-    - scopelint
-    - wrapcheck
-# deprecated
-    - deadcode
-    - nosnakecase
-    - exhaustivestruct
-    - ifshort
-    - structcheck
-    - varcheck
-    - golint
-# generics
-    - rowserrcheck
-    - sqlclosecheck
-    - wastedassign
+name: Build
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/*
 
+jobs:
+  build:
+    name: Bundle xk6 extensions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Lint Go Code
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.50.1
+  
+      - name: Build
+        id: build
+        uses: szkiba/xk6bundler@v0
+        with:
+          with: github.com/szkiba/xk6-dashboard=${{ github.workspace }}
