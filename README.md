@@ -13,10 +13,16 @@ Using **xk6-dashboard** output extension you can access metrics from [k6](https:
 
 **Table of Contents**
 
+- [Download](#download)
 - [Build](#build)
 - [Usage](#usage)
 - [Parameters](#parameters)
+- [Docker](#docker)
 - [Events](#events)
+
+## Download
+
+You can download pre-built k6 binaries from [Releases](https://github.com/szkiba/xk6-dashboard/releases/) page. Check [Packages](https://github.com/szkiba/xk6-dashboard/pkgs/container/xk6-dashboard) page for pre-built k6 Docker images.
 
 ## Build
 
@@ -72,6 +78,24 @@ parameter | description
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
 port      | TCP port for HTTP endpoint (default: `5665`), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
+
+## Docker
+
+You can also use pre-built k6 image within a Docker container. To do that, you'll need to execute something more-or-less like the following:
+
+**Linux**
+
+```plain
+docker run -v $(pwd):/scripts -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=dashboard /scripts/script.js
+```
+
+**Windows**
+
+```plain
+docker run -v %cd%:/scripts -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=dashboard /scripts/script.js
+```
+
+The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ## Events
 
