@@ -2,7 +2,7 @@
 
 A [k6 extension](https://k6.io/docs/extensions/) that enables creating web based metrics dashboard for [k6](https://k6.io).
 
-Using **xk6-dashboard** output extension you can access metrics from [k6](https://k6.io) process via [Server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom [k6](https://k6.io) metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in event stream.
+By using **xk6-dashboard** output extension you can access metrics from [k6](https://k6.io) process via [Server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom [k6](https://k6.io) metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in the event stream.
 
 **Screenshots**
 
@@ -45,7 +45,7 @@ Then:
 
 ## Usage
 
-Without parameters the dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
+Without parameters the dashboard will be accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ```plain
 $ ./k6 run --out dashboard script.js
@@ -63,7 +63,7 @@ $ ./k6 run --out dashboard script.js
 
 ## Parameters
 
-The output extension accept parameters in a standard query string format:
+The output extension accepts parameters in a standard query string format:
 
 ```
 k6 run --out 'dashboard=param1=value1&param2=value2&param3=value3'
@@ -81,7 +81,7 @@ period    | Event emitting frequency (default: `10s`), example: `1m`
 
 ## Docker
 
-You can also use pre-built k6 image within a Docker container. To do that, you'll need to execute something more-or-less like the following:
+You can also use pre-built k6 image within a Docker container. In order to do that, you will need to execute something like the following:
 
 **Linux**
 
@@ -103,9 +103,9 @@ The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE
 
 Events will be emitted periodically, based on `period` parameter (default: `10s`). The event's `data` is a JSON object, with metric names as property names and metric values as property values. The format is similar to [List Metrics](https://k6.io/docs/misc/k6-rest-api/#list-metrics) response format from [k6 REST API](https://k6.io/docs/misc/k6-rest-api/).
 
-Two kind of events emitted:
+Two kind of events will be emitted:
   - `snapshot` contains metric values from last period
-  - `cumulative` contains cumulative metric values from the test start
+  - `cumulative` contains cumulative metric values from the test starting point
 
 **Example events**
 
