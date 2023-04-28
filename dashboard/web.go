@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package internal
+package dashboard
 
 import (
 	"io/fs"
