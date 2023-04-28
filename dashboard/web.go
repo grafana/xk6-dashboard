@@ -23,27 +23,27 @@ const (
 	cumulativeEvent = "cumulative"
 )
 
-type WebServer struct {
-	*EventSource
+type webServer struct {
+	*eventSource
 	*http.ServeMux
 }
 
-func NewWebServer(uiFS fs.FS, logger logrus.FieldLogger) (*WebServer, error) { //nolint:ireturn
-	srv := &WebServer{
-		EventSource: NewEventSource(eventChannel, logger),
+func newWebServer(uiFS fs.FS, logger logrus.FieldLogger) (*webServer, error) { //nolint:ireturn
+	srv := &webServer{
+		eventSource: newEventSource(eventChannel, logger),
 		ServeMux:    http.NewServeMux(),
 	}
 
 	uiHandler := http.StripPrefix(pathUI, http.FileServer(http.FS(uiFS)))
 
-	srv.Handle(pathEvents, srv.EventSource)
+	srv.Handle(pathEvents, srv.eventSource)
 	srv.Handle(pathUI, uiHandler)
 	srv.HandleFunc("/", rootHandler(pathUI))
 
 	return srv, nil
 }
 
-func (srv *WebServer) ListenAndServe(addr string) error {
+func (srv *webServer) listenAndServe(addr string) error {
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
 		return err

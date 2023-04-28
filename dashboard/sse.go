@@ -12,14 +12,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type EventSource struct {
+type eventSource struct {
 	*sse.Server
 	logger  logrus.FieldLogger
 	channel string
 }
 
-func NewEventSource(channel string, logger logrus.FieldLogger) *EventSource {
-	esrc := &EventSource{
+func newEventSource(channel string, logger logrus.FieldLogger) *eventSource {
+	esrc := &eventSource{
 		channel: channel,
 		logger:  logger,
 		Server: sse.NewServer(&sse.Options{
@@ -35,7 +35,7 @@ func NewEventSource(channel string, logger logrus.FieldLogger) *EventSource {
 	return esrc
 }
 
-func (esrc *EventSource) SendEvent(name string, data interface{}) {
+func (esrc *eventSource) sendEvent(name string, data interface{}) {
 	if !esrc.HasChannel(esrc.channel) {
 		return
 	}

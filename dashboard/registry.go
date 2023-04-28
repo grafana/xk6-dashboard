@@ -11,22 +11,22 @@ import (
 	"go.k6.io/k6/metrics"
 )
 
-// Registry is what can create metrics and make them iterable.
-type Registry struct {
+// registry is what can create metrics and make them iterable.
+type registry struct {
 	*metrics.Registry
 	names []string
 }
 
-// NewRegistry returns a new Registry.
-func NewRegistry() *Registry {
-	return &Registry{
+// newRegistry returns a new registry.
+func newRegistry() *registry {
+	return &registry{
 		Registry: metrics.NewRegistry(),
 		names:    make([]string, 0),
 	}
 }
 
-// GetOrNew returns existing metric or create new metric registered to this Registry.
-func (reg *Registry) GetOrNew(name string, typ metrics.MetricType, valTyp ...metrics.ValueType) (*metrics.Metric, error) {
+// getOrNew returns existing metric or create new metric registered to this registry.
+func (reg *registry) getOrNew(name string, typ metrics.MetricType, valTyp ...metrics.ValueType) (*metrics.Metric, error) {
 	if metric := reg.Registry.Get(name); metric != nil {
 		return metric, nil
 	}
@@ -41,9 +41,9 @@ func (reg *Registry) GetOrNew(name string, typ metrics.MetricType, valTyp ...met
 	return metric, nil
 }
 
-// MustGetOrNew is like GetOrNew, but will panic if there is an error.
-func (reg *Registry) MustGetOrNew(name string, typ metrics.MetricType, valTyp ...metrics.ValueType) *metrics.Metric {
-	metric, err := reg.GetOrNew(name, typ, valTyp...)
+// mustGetOrNew is like getOrNew, but will panic if there is an error.
+func (reg *registry) mustGetOrNew(name string, typ metrics.MetricType, valTyp ...metrics.ValueType) *metrics.Metric {
+	metric, err := reg.getOrNew(name, typ, valTyp...)
 	if err != nil {
 		panic(err)
 	}
@@ -51,8 +51,8 @@ func (reg *Registry) MustGetOrNew(name string, typ metrics.MetricType, valTyp ..
 	return metric
 }
 
-// Format creates k6 REST API v1 compatible output map from all registered metrics.
-func (reg *Registry) Format(dur time.Duration) map[string]v1.Metric {
+// format creates k6 REST API v1 compatible output map from all registered metrics.
+func (reg *registry) format(dur time.Duration) map[string]v1.Metric {
 	out := make(map[string]v1.Metric, len(reg.names))
 
 	for _, name := range reg.names {

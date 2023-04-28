@@ -20,35 +20,36 @@ type Extension struct {
 	logger  logrus.FieldLogger
 
 	uiFS   fs.FS
-	server *WebServer
+	server *webServer
 
-	options *Options
+	options *options
 
-	cumulative *Meter
+	cumulative *meter
 
 	description string
 }
 
 var _ output.Output = (*Extension)(nil)
 
+// New creates Exension instance using the passwd uiFS as source of web UI.
 func New(params output.Params, uiFS fs.FS) (*Extension, error) {
-	opts, err := ParseOptions(params.ConfigArgument)
+	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
 		return nil, err
 	}
 
-	dash := &Extension{
+	ext := &Extension{
 		uiFS:        uiFS,
 		logger:      params.Logger,
 		options:     opts,
-		description: fmt.Sprintf("%s (%s) %s", params.OutputType, opts.Addr(), opts.URL()),
+		description: fmt.Sprintf("%s (%s) %s", params.OutputType, opts.addr(), opts.url()),
 		buffer:      nil,
 		server:      nil,
 		flusher:     nil,
 		cumulative:  nil,
 	}
 
-	return dash, nil
+	return ext, nil
 }
 
 func (ext *Extension) Description() string {
@@ -58,15 +59,15 @@ func (ext *Extension) Description() string {
 func (ext *Extension) Start() error {
 	var err error
 
-	ext.cumulative = NewMeter(0)
+	ext.cumulative = newMeter(0)
 
-	ext.server, err = NewWebServer(ext.uiFS, ext.logger)
+	ext.server, err = newWebServer(ext.uiFS, ext.logger)
 	if err != nil {
 		return err
 	}
 
 	go func() {
-		if err := ext.server.ListenAndServe(ext.options.Addr()); err != nil {
+		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {
 			ext.logger.Error(err)
 		}
 	}()
@@ -96,17 +97,17 @@ func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
 func (ext *Extension) flush() {
 	samples := ext.buffer.GetBufferedSamples()
 
-	ext.updateAndSend(samples, NewMeter(ext.options.Period), snapshotEvent)
+	ext.updateAndSend(samples, newMeter(ext.options.Period), snapshotEvent)
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent)
 }
 
-func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, meter *Meter, event string) {
-	data, err := meter.Update(containers)
+func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *meter, event string) {
+	data, err := m.update(containers)
 	if err != nil {
 		ext.logger.WithError(err).Warn("Error while processing samples")
 
 		return
 	}
 
-	ext.server.SendEvent(event, data)
+	ext.server.sendEvent(event, data)
 }

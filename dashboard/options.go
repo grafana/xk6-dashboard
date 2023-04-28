@@ -20,14 +20,14 @@ const (
 	defaultPeriod = time.Second * 10
 )
 
-type Options struct {
+type options struct {
 	Port   int
 	Host   string
 	Period time.Duration
 }
 
-func ParseOptions(query string) (*Options, error) {
-	opts := &Options{
+func getopts(query string) (*options, error) {
+	opts := &options{
 		Port:   defaultPort,
 		Host:   defaultHost,
 		Period: defaultPeriod,
@@ -60,11 +60,11 @@ func ParseOptions(query string) (*Options, error) {
 	return opts, nil
 }
 
-func (opts *Options) Addr() string {
+func (opts *options) addr() string {
 	return net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
 }
 
-func (opts *Options) URL() string {
+func (opts *options) url() string {
 	host := opts.Host
 	if host == "" {
 		host = "127.0.0.1"

@@ -11,23 +11,23 @@ import (
 	"go.k6.io/k6/metrics"
 )
 
-type Meter struct {
-	registry *Registry
+type meter struct {
+	registry *registry
 
 	clock  *metrics.GaugeSink
 	period time.Duration
 	start  time.Time
 }
 
-func NewMeter(period time.Duration) *Meter {
-	registry := NewRegistry()
-	metric := registry.MustGetOrNew("time", metrics.Gauge, metrics.Time)
+func newMeter(period time.Duration) *meter {
+	registry := newRegistry()
+	metric := registry.mustGetOrNew("time", metrics.Gauge, metrics.Time)
 	clock, _ := metric.Sink.(*metrics.GaugeSink)
 
 	start := time.Now()
 	clock.Value = float64(start.UnixMilli())
 
-	return &Meter{
+	return &meter{
 		registry: registry,
 		start:    start,
 		clock:    clock,
@@ -35,29 +35,29 @@ func NewMeter(period time.Duration) *Meter {
 	}
 }
 
-func (meter *Meter) Update(containers []metrics.SampleContainer) (map[string]v1.Metric, error) {
+func (m *meter) update(containers []metrics.SampleContainer) (map[string]v1.Metric, error) {
 	now := time.Now()
 
-	dur := meter.period
+	dur := m.period
 	if dur == 0 {
-		dur = now.Sub(meter.start)
+		dur = now.Sub(m.start)
 	}
 
-	meter.clock.Value = float64(now.UnixMilli())
+	m.clock.Value = float64(now.UnixMilli())
 
 	for _, container := range containers {
 		for _, sample := range container.GetSamples() {
-			if err := meter.add(sample); err != nil {
+			if err := m.add(sample); err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	return meter.registry.Format(dur), nil
+	return m.registry.format(dur), nil
 }
 
-func (meter *Meter) add(sample metrics.Sample) error {
-	metric, err := meter.registry.GetOrNew(sample.Metric.Name, sample.Metric.Type, sample.Metric.Contains)
+func (m *meter) add(sample metrics.Sample) error {
+	metric, err := m.registry.getOrNew(sample.Metric.Name, sample.Metric.Type, sample.Metric.Contains)
 	if err != nil {
 		return err
 	}
