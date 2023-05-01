@@ -61,6 +61,8 @@ $ ./k6 run --out dashboard script.js
      output: dashboard (:5665) http://127.0.0.1:5665
 ```
 
+> Using `--out dashboard=open` will automatically open a new browser window.
+
 ## Parameters
 
 The output extension accepts parameters in a standard query string format:
@@ -78,6 +80,7 @@ parameter | description
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
 port      | TCP port for HTTP endpoint (default: `5665`), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
+open      | Set to `true` (or empty) for opening browser window automatically
 
 ## Docker
 

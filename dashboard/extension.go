@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/fs"
 
+	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
@@ -78,6 +79,10 @@ func (ext *Extension) Start() error {
 
 	ext.flusher = flusher
 
+	if ext.options.Open {
+		browser.OpenURL(ext.options.url())
+	}
+
 	return nil
 }
 
@@ -107,8 +112,4 @@ func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *met
 	}
 
 	ext.server.sendEvent(event, data)
-}
-
-func (ext *Extension) URL() string {
-	return ext.options.url()
 }

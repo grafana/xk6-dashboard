@@ -24,7 +24,6 @@ func TestNewExtension(t *testing.T) {
 	assert.NotNil(t, ext)
 
 	assert.Equal(t, "dashboard (localhost:1) http://localhost:1", ext.Description())
-	assert.Equal(t, "http://localhost:1", ext.URL())
 
 	params.ConfigArgument = "period=2"
 

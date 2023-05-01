@@ -19,12 +19,14 @@ const (
 	defaultHost   = ""
 	defaultPort   = 5665
 	defaultPeriod = time.Second * 10
+	defaultOpen   = false
 )
 
 type options struct {
 	Port   int
 	Host   string
 	Period time.Duration
+	Open   bool
 }
 
 func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
@@ -32,6 +34,7 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		Port:   defaultPort,
 		Host:   defaultHost,
 		Period: defaultPeriod,
+		Open:   defaultOpen,
 	}
 
 	if query == "" {
@@ -64,6 +67,10 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 
 	if e := decoder.Decode(opts, value); e != nil {
 		err = e
+	}
+
+	if value.Has("open") && len(value.Get("open")) == 0 {
+		opts.Open = true
 	}
 
 	return opts, err

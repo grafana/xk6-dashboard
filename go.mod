@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/alexandrevicenzi/go-sse v1.6.0
 	github.com/gorilla/schema v1.2.0
+	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0
 	go.k6.io/k6 v0.43.1
