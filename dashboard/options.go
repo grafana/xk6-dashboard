@@ -5,6 +5,7 @@
 package dashboard
 
 import (
+	"errors"
 	"net"
 	"net/url"
 	"reflect"
@@ -26,8 +27,8 @@ type options struct {
 	Period time.Duration
 }
 
-func getopts(query string) (*options, error) {
-	opts := &options{
+func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
+	opts = &options{
 		Port:   defaultPort,
 		Host:   defaultHost,
 		Period: defaultPeriod,
@@ -44,6 +45,8 @@ func getopts(query string) (*options, error) {
 
 	decoder := schema.NewDecoder()
 
+	decoder.IgnoreUnknownKeys(true)
+
 	decoder.RegisterConverter(time.Second, func(s string) reflect.Value {
 		v, err := time.ParseDuration(s)
 		if err != nil {
@@ -53,11 +56,17 @@ func getopts(query string) (*options, error) {
 		return reflect.ValueOf(v)
 	})
 
-	if err = decoder.Decode(opts, value); err != nil {
-		return nil, err
+	defer func() {
+		if r := recover(); r != nil {
+			err = errInvalidDuration
+		}
+	}()
+
+	if e := decoder.Decode(opts, value); e != nil {
+		err = e
 	}
 
-	return opts, nil
+	return opts, err
 }
 
 func (opts *options) addr() string {
@@ -72,3 +81,5 @@ func (opts *options) url() string {
 
 	return "http://" + net.JoinHostPort(host, strconv.Itoa(opts.Port))
 }
+
+var errInvalidDuration = errors.New("invalid duration")
