@@ -88,11 +88,11 @@ func License() error {
 		"*.ts",
 		"*/*ts",
 		".github/workflows/*",
-		"assets/ui/*.yml",
-		"assets/ui/*.js",
-		"assets/ui/*.html",
-		"assets/ui/.gitignore",
-		"assets/ui/src/*",
+		"ui/assets/ui/*.yml",
+		"ui/assets/ui/*.js",
+		"ui/assets/ui/*.html",
+		"ui/assets/ui/.gitignore",
+		"ui/assets/ui/src/*",
 	)
 	if err != nil {
 		return err
@@ -107,8 +107,8 @@ func Clean() error {
 	sh.Rm("magefiles/bin")
 	sh.Rm("coverage.txt")
 	sh.Rm("bin")
-	sh.Rm("assets/ui/node_modules")
-	sh.Rm("assets/ui/node_modules")
+	sh.Rm("ui/assets/ui/node_modules")
+	sh.Rm("ui/assets/ui/node_modules")
 	sh.Rm("k6")
 
 	return nil
@@ -131,7 +131,7 @@ func All() error {
 }
 
 func yarn(arg string) shellcmd.Command {
-	return shellcmd.Command("yarn --silent --cwd assets/ui " + arg)
+	return shellcmd.Command("yarn --silent --cwd ui/assets/ui " + arg)
 }
 
 func Prepare() error {
