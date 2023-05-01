@@ -31,7 +31,7 @@ type Extension struct {
 
 var _ output.Output = (*Extension)(nil)
 
-// New creates Exension instance using the passwd uiFS as source of web UI.
+// New creates Extension instance using the passwd uiFS as source of web UI.
 func New(params output.Params, uiFS fs.FS) (*Extension, error) {
 	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
@@ -61,10 +61,7 @@ func (ext *Extension) Start() error {
 
 	ext.cumulative = newMeter(0)
 
-	ext.server, err = newWebServer(ext.uiFS, ext.logger)
-	if err != nil {
-		return err
-	}
+	ext.server = newWebServer(ext.uiFS, ext.logger)
 
 	go func() {
 		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {
@@ -110,4 +107,8 @@ func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *met
 	}
 
 	ext.server.sendEvent(event, data)
+}
+
+func (ext *Extension) URL() string {
+	return ext.options.url()
 }

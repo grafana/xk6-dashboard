@@ -28,7 +28,7 @@ type webServer struct {
 	*http.ServeMux
 }
 
-func newWebServer(uiFS fs.FS, logger logrus.FieldLogger) (*webServer, error) { //nolint:ireturn
+func newWebServer(uiFS fs.FS, logger logrus.FieldLogger) *webServer { //nolint:ireturn
 	srv := &webServer{
 		eventSource: newEventSource(eventChannel, logger),
 		ServeMux:    http.NewServeMux(),
@@ -40,7 +40,7 @@ func newWebServer(uiFS fs.FS, logger logrus.FieldLogger) (*webServer, error) { /
 	srv.Handle(pathUI, uiHandler)
 	srv.HandleFunc("/", rootHandler(pathUI))
 
-	return srv, nil
+	return srv
 }
 
 func (srv *webServer) listenAndServe(addr string) error {
