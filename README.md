@@ -6,9 +6,9 @@ By using **xk6-dashboard** output extension you can access metrics from [k6](htt
 
 **Screenshots**
 
-![k6 dashboard snapshot](screenshots/../screenshot/k6-dashboard-snapshot.png)
+![k6 dashboard snapshot](screenshot/k6-dashboard-snapshot.png)
 
-![k6 dashboard cumulative](screenshots/../screenshot/k6-dashboard-cumulative.png)
+![k6 dashboard cumulative](screenshot/k6-dashboard-cumulative.png)
 
 
 **Table of Contents**
