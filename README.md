@@ -1,3 +1,8 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/szkiba/xk6-dashboard)](https://goreportcard.com/report/github.com/szkiba/xk6-dashboard)
+[![GitHub Actions](https://github.com/szkiba/xk6-dashboard/workflows/Test/badge.svg)](https://github.com/szkiba/xk6-dashboard/actions?query=workflow%3ATest+branch%3Amaster)
+[![codecov](https://codecov.io/gh/szkiba/xk6-dashboard/branch/master/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/szkiba/xk6-dashboard)
+
+
 # xk6-dashboard <!-- omit in toc -->
 
 A [k6 extension](https://k6.io/docs/extensions/) that enables creating web based metrics dashboard for [k6](https://k6.io).
