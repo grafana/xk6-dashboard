@@ -80,7 +80,7 @@ func (ext *Extension) Start() error {
 	ext.flusher = flusher
 
 	if ext.options.Open {
-		browser.OpenURL(ext.options.url())
+		browser.OpenURL(ext.options.url()) // nolint:errcheck
 	}
 
 	return nil
