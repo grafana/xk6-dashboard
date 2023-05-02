@@ -62,7 +62,7 @@ func (srv *webServer) listenAndServe(addr string) error {
 
 func rootHandler(uiPath string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-		if r.URL.Path == "/" || r.URL.Path == "/favicon.ico" {
+		if r.URL.Path == "/" {
 			http.Redirect(w, r, path.Join(uiPath, r.URL.Path)+"?endpoint=/", http.StatusTemporaryRedirect)
 
 			return
