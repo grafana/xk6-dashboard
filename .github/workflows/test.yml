@@ -1,0 +1,50 @@
+# SPDX-FileCopyrightText: 2023 Iván Szkiba
+#
+# SPDX-License-Identifier: MIT
+
+name: Test
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "v*"
+  pull_request:
+jobs:
+  test:
+    strategy:
+      matrix:
+        platform:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+    runs-on: ${{matrix.platform}}
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.20.x
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lint
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        uses: magefile/mage-action@v1
+        with:
+          version: latest
+          args: lint
+
+      - name: Test
+        uses: magefile/mage-action@v1
+        with:
+          version: latest
+          args: test
+
+      - name: Upload Coverage
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        uses: codecov/codecov-action@v2
+
+      - name: Generate Go Report Card
+        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        uses: creekorful/goreportcard-action@v1.0

@@ -1,0 +1,16 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Iván Szkiba
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+.summary-panel .u-title {
+  font-size: 1.5rem;
+  font-weight: 500 !important;
+  white-space: nowrap;
+}
+
+.summary-panel .MuiCardContent-root {
+  padding: 5px;
+  padding-bottom: 5px !important;
+}
