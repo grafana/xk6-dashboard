@@ -2,7 +2,11 @@ package dashboard
 
 import (
 	"embed"
+	"net"
+	"strconv"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -35,9 +39,13 @@ func TestNewExtension(t *testing.T) {
 func TestExtension(t *testing.T) {
 	t.Parallel()
 
+	port := getRandomPort(t)
+	addr := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
+
 	var params output.Params
 
 	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "period=10ms&port=" + strconv.Itoa(port)
 
 	ext, err := New(params, embed.FS{})
 
@@ -46,9 +54,24 @@ func TestExtension(t *testing.T) {
 
 	assert.NoError(t, ext.Start())
 
-	sample := testSample(t, "foo", metrics.Counter, 1)
+	time.Sleep(time.Millisecond)
 
-	ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
+	go func() {
+		sample := testSample(t, "foo", metrics.Counter, 1)
+
+		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
+	}()
+
+	lines := readSSE(t, 5, "http://"+addr+"/events")
+
+	assert.NotNil(t, lines)
+	assert.Equal(t, "event: snapshot", lines[0])
+	assert.Equal(t, "event: cumulative", lines[3])
+
+	dataPrefix := `data: {"foo":{"type":"counter","contains":"default","tainted":null,"sample":{"count":1,"rate":`
+
+	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[4], dataPrefix))
 
 	assert.NoError(t, ext.Stop())
 }

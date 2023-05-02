@@ -47,7 +47,7 @@ func It() error {
 	}
 
 	for _, script := range all {
-		err := xk6run("--out dashboard='period=5s' " + script).Run()
+		err := xk6run("--out dashboard='period=100ms' " + script).Run()
 		if err != nil {
 			return err
 		}
