@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <SSEProvider endpoint={base + "events"}>
       <ThemeProvider theme={theme}>
-        <App />
+        <App {...window.config}/>
       </ThemeProvider>
     </SSEProvider>
   </React.StrictMode>,

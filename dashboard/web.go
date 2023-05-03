@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
+	"os"
 	"path"
 	"time"
 
@@ -28,16 +29,14 @@ type webServer struct {
 	*http.ServeMux
 }
 
-func newWebServer(uiFS fs.FS, logger logrus.FieldLogger) *webServer { //nolint:ireturn
+func newWebServer(uiFS fs.FS, uiConfig string, logger logrus.FieldLogger) *webServer { //nolint:ireturn
 	srv := &webServer{
 		eventSource: newEventSource(eventChannel, logger),
 		ServeMux:    http.NewServeMux(),
 	}
 
-	uiHandler := http.StripPrefix(pathUI, http.FileServer(http.FS(uiFS)))
-
 	srv.Handle(pathEvents, srv.eventSource)
-	srv.Handle(pathUI, uiHandler)
+	srv.HandleFunc(pathUI, uiHandler(pathUI, uiFS, uiConfig, logger))
 	srv.HandleFunc("/", rootHandler(pathUI))
 
 	return srv
@@ -69,5 +68,35 @@ func rootHandler(uiPath string) http.HandlerFunc {
 		}
 
 		http.NotFound(w, r)
+	}
+}
+
+func uiHandler(uiPath string, uiFS fs.FS, uiConfig string, logger logrus.FieldLogger) http.HandlerFunc {
+	handler := http.StripPrefix(uiPath, http.FileServer(http.FS(uiFS)))
+
+	if len(uiConfig) == 0 {
+		return handler.ServeHTTP
+	}
+
+	return func(res http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != uiPath+"config.js" {
+			handler.ServeHTTP(res, req)
+
+			return
+		}
+
+		// try to read on every request to allow dynamic reload
+		content, err := os.ReadFile(uiConfig)
+		if err != nil {
+			logger.WithError(err).Debugf("ignoring ui config file: %s", uiConfig)
+
+			handler.ServeHTTP(res, req)
+
+			return
+		}
+
+		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+		res.WriteHeader(http.StatusOK)
+		res.Write(content) // nolint:errcheck
 	}
 }

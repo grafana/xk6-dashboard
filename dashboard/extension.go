@@ -62,7 +62,7 @@ func (ext *Extension) Start() error {
 
 	ext.cumulative = newMeter(0)
 
-	ext.server = newWebServer(ext.uiFS, ext.logger)
+	ext.server = newWebServer(ext.uiFS, ext.options.Config, ext.logger)
 
 	go func() {
 		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {

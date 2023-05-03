@@ -20,6 +20,7 @@ const (
 	defaultPort   = 5665
 	defaultPeriod = time.Second * 10
 	defaultOpen   = false
+	defaultConfig = ".dashboard.js"
 )
 
 type options struct {
@@ -27,6 +28,7 @@ type options struct {
 	Host   string
 	Period time.Duration
 	Open   bool
+	Config string
 }
 
 func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
@@ -35,6 +37,7 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		Host:   defaultHost,
 		Period: defaultPeriod,
 		Open:   defaultOpen,
+		Config: defaultConfig,
 	}
 
 	if query == "" {

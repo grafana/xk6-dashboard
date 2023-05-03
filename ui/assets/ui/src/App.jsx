@@ -4,37 +4,70 @@
 
 import React from 'react';
 import './App.css'
-import { DurationChart, IterationChart, LoadChart, TransferChart } from './Charts';
-import { VusPanel, IterationPanel, RequestPanel, DurationPanel, DataReceivedPanel, DataSentPanel } from './Panels'
-import { MetricsContext, useSnapshot, useCumulative } from './metrics';
+import { MetricsContext, useEvent } from './metrics';
 import { Grid, AppBar, Typography, Tabs, Tab, Box } from '@mui/material'
 import { PropTypes } from 'prop-types';
 
-function ContentPanel() {
+import { Panel } from './Panel';
+import { Chart } from './Chart';
+
+function iterable(input) {  
+  if (input === null || input === undefined) {
+    return false
+  }
+
+  return typeof input[Symbol.iterator] === 'function'
+}
+
+function panels(conf) {
+  const all = []
+
+  if (!iterable(conf)) {
+    return all
+  }
+
+  for (const panel of conf) {
+    all.push(
+      <Grid key={panel.title} item xs={1}>{Panel(panel)}</Grid>
+    )
+  }
+
+  return all
+}
+
+function charts(conf) {
+  const all = []
+
+  if (!iterable(conf)) {
+    return all
+  }
+
+  for (const chart of conf) {
+    all.push(
+      <Grid key={chart.title} item lg={6} xs={12}>{Chart(chart)}</Grid>
+    )
+  }
+
+  return all
+}
+
+function ContentPanel(props) {
   return (
     <>
       <Box>
         <Grid container spacing={1} marginBottom={1} columns={6}>
-          <Grid item xs={1} ><IterationPanel /></Grid>
-          <Grid item xs={1} ><VusPanel /></Grid>
-          <Grid item xs={1} ><RequestPanel /></Grid>
-          <Grid item xs={1} ><DurationPanel /></Grid>
-          <Grid item xs={1} ><DataReceivedPanel /></Grid>
-          <Grid item xs={1} ><DataSentPanel /></Grid>
+          {panels(props.panels)}
         </Grid>
       </Box>
       <Grid container spacing={1}>
-        <Grid item lg={6} xs={12} ><LoadChart /></Grid>
-        <Grid item lg={6} xs={12}><TransferChart /></Grid>
-        <Grid item lg={6} xs={12}><DurationChart /></Grid>
-        <Grid item lg={6} xs={12}><IterationChart /></Grid>
+        {charts(props.charts)}
       </Grid>
     </>
   )
 }
 
 
-function TabPanel(props) {
+function TabContent(props) {
   const { children, value, index, ...other } = props;
 
   return (
@@ -51,7 +84,7 @@ function TabPanel(props) {
   );
 }
 
-TabPanel.propTypes = {
+TabContent.propTypes = {
   children: PropTypes.node,
   index: PropTypes.any.isRequired,
   value: PropTypes.any.isRequired
@@ -64,7 +97,43 @@ function a11yProps(index) {
   };
 }
 
-function App() {
+function tabContents(conf, value) {
+  const all = []
+
+  if (!iterable(conf)) {
+    return all
+  }
+
+  for (let i = 0; i < conf.length; i++) {
+    all.push(
+      <MetricsContext.Provider key={i} value={useEvent(conf[i].event)}>
+        <TabContent value={value} index={i}>
+          <ContentPanel panels={conf[i].panels} charts={conf[i].charts} />
+        </TabContent>
+      </MetricsContext.Provider>
+    )
+  }
+
+  return all
+}
+
+function tabs(conf) {
+  const all = []
+
+  if (!iterable(conf)) {
+    return all
+  }
+
+  for (let i = 0; i < conf.length; i++) {
+    all.push(
+      <Tab key={i} label={conf[i].title} {...a11yProps(i)} />
+    )
+  }
+
+  return all
+}
+
+function App(props) {
   const [value, setValue] = React.useState(0);
 
   function handleChange(event, newValue) {
@@ -74,24 +143,14 @@ function App() {
   return (
     <div className="App">
       <AppBar position="sticky">
-        <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>k6 dashboard</Typography>
+        <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>{props.title}</Typography>
       </AppBar>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange}>
-          <Tab label="Snapshot" {...a11yProps(0)} />
-          <Tab label="Cumulative" {...a11yProps(1)} />
+          {tabs(props.tabs)}
         </Tabs>
       </Box>
-      <MetricsContext.Provider value={useSnapshot()}>
-        <TabPanel value={value} index={0}>
-          <ContentPanel />
-        </TabPanel>
-      </MetricsContext.Provider>
-      <MetricsContext.Provider value={useCumulative()}>
-        <TabPanel value={value} index={1}>
-          <ContentPanel />
-        </TabPanel>
-      </MetricsContext.Provider>
+      {tabContents(props.tabs, value)}
     </div>
   )
 }

@@ -11,9 +11,20 @@ By using **xk6-dashboard** output extension you can access metrics from [k6](htt
 
 **Screenshots**
 
-![k6 dashboard snapshot](screenshot/k6-dashboard-snapshot.png)
+*Overview*
+![k6 dashboard overview snapshot](screenshot/k6-dashboard-overview-snapshot.png)
 
-![k6 dashboard cumulative](screenshot/k6-dashboard-cumulative.png)
+*Overview Cumulative*
+![k6 dashboard overview cumulative](screenshot/k6-dashboard-overview-cumulative.png)
+
+*Timings*
+![k6 dashboard timings snapshot](screenshot/k6-dashboard-timings-snapshot.png)
+
+*Timings Cumulative*
+![k6 dashboard timings cumulative](screenshot/k6-dashboard-timings-cumulative.png)
+
+*Custom Tab*
+![k6 dashboard custom](screenshot/k6-dashboard-custom.png)
 
 
 **Table of Contents**
@@ -24,6 +35,8 @@ By using **xk6-dashboard** output extension you can access metrics from [k6](htt
 - [Parameters](#parameters)
 - [Docker](#docker)
 - [Events](#events)
+- [Customization](#customization)
+  - [Examples](#examples)
 
 ## Download
 
@@ -86,6 +99,7 @@ host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen
 port      | TCP port for HTTP endpoint (default: `5665`), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
 open      | Set to `true` (or empty) for opening browser window automatically
+config    | UI configuration file location (default: `.dashboard.js`) (see [Customization](#customization))
 
 ## Docker
 
@@ -125,3 +139,85 @@ event: cumulative
 data: {"checks":{"type":"rate","contains":"default","tainted":null,"sample":{"rate":0}},"data_received":{"type":"counter","contains":"data","tainted":null,"sample":{"count":46837,"rate":1115.1362807429666}},"data_sent":{"type":"counter","contains":"data","tainted":null,"sample":{"count":1653,"rate":39.35607045857172}},"http_req_blocked":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":88.12648020000002,"max":456.345376,"med":0.0056419999999999994,"min":0.00219,"p(90)":262.8713841999999,"p(95)":359.60838009999975}},"http_req_connecting":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":37.2988213,"max":131.097342,"med":0,"min":0,"p(90)":122.40998579999999,"p(95)":126.75366389999999}},"http_req_duration":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":123.92543040000001,"max":133.508481,"med":121.77833150000001,"min":120.412089,"p(90)":132.29845799999998,"p(95)":132.9034695}},"http_req_failed":{"type":"rate","contains":"default","tainted":null,"sample":{"rate":0.2}},"http_req_receiving":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.10157959999999999,"max":0.337678,"med":0.0826445,"min":0.052983,"p(90)":0.11383719999999992,"p(95)":0.22575759999999973}},"http_req_sending":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":0.035149900000000005,"max":0.096238,"med":0.0272325,"min":0.011707,"p(90)":0.06422679999999999,"p(95)":0.08023239999999997}},"http_req_tls_handshaking":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":38.9789687,"max":268.92473,"med":0,"min":0,"p(90)":135.67093429999994,"p(95)":202.29783214999986}},"http_req_waiting":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":123.78870090000001,"max":133.411013,"med":121.5094465,"min":120.326814,"p(90)":132.15912649999999,"p(95)":132.78506975}},"http_reqs":{"type":"counter","contains":"default","tainted":null,"sample":{"count":10,"rate":0.23808875050557607}},"iteration_duration":{"type":"trend","contains":"time","tainted":null,"sample":{"avg":3626.924762,"max":4258.763721,"med":3377.395781,"min":3244.614784,"p(90)":4082.4901330000002,"p(95)":4170.626927}},"iterations":{"type":"counter","contains":"default","tainted":null,"sample":{"count":3,"rate":0.07142662515167282}},"time":{"type":"gauge","contains":"time","tainted":null,"sample":{"value":1679907081015}},"vus":{"type":"gauge","contains":"default","tainted":null,"sample":{"value":1}},"vus_max":{"type":"gauge","contains":"default","tainted":null,"sample":{"value":2}}}
 ```
 
+## Customization
+
+The embedded user interface can be customized using a single JavaScript configuration file specified in the `config` parameter (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module that is executed in the browser. The module's default export is a JavaScript configuration object.
+
+Before executing the configuration file, the `window.defaultConfig` object is created with the default configuration. The default configuration is loaded from the [public/boot.js](public/boot.js) file, which can give you ideas for creating your own configuration.
+
+### Examples
+
+**Custom tab**
+![k6 dashboard custom](screenshot/k6-dashboard-custom.png)
+
+In this example, a tab called *Custom* is defined, which contains six panels and two charts. The first two panels are just a reference to the two panels of the built-in *Overview* tab.
+
+```js
+// helper for adding p(99) to existing chart
+function addP99 (chart) {
+  chart.series = {
+    ...chart.series,
+    'http_req_duration_trend_p(99)': { label: 'p(99)' }
+  }
+}
+
+// define request duration panel
+function durationPanel (suffix) {
+  return {
+    id: `http_req_duration_${suffix}`,
+    title: `Request Duration ${suffix}`,
+    metric: `http_req_duration_trend_${suffix}`,
+    format: 'duration'
+  }
+}
+
+// copy vus and http_reqs panel from default config
+const overview = defaultConfig.tab('overview_snapshot')
+
+// define custom panels
+const customPanels = [
+  overview.panel('vus'),
+  overview.panel('http_reqs'),
+  durationPanel('avg'),
+  durationPanel('p(90)'),
+  durationPanel('p(95)'),
+  durationPanel('p(99)')
+]
+
+// copy http_req_duration chart form default config...
+const durationChart = { ...overview.chart('http_req_duration') }
+
+// ... and add p(99)
+addP99(durationChart)
+
+// define custom tab
+const customTab = {
+  id: 'custom',
+  title: 'Custom',
+  event: overview.event,
+  panels: customPanels,
+  charts: [overview.chart('http_reqs'), durationChart]
+}
+
+// add custom tab to configuration
+defaultConfig.tabs.push(customTab)
+
+export default defaultConfig
+```
+
+**p(99)**
+
+In this example, the 99th percentile value is added to the *Request Duration* chart on the built-in *Overview* tabs.
+
+```js
+// helper for adding p(99) to existing chart
+function addP99 (chart) {
+  chart.series['http_req_duration_trend_p(99)'] = { label: 'p(99)' }
+}
+
+// add p(99) to overview panels request duration charts
+addP99(defaultConfig.tab('overview_snapshot').chart('http_req_duration'))
+addP99(defaultConfig.tab('overview_cumulative').chart('http_req_duration'))
+
+export default defaultConfig
+```

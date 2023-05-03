@@ -17,7 +17,7 @@ function Panel(props) {
   const summaries = useContext(MetricsContext)
 
   const series = {}
-  series[props.metric] = { label: "foo" }
+  series[props.metric] = { label: "" }
 
   const model = new MetricsUplot(summaries, series)
   const ref = useRef(null);

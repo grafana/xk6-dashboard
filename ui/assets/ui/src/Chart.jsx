@@ -25,7 +25,7 @@ function Chart(props) {
 
   let options = {
     width: width,
-    height: 250,
+    height: props.height || 250,
     title: props.title,
     cursor: {
       sync: { key: sync.key },
