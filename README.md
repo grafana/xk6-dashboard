@@ -143,7 +143,7 @@ data: {"checks":{"type":"rate","contains":"default","tainted":null,"sample":{"ra
 
 The embedded user interface can be customized using a single JavaScript configuration file specified in the `config` parameter (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module that is executed in the browser. The module's default export is a JavaScript configuration object.
 
-Before executing the configuration file, the `window.defaultConfig` object is created with the default configuration. The default configuration is loaded from the [public/boot.js](public/boot.js) file, which can give you ideas for creating your own configuration.
+Before executing the configuration file, the `window.defaultConfig` object is created with the default configuration. The default configuration is loaded from the [ui/assets/ui/public/boot.js](ui/assets/ui/public/boot.js) file, which can give you ideas for creating your own configuration.
 
 ### Examples
 
