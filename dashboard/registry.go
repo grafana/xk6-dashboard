@@ -61,8 +61,19 @@ func (reg *registry) format(dur time.Duration) map[string]v1.Metric {
 			continue
 		}
 
-		out[name] = v1.NewMetric(metric, dur)
+		v1metric := v1.NewMetric(metric, dur)
+
+		if sink, ok := metric.Sink.(*metrics.TrendSink); ok {
+			v1metric.Sample[pc99Name] = sink.P(pc99)
+		}
+
+		out[name] = v1metric
 	}
 
 	return out
 }
+
+const (
+	pc99     = 0.99
+	pc99Name = "p(99)"
+)

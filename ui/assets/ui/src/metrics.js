@@ -77,15 +77,8 @@ class Metrics {
   }
 }
 
-function useSnapshot () {
-  return useSSE('snapshot', new Metrics(), {
-    parser: JSON.parse,
-    stateReducer: Metrics.reducer
-  })
-}
-
-function useCumulative () {
-  return useSSE('cumulative', new Metrics(), {
+function useEvent (name) {
+  return useSSE(name, new Metrics(), {
     parser: JSON.parse,
     stateReducer: Metrics.reducer
   })
@@ -94,4 +87,4 @@ function useCumulative () {
 const MetricsContext = React.createContext(new Metrics())
 MetricsContext.displayName = 'Metrics'
 
-export { MetricsContext, useSnapshot, useCumulative, propTime }
+export { MetricsContext, useEvent, propTime }
