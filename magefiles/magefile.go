@@ -146,6 +146,8 @@ func Exif() error {
 	return shellcmd.RunAll(
 		`exiftool -all= -overwrite_original -ext png screenshot`,
 		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" screenshot`,
+		`exiftool -all= -overwrite_original -ext png .github`,
+		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" .github`,
 	)
 }
 
