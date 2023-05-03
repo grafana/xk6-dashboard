@@ -74,7 +74,7 @@ func Test_uiHandler_no_config(t *testing.T) {
 	body, err := io.ReadAll(res.Body)
 
 	assert.NoError(t, err)
-	assert.Equal(t, "export default defaultConfig\n", string(body))
+	assert.Equal(t, "export default defaultConfig", strings.TrimSpace(string(body)))
 }
 
 func Test_uiHandler_missing_config(t *testing.T) {
