@@ -4,6 +4,8 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -67,7 +69,7 @@ func Test_uiHandler_no_config(t *testing.T) {
 	res := rec.Result() // nolint:bodyclose
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, "text/javascript; charset=utf-8", res.Header.Get("Content-Type"))
+	assert.Contains(t, res.Header.Get("Content-Type"), "/javascript")
 
 	body, err := io.ReadAll(res.Body)
 
@@ -88,18 +90,18 @@ func Test_uiHandler_missing_config(t *testing.T) {
 	res := rec.Result() // nolint:bodyclose
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, "text/javascript; charset=utf-8", res.Header.Get("Content-Type"))
+	assert.Contains(t, res.Header.Get("Content-Type"), "/javascript")
 
 	body, err := io.ReadAll(res.Body)
 
 	assert.NoError(t, err)
-	assert.Equal(t, "export default defaultConfig\n", string(body))
+	assert.Equal(t, "export default defaultConfig", strings.TrimSpace(string(body)))
 }
 
 func Test_uiHandler(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", ui.GetFS(), "../.dashboard.js", logrus.StandardLogger())
+	handler := uiHandler("/foo/", ui.GetFS(), filepath.Join("..", ".dashboard.js"), logrus.StandardLogger())
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
@@ -109,13 +111,13 @@ func Test_uiHandler(t *testing.T) {
 	res := rec.Result() // nolint:bodyclose
 
 	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, "text/javascript; charset=utf-8", res.Header.Get("Content-Type"))
+	assert.Contains(t, res.Header.Get("Content-Type"), "/javascript")
 
 	body, err := io.ReadAll(res.Body)
 
 	assert.NoError(t, err)
 	assert.NotEmpty(t, body)
-	assert.NotEqual(t, "export default defaultConfig\n", string(body))
+	assert.NotEqual(t, "export default defaultConfig", strings.TrimSpace(string(body)))
 
 	rec = httptest.NewRecorder()
 	req = httptest.NewRequest(http.MethodGet, "/foo/init.js", nil)
