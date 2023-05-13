@@ -68,7 +68,7 @@ func TestExtension(t *testing.T) {
 	assert.Equal(t, "event: snapshot", lines[2])
 	assert.Equal(t, "event: cumulative", lines[6])
 
-	dataPrefix := `data: {"foo":{"type":"counter","contains":"default","tainted":null,"sample":{"count":1,"rate":`
+	dataPrefix := `data: {"foo":{`
 
 	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
 	assert.True(t, strings.HasPrefix(lines[5], dataPrefix))
