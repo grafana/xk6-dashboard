@@ -49,7 +49,7 @@ func (srv *webServer) listenAndServe(addr string) error {
 	}
 
 	go func() {
-		server := &http.Server{Handler: srv, ReadHeaderTimeout: time.Second} //nolint:exhaustruct
+		server := &http.Server{Handler: srv.ServeMux, ReadHeaderTimeout: time.Second} //nolint:exhaustruct
 
 		if err := server.Serve(listener); err != nil {
 			srv.logger.Error(err)

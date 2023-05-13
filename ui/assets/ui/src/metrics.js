@@ -10,11 +10,12 @@ const propTime = 'time'
 const propType = 'type'
 
 class Metrics {
-  constructor ({ capacity = 10000, values = {}, progress = 0 } = {}) {
+  constructor ({ capacity = 10000, values = {}, progress = 0, lastEventId = 0 } = {}) {
     this.capacity = capacity
     this.values = values
     this.length = values[propTime] ? values[propTime].length : 0
     this.progress = progress
+    this.lastEventId = lastEventId
   }
 
   _filterDuplicate (data) {
@@ -69,9 +70,21 @@ class Metrics {
   }
 
   static reducer (state, action) {
-    const newState = new Metrics(state)
+    var newState
+
+    var lastEventId = parseInt(action.event.lastEventId)
+    if (isNaN(lastEventId)) {
+      lastEventId = 0
+    }
+
+    if (state.lastEventId > lastEventId) {
+      newState = new Metrics()
+    } else {
+      newState = new Metrics(state)
+    }
 
     newState.push(action.data)
+    newState.lastEventId = lastEventId
 
     return newState
   }
