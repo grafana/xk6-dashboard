@@ -28,8 +28,8 @@ By using **xk6-dashboard** output extension you can access metrics from [k6](htt
 
 **Report**
 
-<object data="k6-dashboard-report.pdf" type="application/pdf" width="100%" height="500px">
-  <p>Unable to display PDF file. <a href="k6-dashboard-report.pdf">Download</a> instead.</p>
+<object data="https://github.com/szkiba/xk6-dashboard/blob/90816e72affdd08ca4ecd28df4c31e439094f2be/k6-dashboard-report.pdf" type="application/pdf" width="100%" height="500px">
+  <p>Unable to display PDF file. <a href="https://github.com/szkiba/xk6-dashboard/blob/90816e72affdd08ca4ecd28df4c31e439094f2be/k6-dashboard-report.pdf">Download</a> instead.</p>
 </object>
 
 **Table of Contents**
