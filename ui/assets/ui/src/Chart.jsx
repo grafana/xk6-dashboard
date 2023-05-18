@@ -24,7 +24,7 @@ function Chart(props) {
   }
 
   let options = {
-    width: width,
+    width: props.width || width,
     height: props.height || 250,
     title: props.title,
     cursor: {
@@ -35,6 +35,12 @@ function Chart(props) {
 
   if (props.axes) {
     options.axes = props.axes
+  }
+
+  if (props.plain) {
+    options.cursor.show = false
+
+    return <UplotReact options={options} data={model.data} />
   }
 
   return (

@@ -6,5 +6,15 @@
 
 body {
   margin: 0;
-  background-color: #f7f7f7;
+}
+
+@media screen {
+  body {
+    background-color: #f7f7f7;
+  }
+}
+
+.uplot {
+  margin-left: auto;
+  margin-right: auto;
 }

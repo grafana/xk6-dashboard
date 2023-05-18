@@ -1,0 +1,60 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Iván Szkiba
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+@media print {
+  .MuiFab-root {
+    display: none !important;
+  }
+
+  .Report h2 {
+    page-break-before: always;
+  }
+
+  .Report .PageHeader+h2 {
+    page-break-before: avoid !important;
+  }
+
+  .PageHeader {
+    position: fixed;
+    top: 0;
+    right: 0;
+    font-size: medium !important;
+    color: gray;
+  }
+
+  .FabBox {
+    display: none !important;
+  }
+}
+
+.FabBox {
+  float: right;
+}
+
+.Report {
+  min-width: 1024px;
+  max-width: 1280px;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+@media screen {
+  .Report {
+    max-width: 1152px;
+    box-shadow: 2px 2px 2px gray;
+    border: 1px solid lightgray;
+  }
+
+  .PageHeader {
+    display: none;
+  }
+}
+
+.Dashboard> :last-child .Report {
+  background-color: #ffffff !important;
+}

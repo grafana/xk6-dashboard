@@ -1,0 +1,35 @@
+/*
+ * SPDX-FileCopyrightText: 2023 Iván Szkiba
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+thead tr th {
+  font-weight: 700 !important;
+}
+
+tbody tr :first-child {
+  font-weight: 500 !important;
+}
+
+.MuiTable-root th,
+.MuiTable-root td {
+  padding: 8px;
+}
+
+table.MuiTable-root caption {
+  display: table-caption;
+  text-align: center;
+  caption-side: top;
+  font-weight: 700;
+  background-color: #7b65fa20;
+  border-bottom: 1px solid #7b65fa;
+  padding: 8px;
+}
+
+@media print {
+  table.MuiTable-root caption {
+    background-color: unset;
+    border-bottom: 1px solid lightgrey !important;
+  }
+}
