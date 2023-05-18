@@ -84,21 +84,27 @@ const overviewCharts = [
   }
 ]
 
-function suffix(event) {
+function suffix (event) {
   return event == 'snapshot' ? '' : ' (cum)'
 }
 
-function tabOverview(event) {
+function reportable (event) {
+  return event == 'snapshot'
+}
+
+function tabOverview (event) {
   return {
     id: `overview_${event}`,
     title: `Overview${suffix(event)}`,
     event: event,
     panels: overviewPanels,
-    charts: overviewCharts
+    charts: overviewCharts,
+    description:
+      'This section provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.'
   }
 }
 
-function chartTimings(metric, title) {
+function chartTimings (metric, title) {
   return {
     id: metric,
     title: title,
@@ -108,11 +114,11 @@ function chartTimings(metric, title) {
       [`${metric}_trend_p(95)`]: { label: 'p(95)' }
     },
     axes: [{}, {}, { side: 1 }],
-    height: 224,
+    height: 224
   }
 }
 
-function tabTimings(event) {
+function tabTimings (event) {
   return {
     id: `timings_${event}`,
     title: `Timings${suffix(event)}`,
@@ -123,14 +129,22 @@ function tabTimings(event) {
       chartTimings('http_req_tls_handshaking', 'TLS handshaking (ms)'),
       chartTimings('http_req_sending', 'Request Sending (ms)'),
       chartTimings('http_req_connecting', 'Request Connecting (ms)'),
-      chartTimings('http_req_receiving', 'Request Receiving (ms)'),
+      chartTimings('http_req_receiving', 'Request Receiving (ms)')
     ],
+    report: reportable(event),
+    description:
+      'This section provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.'
   }
 }
 
 const defaultConfig = {
   title: 'k6 dashboard',
-  tabs: [tabOverview('snapshot'), tabOverview('cumulative'), tabTimings('snapshot'), tabTimings('cumulative')],
+  tabs: [
+    tabOverview('snapshot'),
+    tabOverview('cumulative'),
+    tabTimings('snapshot'),
+    tabTimings('cumulative'),
+  ],
 
   tab (id) {
     let tab = null
@@ -170,4 +184,3 @@ const defaultConfig = {
 }
 
 window.defaultConfig = defaultConfig
-

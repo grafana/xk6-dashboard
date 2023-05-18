@@ -50,5 +50,7 @@ func (esrc *eventSource) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	values.Add("stream", esrc.channel)
 	req.URL.RawQuery = values.Encode()
 
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+
 	esrc.Server.ServeHTTP(res, req)
 }

@@ -12,20 +12,45 @@ By using **xk6-dashboard** output extension you can access metrics from [k6](htt
 **Screenshots**
 
 *Overview*
+
+The overview tabs provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.
+
 ![k6 dashboard overview snapshot](screenshot/k6-dashboard-overview-snapshot.png)
 
 *Overview Cumulative*
 ![k6 dashboard overview cumulative](screenshot/k6-dashboard-overview-cumulative.png)
 
 *Timings*
+
+The timings tabs provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.
+
 ![k6 dashboard timings snapshot](screenshot/k6-dashboard-timings-snapshot.png)
 
 *Timings Cumulative*
 ![k6 dashboard timings cumulative](screenshot/k6-dashboard-timings-cumulative.png)
 
 *Custom Tab*
+
+Example of customizing the display of metrics.
+
 ![k6 dashboard custom](screenshot/k6-dashboard-custom.png)
 
+*Summary Tab*
+
+Summary tab contains a summary of the test run metrics. The tables contains the aggregated values of the metrics for the entire test run.
+
+![k6 dashboard summary](screenshot/k6-dashboard-summary.png)
+
+**Report**
+
+The report tab contains a test run report in a printable (or saveable to PDF) format.
+
+*Report Tab*
+![k6 dashboard report](screenshot/k6-dashboard-report.png)
+
+*Report PDF*
+
+See [sample PDF report](screenshot/k6-dashboard-report.pdf)
 
 **Table of Contents**
 
@@ -198,7 +223,8 @@ const customTab = {
   title: 'Custom',
   event: overview.event,
   panels: customPanels,
-  charts: [overview.chart('http_reqs'), durationChart]
+  charts: [overview.chart('http_reqs'), durationChart],
+  description: 'Example of customizing the display of metrics.'
 }
 
 // add custom tab to configuration

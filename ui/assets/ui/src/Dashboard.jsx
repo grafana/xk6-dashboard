@@ -3,21 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 import React from 'react';
-import './App.css'
+import './Dashboard.css'
 import { MetricsContext, useEvent } from './metrics';
-import { Grid, AppBar, Typography, Tabs, Tab, Box } from '@mui/material'
+import { Grid, Typography, Tabs, Tab, Box } from '@mui/material'
 import { PropTypes } from 'prop-types';
+
+import Header from './Header'
+import Report from './Report'
+import Summary from './Summary'
 
 import { Panel } from './Panel';
 import { Chart } from './Chart';
-
-function iterable(input) {  
-  if (input === null || input === undefined) {
-    return false
-  }
-
-  return typeof input[Symbol.iterator] === 'function'
-}
+import { iterable } from './util';
 
 function panels(conf) {
   const all = []
@@ -104,15 +101,33 @@ function tabContents(conf, value) {
     return all
   }
 
+  let ctx = { snapshot: useEvent('snapshot'), cumulative: useEvent('cumulative') }
+
   for (let i = 0; i < conf.length; i++) {
     all.push(
-      <MetricsContext.Provider key={i} value={useEvent(conf[i].event)}>
+      <MetricsContext.Provider key={i} value={ctx[conf[i].event]}>
         <TabContent value={value} index={i}>
           <ContentPanel panels={conf[i].panels} charts={conf[i].charts} />
         </TabContent>
       </MetricsContext.Provider>
     )
   }
+
+  let idx = conf.length
+
+  all.push(
+    <TabContent key={idx} value={value} index={idx}>
+      <Summary />
+    </TabContent>
+  )
+
+  idx++
+
+  all.push(
+    <TabContent key={idx} value={value} index={idx}>
+      <Report tabs={conf} />
+    </TabContent>
+  )
 
   return all
 }
@@ -130,10 +145,22 @@ function tabs(conf) {
     )
   }
 
+  let idx = conf.length
+
+  all.push(
+    <Tab key={idx} label={"summary"} {...a11yProps(idx)} />
+  )
+
+  idx++
+
+  all.push(
+    <Tab key={idx} label={"report"} {...a11yProps(idx)} />
+  )
+
   return all
 }
 
-function App(props) {
+function Dashboard(props) {
   const [value, setValue] = React.useState(0);
 
   function handleChange(event, newValue) {
@@ -141,18 +168,18 @@ function App(props) {
   }
 
   return (
-    <div className="App">
-      <AppBar position="sticky">
-        <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>{props.title}</Typography>
-      </AppBar>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={value} onChange={handleChange}>
-          {tabs(props.tabs)}
-        </Tabs>
-      </Box>
-      {tabContents(props.tabs, value)}
-    </div>
+    <>
+      <Header {...props} />
+      <div className="Dashboard">
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={value} onChange={handleChange}>
+            {tabs(props.tabs)}
+          </Tabs>
+        </Box>
+        {tabContents(props.tabs, value)}
+      </div>
+    </>
   )
 }
 
-export default App
+export default Dashboard

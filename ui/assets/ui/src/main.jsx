@@ -6,7 +6,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { SSEProvider } from 'react-hooks-sse';
 import { ThemeProvider, createTheme } from '@mui/material'
-import App from './App'
+import Dashboard from './Dashboard'
 import './index.css'
 
 const base = new URLSearchParams(window.location.search).get("endpoint") || "http://localhost:5665/";
@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <SSEProvider endpoint={base + "events"}>
       <ThemeProvider theme={theme}>
-        <App {...window.config}/>
+        <Dashboard {...window.config} />
       </ThemeProvider>
     </SSEProvider>
   </React.StrictMode>,

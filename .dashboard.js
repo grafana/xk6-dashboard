@@ -41,7 +41,8 @@ const customTab = {
   title: 'Custom',
   event: overview.event,
   panels: customPanels,
-  charts: [overview.chart('http_reqs'), durationChart]
+  charts: [overview.chart('http_reqs'), durationChart],
+  description: 'Example of customizing the display of metrics.'
 }
 
 // add custom tab to configuration

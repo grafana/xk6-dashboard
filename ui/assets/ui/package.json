@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@cutting/use-get-parent-size": "^1.26.2",
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@mui/material": "^5.11.13",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.13.0",
+    "byte-size": "^8.1.1",
+    "humanize-duration": "^3.28.0",
     "numeral": "^2.0.6",
     "pretty-bytes": "^6.1.0",
     "pretty-ms": "^8.0.0",
@@ -21,7 +23,8 @@
     "react-hooks-sse": "^2.1.0",
     "round-to": "^6.0.0",
     "uplot": "^1.6.24",
-    "uplot-react": "^1.1.4"
+    "uplot-react": "^1.1.4",
+    "vite-plugin-svgr": "^3.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
