@@ -26,6 +26,11 @@ By using **xk6-dashboard** output extension you can access metrics from [k6](htt
 *Custom Tab*
 ![k6 dashboard custom](screenshot/k6-dashboard-custom.png)
 
+**Report**
+
+<object data="k6-dashboard-report.pdf" type="application/pdf" width="100%" height="500px">
+  <p>Unable to display PDF file. <a href="k6-dashboard-report.pdf">Download</a> instead.</p>
+</object>
 
 **Table of Contents**
 
