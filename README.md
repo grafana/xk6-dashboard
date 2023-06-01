@@ -310,13 +310,15 @@ You can also use pre-built k6 image within a Docker container. In order to do th
 **Linux**
 
 ```plain
-docker run -v $(pwd):/work -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /work/dashboard/testdata/result.gz
+docker run -v $(pwd):/work -v /tmp:/tmp/work -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
+docker run -v /tmp:/tmp/work -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
 ```
 
 **Windows**
 
 ```plain
-docker run -v %cd%:/work  -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /work/dashboard/testdata/result.gz
+docker run -v %cd%:/work -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
+docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
