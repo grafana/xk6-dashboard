@@ -4,6 +4,8 @@
 
 k6
 
+test_result.*
+
 coverage.txt
 
 .task

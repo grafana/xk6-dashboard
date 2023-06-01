@@ -15,19 +15,21 @@ import (
 func Test_newMeter(t *testing.T) {
 	t.Parallel()
 
-	met := newMeter(time.Second)
+	now := time.Now()
+	met := newMeter(time.Second, now)
 
 	assert.NotNil(t, met)
 	assert.NotNil(t, met.registry)
 	assert.NotNil(t, met.clock)
 	assert.Equal(t, time.Second, met.period)
-	assert.InDelta(t, time.Now().UnixMilli(), met.start.UnixMilli(), float64(time.Millisecond))
+	assert.InDelta(t, now.UnixMilli(), met.start.UnixMilli(), float64(time.Millisecond))
 }
 
 func Test_meter_add_error(t *testing.T) {
 	t.Parallel()
 
-	met := newMeter(time.Second)
+	now := time.Now()
+	met := newMeter(time.Second, now)
 
 	sample := metrics.Sample{ // nolint:exhaustruct
 		TimeSeries: metrics.TimeSeries{ // nolint:exhaustruct
@@ -43,7 +45,8 @@ func Test_meter_add_error(t *testing.T) {
 func Test_meter_add(t *testing.T) {
 	t.Parallel()
 
-	met := newMeter(time.Second)
+	now := time.Now()
+	met := newMeter(time.Second, now)
 
 	sample := testSample(t, "foo", metrics.Counter, 1)
 
@@ -58,10 +61,11 @@ func Test_meter_add(t *testing.T) {
 func Test_meter_update_error(t *testing.T) {
 	t.Parallel()
 
-	met := newMeter(time.Second)
+	now := time.Now()
+	met := newMeter(time.Second, now)
 
 	sample := testSample(t, "", metrics.Gauge, 0)
-	data, err := met.update(testSampleContainer(t, sample).toArray())
+	data, err := met.update(testSampleContainer(t, sample).toArray(), now)
 
 	assert.Error(t, err)
 	assert.Nil(t, data)
@@ -70,11 +74,12 @@ func Test_meter_update_error(t *testing.T) {
 func Test_meter_update(t *testing.T) {
 	t.Parallel()
 
-	met := newMeter(time.Second)
+	now := time.Now()
+	met := newMeter(time.Second, now)
 
 	foo := testSample(t, "foo", metrics.Counter, 1)
 	bar := testSample(t, "bar", metrics.Counter, 1)
-	data, err := met.update(testSampleContainer(t, foo, bar).toArray())
+	data, err := met.update(testSampleContainer(t, foo, bar).toArray(), now)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, data)
@@ -96,10 +101,11 @@ func Test_meter_update(t *testing.T) {
 func Test_meter_update_no_period(t *testing.T) {
 	t.Parallel()
 
-	met := newMeter(0)
+	now := time.Now()
+	met := newMeter(0, now)
 
 	sample := testSample(t, "foo", metrics.Counter, 1)
-	data, err := met.update(testSampleContainer(t, sample).toArray())
+	data, err := met.update(testSampleContainer(t, sample).toArray(), now)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, data)

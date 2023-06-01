@@ -19,12 +19,12 @@ type meter struct {
 	start  time.Time
 }
 
-func newMeter(period time.Duration) *meter {
+func newMeter(period time.Duration, now time.Time) *meter {
 	registry := newRegistry()
 	metric := registry.mustGetOrNew("time", metrics.Gauge, metrics.Time)
 	clock, _ := metric.Sink.(*metrics.GaugeSink)
 
-	start := time.Now()
+	start := now
 	clock.Value = float64(start.UnixMilli())
 
 	return &meter{
@@ -35,9 +35,7 @@ func newMeter(period time.Duration) *meter {
 	}
 }
 
-func (m *meter) update(containers []metrics.SampleContainer) (map[string]v1.Metric, error) {
-	now := time.Now()
-
+func (m *meter) update(containers []metrics.SampleContainer, now time.Time) (map[string]v1.Metric, error) {
 	dur := m.period
 	if dur == 0 {
 		dur = now.Sub(m.start)
