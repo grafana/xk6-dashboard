@@ -159,3 +159,31 @@ func xk6run(arg string) shellcmd.Command {
 func Run() error {
 	return xk6run(`--out dashboard='period=10s' script.js`).Run()
 }
+
+func Record() error {
+	return xk6run(`--out json=test_result.json script.js`).Run()
+}
+
+func RecordGZ() error {
+	return xk6run(`--out json=test_result.gz script.js`).Run()
+}
+
+func RecordTest() error {
+	return xk6run(`--out json=dashboard/testdata/result.json scripts/test.js`).Run()
+}
+
+func RecordTestGZ() error {
+	return xk6run(`--out json=dashboard/testdata/result.gz scripts/test.js`).Run()
+}
+
+func xk6dashboard(arg string) shellcmd.Command {
+	return shellcmd.Command("xk6 dashboard  " + arg)
+}
+
+func Replay() error {
+	return xk6dashboard(`replay test_result.json`).Run()
+}
+
+func ReplayGZ() error {
+	return xk6dashboard(`replay test_result.gz`).Run()
+}

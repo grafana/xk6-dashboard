@@ -75,6 +75,8 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	req, err := http.NewRequest(http.MethodGet, loc, nil)
 
+	assert.NoError(t, err)
+
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Connection", "keep-alive")
 

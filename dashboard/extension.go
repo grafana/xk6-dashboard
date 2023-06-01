@@ -7,6 +7,7 @@ package dashboard
 import (
 	"fmt"
 	"io/fs"
+	"time"
 
 	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
@@ -60,7 +61,7 @@ func (ext *Extension) Description() string {
 func (ext *Extension) Start() error {
 	var err error
 
-	ext.cumulative = newMeter(0)
+	ext.cumulative = newMeter(0, time.Now())
 
 	ext.server = newWebServer(ext.uiFS, ext.options.Config, ext.logger)
 
@@ -98,13 +99,14 @@ func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
 
 func (ext *Extension) flush() {
 	samples := ext.buffer.GetBufferedSamples()
+	now := time.Now()
 
-	ext.updateAndSend(samples, newMeter(ext.options.Period), snapshotEvent)
-	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent)
+	ext.updateAndSend(samples, newMeter(ext.options.Period, now), snapshotEvent, now)
+	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
-func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *meter, event string) {
-	data, err := m.update(containers)
+func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *meter, event string, now time.Time) {
+	data, err := m.update(containers, now)
 	if err != nil {
 		ext.logger.WithError(err).Warn("Error while processing samples")
 

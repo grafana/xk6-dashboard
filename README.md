@@ -62,6 +62,7 @@ See [sample PDF report](screenshot/k6-dashboard-report.pdf)
 - [Events](#events)
 - [Customization](#customization)
   - [Examples](#examples)
+- [Command Line](#command-line)
 
 ## Download
 
@@ -248,4 +249,55 @@ addP99(defaultConfig.tab('overview_snapshot').chart('http_req_duration'))
 addP99(defaultConfig.tab('overview_cumulative').chart('http_req_duration'))
 
 export default defaultConfig
+```
+
+## Command Line
+
+The xk6-dashboard extension adds a `dashboard` command to the k6 command line:
+
+```sh
+$ ./k6 dashboard --help
+
+xk6-dashboard commands
+
+Usage:
+  k6 dashboard [command]
+
+Available Commands:
+  replay      load the saved JSON results and replay it for the dashboard UI
+
+Flags:
+  -h, --help   help for dashboard
+
+Use "k6 dashboard [command] --help" for more information about a command.
+```
+
+At the moment, the `dashboard` command has only one subcommand, `replay`, which can be used to play back test run results previously saved in JSON format for the dashboard.
+
+```sh
+$ ./k6 dashboard replay --help
+
+The replay command load the saved JSON results and replay it for the dashboard UI.
+The compressed file will be automatically decompressed if the file extension is .gz
+
+Usage:
+  k6 dashboard replay file [flags]
+
+Flags:
+      --config string   UI configuration file location (default: '.dashboard.js')
+      --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
+      --open            Open browser window automatically
+      --period 10s      Event emitting frequency (default: 10s), example: `1m` (default 10s)
+      --port int        TCP port for HTTP endpoint (default: 5665), example: 8080 (default 5665)
+  -h, --help            help for replay
+```
+
+The `replay` command expects a JSON (or gzip-compressed JSON) file as an argument. Flags with the same name and meaning as the extension parameters can be used in the `replay` command.
+
+
+Visualization of the result of a previous test run:
+
+```
+./k6 run --out json=test_result.json script.js
+./k6 dashboard replay test_result.json
 ```
