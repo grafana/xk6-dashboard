@@ -63,6 +63,7 @@ See [sample PDF report](screenshot/k6-dashboard-report.pdf)
 - [Customization](#customization)
   - [Examples](#examples)
 - [Command Line](#command-line)
+  - [Docker](#docker-1)
 
 ## Download
 
@@ -301,3 +302,22 @@ Visualization of the result of a previous test run:
 ./k6 run --out json=test_result.json script.js
 ./k6 dashboard replay test_result.json
 ```
+
+### Docker
+
+You can also use pre-built k6 image within a Docker container. In order to do that, you will need to execute something like the following:
+
+**Linux**
+
+```plain
+docker run -v $(pwd):/work -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /work/dashboard/testdata/result.gz
+```
+
+**Windows**
+
+```plain
+docker run -v %cd%:/work  -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /work/dashboard/testdata/result.gz
+```
+
+The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
+
