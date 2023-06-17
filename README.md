@@ -273,13 +273,13 @@ Flags:
 Use "k6 dashboard [command] --help" for more information about a command.
 ```
 
-At the moment, the `dashboard` command has only one subcommand, `replay`, which can be used to play back test run results previously saved in JSON format from the dashboard.
+At the moment, the `dashboard` command has only one subcommand, `replay`, which can be used to play back test run results previously saved in JSON format from k6.
 
 ```sh
 $ ./k6 dashboard replay --help
 
-The replay command load the saved JSON results and replay it for the dashboard UI.
-The compressed file will be automatically decompressed if the file extension is .gz
+The replay command will load the saved JSON results and replay it in the dashboard UI.
+The compressed file will automatically be decompressed if the file extension is .gz
 
 Usage:
   k6 dashboard replay file [flags]
