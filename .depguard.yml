@@ -1,0 +1,17 @@
+Main:
+  files:
+  - $all
+  - "!$test"
+  allow:
+  - $gostd
+  - github.com/szkiba/xk6-dashboard
+  deny:
+    reflect: Please don't use reflect package
+Test:
+  files:
+  - $test
+  allow:
+  - $gostd
+  - github.com/stretchr/testify
+  deny:
+    reflect: Please don't use reflect package
