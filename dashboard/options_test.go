@@ -27,6 +27,7 @@ func Test_getopts_defaults(t *testing.T) {
 	assert.Equal(t, defaultPeriod, opts.Period)
 	assert.Equal(t, defaultOpen, opts.Open)
 	assert.Equal(t, defaultConfig, opts.Config)
+	assert.Equal(t, defaultReport, opts.Report)
 
 	assert.Equal(t, fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", strconv.Itoa(defaultPort))), opts.url())
 }
@@ -42,13 +43,14 @@ func Test_getopts_error(t *testing.T) {
 func Test_getopts(t *testing.T) {
 	t.Parallel()
 
-	opts, err := getopts("period=1s&port=1&host=localhost&open&config=dashboard.js")
+	opts, err := getopts("period=1s&port=1&host=localhost&open&config=dashboard.js&report=report.html")
 
 	assert.NoError(t, err)
 	assert.Equal(t, time.Second, opts.Period)
 	assert.Equal(t, 1, opts.Port)
 	assert.True(t, opts.Open)
 	assert.Equal(t, "dashboard.js", opts.Config)
+	assert.Equal(t, "report.html", opts.Report)
 	assert.Equal(t, "localhost", opts.Host)
 	assert.Equal(t, "http://localhost:1", opts.url())
 	assert.Equal(t, "localhost:1", opts.addr())

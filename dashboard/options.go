@@ -22,6 +22,7 @@ const (
 	defaultPeriod = time.Second * 10
 	defaultOpen   = false
 	defaultConfig = ".dashboard.js"
+	defaultReport = ""
 )
 
 type options struct {
@@ -30,6 +31,7 @@ type options struct {
 	Period time.Duration
 	Open   bool
 	Config string
+	Report string
 }
 
 func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
@@ -39,6 +41,7 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		Period: defaultPeriod,
 		Open:   defaultOpen,
 		Config: defaultConfig,
+		Report: defaultReport,
 	}
 
 	if query == "" {

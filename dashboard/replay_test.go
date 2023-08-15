@@ -44,6 +44,7 @@ func Test_replay(t *testing.T) {
 		Period: time.Second,
 		Open:   false,
 		Config: "",
+		Report: "",
 	}
 
 	assert.NoError(t, replay(opts, embed.FS{}, "testdata/result.gz"))

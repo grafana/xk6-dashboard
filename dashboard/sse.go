@@ -32,6 +32,14 @@ func newEventEmitter(channel string, logger logrus.FieldLogger) *eventEmitter {
 	return emitter
 }
 
+func (emitter *eventEmitter) onStart() error {
+	return nil
+}
+
+func (emitter *eventEmitter) onStop() error {
+	return nil
+}
+
 func (emitter *eventEmitter) onEvent(name string, data interface{}) {
 	buff, err := json.Marshal(data)
 	if err != nil {

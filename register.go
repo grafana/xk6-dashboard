@@ -19,5 +19,5 @@ func register() {
 }
 
 func ctor(params output.Params) (output.Output, error) { //nolint:ireturn
-	return dashboard.New(params, assets.DirUI())
+	return dashboard.New(params, assets.DirUI(), assets.DirBrief())
 }

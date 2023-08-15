@@ -26,7 +26,7 @@ func TestNewExtension(t *testing.T) {
 	params.ConfigArgument = "port=1&host=localhost"
 	params.OutputType = "dashboard"
 
-	ext, err := New(params, embed.FS{})
+	ext, err := New(params, embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -35,7 +35,7 @@ func TestNewExtension(t *testing.T) {
 
 	params.ConfigArgument = "period=2"
 
-	_, err = New(params, embed.FS{})
+	_, err = New(params, embed.FS{}, embed.FS{})
 
 	assert.Error(t, err)
 }
@@ -51,7 +51,7 @@ func TestExtension(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=" + strconv.Itoa(port)
 
-	ext, err := New(params, embed.FS{})
+	ext, err := New(params, embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)

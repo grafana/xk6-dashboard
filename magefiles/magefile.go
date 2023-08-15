@@ -88,11 +88,16 @@ func License() error {
 		"*.ts",
 		"*/*ts",
 		".github/workflows/*",
+		//
 		"assets/packages/ui/*.yml",
 		"assets/packages/ui/*.js",
-		"assets/packages/ui/*.html",
 		"assets/packages/ui/.gitignore",
 		"assets/packages/ui/src/*",
+		//
+		"assets/packages/brief/*.yml",
+		"assets/packages/brief/*.js",
+		"assets/packages/brief/.gitignore",
+		"assets/packages/brief/src/*",
 	)
 	if err != nil {
 		return err
@@ -108,6 +113,7 @@ func Clean() error {
 	sh.Rm("coverage.txt")
 	sh.Rm("bin")
 	sh.Rm("assets/packages/ui/node_modules")
+	sh.Rm("assets/packages/brief/node_modules")
 	sh.Rm("k6")
 
 	return nil
@@ -130,14 +136,14 @@ func All() error {
 }
 
 func yarn(arg string) shellcmd.Command {
-	return shellcmd.Command("yarn --silent --cwd ui/assets/ui " + arg)
+	return shellcmd.Command("yarn --silent --cwd assets " + arg)
 }
 
 func Prepare() error {
 	return yarn("install").Run()
 }
 
-func Ui() error {
+func Assets() error {
 	return yarn("build").Run()
 }
 
@@ -156,7 +162,15 @@ func xk6run(arg string) shellcmd.Command {
 }
 
 func Run() error {
-	return xk6run(`--out dashboard='period=10s' script.js`).Run()
+	return xk6run(`--out dashboard='period=10s&report=test_result_run.html' script.js`).Run()
+}
+
+func Report() error {
+	return xk6run(`--out dashboard='period=100ms&report=test_result_report.html' scripts/test.js`).Run()
+}
+
+func Hour() error {
+	return xk6run(`--out dashboard='report=test_result_hour.html' script-hour.js`).Run()
 }
 
 func Record() error {

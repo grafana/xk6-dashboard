@@ -1,0 +1,30 @@
+{
+  "name": "xk6-dashboard-brief",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --emptyOutDir",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.1",
+    "byte-size": "^8.1.1",
+    "humanize-duration": "^3.28.0",
+    "numeral": "^2.0.6",
+    "preact": "^10.16.0",
+    "pretty-bytes": "^6.1.0",
+    "pretty-ms": "^8.0.0",
+    "round-to": "^6.0.0",
+    "uplot": "^1.6.24",
+    "uplot-react": "^1.1.4"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.5.0",
+    "sass": "^1.65.1",
+    "vite": "^4.4.5",
+    "vite-plugin-handlebars": "^1.6.0",
+    "vite-plugin-singlefile": "^0.13.5"
+  }
+}

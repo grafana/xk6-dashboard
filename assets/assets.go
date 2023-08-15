@@ -9,11 +9,15 @@ import (
 	"io/fs"
 )
 
-//go:embed ui
+//go:embed ui brief
 var distFS embed.FS
 
 func DirUI() fs.FS {
 	return dir("ui")
+}
+
+func DirBrief() fs.FS {
+	return dir("brief")
 }
 
 func dir(dirname string) fs.FS {

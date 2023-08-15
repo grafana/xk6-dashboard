@@ -31,12 +31,14 @@ type Extension struct {
 	cumulative *meter
 
 	description string
+
+	briefFS fs.FS
 }
 
 var _ output.Output = (*Extension)(nil)
 
 // New creates Extension instance using the passwd uiFS as source of web UI.
-func New(params output.Params, uiFS fs.FS) (*Extension, error) {
+func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
 		return nil, err
@@ -44,6 +46,7 @@ func New(params output.Params, uiFS fs.FS) (*Extension, error) {
 
 	ext := &Extension{
 		uiFS:        uiFS,
+		briefFS:     briefFS,
 		logger:      params.Logger,
 		options:     opts,
 		description: fmt.Sprintf("%s (%s) %s", params.OutputType, opts.addr(), opts.url()),
@@ -72,6 +75,16 @@ func (ext *Extension) Start() error {
 	ext.server = newWebServer(ext.uiFS, config, ext.logger)
 	ext.addEventListener(ext.server)
 
+	if len(ext.options.Report) != 0 {
+		brf := newBriefer(ext.briefFS, config, ext.options.Report, ext.logger)
+
+		ext.addEventListener(brf)
+	}
+
+	if err := ext.fireStart(); err != nil {
+		return err
+	}
+
 	go func() {
 		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {
 			ext.logger.Error(err)
@@ -97,7 +110,7 @@ func (ext *Extension) Start() error {
 func (ext *Extension) Stop() error {
 	ext.flusher.Stop()
 
-	return nil
+	return ext.fireStop()
 }
 
 func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
