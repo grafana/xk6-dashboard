@@ -40,11 +40,16 @@ type replayer struct {
 }
 
 func replay(opts *options, uiFS fs.FS, filename string) error {
+	config, err := opts.config()
+	if err != nil {
+		return err
+	}
+
 	rep := new(replayer)
 
 	rep.options = opts
 	rep.logger = logrus.StandardLogger()
-	rep.server = newWebServer(uiFS, rep.options.Config, rep.logger)
+	rep.server = newWebServer(uiFS, config, rep.logger)
 
 	if err := rep.server.listenAndServe(rep.options.addr()); err != nil {
 		return err

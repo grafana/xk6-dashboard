@@ -59,11 +59,14 @@ func (ext *Extension) Description() string {
 }
 
 func (ext *Extension) Start() error {
-	var err error
+	config, err := ext.options.config()
+	if err != nil {
+		return err
+	}
 
 	ext.cumulative = newMeter(0, time.Now())
 
-	ext.server = newWebServer(ext.uiFS, ext.options.Config, ext.logger)
+	ext.server = newWebServer(ext.uiFS, config, ext.logger)
 
 	go func() {
 		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {

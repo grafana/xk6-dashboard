@@ -8,6 +8,7 @@ import (
 	"errors"
 	"net"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"time"
@@ -77,6 +78,19 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 	}
 
 	return opts, err
+}
+
+func (opts *options) config() ([]byte, error) {
+	if len(opts.Config) == 0 {
+		return []byte{}, nil
+	}
+
+	data, err := os.ReadFile(opts.Config)
+	if err != nil && os.IsNotExist(err) && opts.Config == defaultConfig {
+		return []byte{}, nil
+	}
+
+	return data, err
 }
 
 func (opts *options) addr() string {

@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -20,7 +21,7 @@ import (
 func Test_newWebServer(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(assets.DirUI(), "", logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), []byte{}, logrus.StandardLogger())
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
@@ -52,7 +53,7 @@ func Test_newWebServer(t *testing.T) {
 func Test_webServer_used_addr(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(assets.DirUI(), "", logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), []byte{}, logrus.StandardLogger())
 
 	addr := getRandomAddr(t)
 
@@ -63,28 +64,7 @@ func Test_webServer_used_addr(t *testing.T) {
 func Test_uiHandler_no_config(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", assets.DirUI(), "", logrus.StandardLogger())
-
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
-
-	handler(rec, req)
-
-	res := rec.Result() // nolint:bodyclose
-
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Contains(t, res.Header.Get("Content-Type"), "/javascript")
-
-	body, err := io.ReadAll(res.Body)
-
-	assert.NoError(t, err)
-	assert.Equal(t, "export default defaultConfig", strings.TrimSpace(string(body)))
-}
-
-func Test_uiHandler_missing_config(t *testing.T) {
-	t.Parallel()
-
-	handler := uiHandler("/foo/", assets.DirUI(), "no-such-file", logrus.StandardLogger())
+	handler := uiHandler("/foo/", assets.DirUI(), []byte{})
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
@@ -105,7 +85,11 @@ func Test_uiHandler_missing_config(t *testing.T) {
 func Test_uiHandler(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", assets.DirUI(), filepath.Join("..", ".dashboard.js"), logrus.StandardLogger())
+	config, err := os.ReadFile(filepath.Join("..", ".dashboard.js"))
+
+	assert.NoError(t, err)
+
+	handler := uiHandler("/foo/", assets.DirUI(), config)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
