@@ -1,10 +1,14 @@
+// SPDX-FileCopyrightText: 2023 Iván Szkiba
+//
+// SPDX-License-Identifier: MIT
+
 package dashboard
 
 import (
 	"os"
 
+	"github.com/szkiba/xk6-dashboard/assets"
 	"github.com/szkiba/xk6-dashboard/dashboard"
-	"github.com/szkiba/xk6-dashboard/ui"
 )
 
 func init() {
@@ -12,5 +16,5 @@ func init() {
 		return
 	}
 
-	dashboard.Execute(ui.GetFS())
+	dashboard.Execute(assets.DirUI())
 }

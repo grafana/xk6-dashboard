@@ -14,13 +14,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/szkiba/xk6-dashboard/ui"
+	"github.com/szkiba/xk6-dashboard/assets"
 )
 
 func Test_newWebServer(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(ui.GetFS(), "", logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), "", logrus.StandardLogger())
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
@@ -52,7 +52,7 @@ func Test_newWebServer(t *testing.T) {
 func Test_webServer_used_addr(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(ui.GetFS(), "", logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), "", logrus.StandardLogger())
 
 	addr := getRandomAddr(t)
 
@@ -63,7 +63,7 @@ func Test_webServer_used_addr(t *testing.T) {
 func Test_uiHandler_no_config(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", ui.GetFS(), "", logrus.StandardLogger())
+	handler := uiHandler("/foo/", assets.DirUI(), "", logrus.StandardLogger())
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
@@ -84,7 +84,7 @@ func Test_uiHandler_no_config(t *testing.T) {
 func Test_uiHandler_missing_config(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", ui.GetFS(), "no-such-file", logrus.StandardLogger())
+	handler := uiHandler("/foo/", assets.DirUI(), "no-such-file", logrus.StandardLogger())
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
@@ -105,7 +105,7 @@ func Test_uiHandler_missing_config(t *testing.T) {
 func Test_uiHandler(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", ui.GetFS(), filepath.Join("..", ".dashboard.js"), logrus.StandardLogger())
+	handler := uiHandler("/foo/", assets.DirUI(), filepath.Join("..", ".dashboard.js"), logrus.StandardLogger())
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)

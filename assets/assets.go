@@ -2,23 +2,25 @@
 //
 // SPDX-License-Identifier: MIT
 
-package ui
+package assets
 
 import (
 	"embed"
 	"io/fs"
 )
 
-const distDir = "assets/ui/dist"
-
-//go:embed assets/ui/dist
+//go:embed ui
 var distFS embed.FS
 
-func GetFS() fs.FS {
-	uiFS, err := fs.Sub(distFS, distDir)
+func DirUI() fs.FS {
+	return dir("ui")
+}
+
+func dir(dirname string) fs.FS {
+	subfs, err := fs.Sub(distFS, dirname)
 	if err != nil {
 		panic(err)
 	}
 
-	return uiFS
+	return subfs
 }

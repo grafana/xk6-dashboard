@@ -1,0 +1,17 @@
+{
+  "name": "xk6-dashboard-assets",
+  "version": "1.0.0",
+  "description": "xk6-dashboard embeddable assets",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "lerna run build"
+  },
+  "devDependencies": {
+    "lerna": "^7.1.5",
+    "vite": "^4.4.9"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}

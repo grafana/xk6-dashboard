@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-package ui
+package assets
 
 import (
 	"testing"
@@ -13,7 +13,7 @@ import (
 func TestGetFS(t *testing.T) {
 	t.Parallel()
 
-	fs := GetFS()
+	fs := DirUI()
 
 	assert.NotNil(t, fs)
 

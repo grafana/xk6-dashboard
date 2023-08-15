@@ -88,11 +88,11 @@ func License() error {
 		"*.ts",
 		"*/*ts",
 		".github/workflows/*",
-		"ui/assets/ui/*.yml",
-		"ui/assets/ui/*.js",
-		"ui/assets/ui/*.html",
-		"ui/assets/ui/.gitignore",
-		"ui/assets/ui/src/*",
+		"assets/packages/ui/*.yml",
+		"assets/packages/ui/*.js",
+		"assets/packages/ui/*.html",
+		"assets/packages/ui/.gitignore",
+		"assets/packages/ui/src/*",
 	)
 	if err != nil {
 		return err
@@ -107,8 +107,7 @@ func Clean() error {
 	sh.Rm("magefiles/bin")
 	sh.Rm("coverage.txt")
 	sh.Rm("bin")
-	sh.Rm("ui/assets/ui/node_modules")
-	sh.Rm("ui/assets/ui/node_modules")
+	sh.Rm("assets/packages/ui/node_modules")
 	sh.Rm("k6")
 
 	return nil
