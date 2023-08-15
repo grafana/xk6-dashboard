@@ -97,6 +97,10 @@ func (opts *options) config() ([]byte, error) {
 }
 
 func (opts *options) addr() string {
+	if opts.Port < 0 {
+		return ""
+	}
+
 	return net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
 }
 

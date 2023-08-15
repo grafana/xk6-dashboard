@@ -55,8 +55,13 @@ func replay(opts *options, uiFS fs.FS, filename string) error {
 	rep.eventSource = new(eventSource)
 	rep.addEventListener(rep.server)
 
-	if err := rep.server.listenAndServe(rep.options.addr()); err != nil {
+	addr, err := rep.server.listenAndServe(rep.options.addr())
+	if err != nil {
 		return err
+	}
+
+	if rep.options.Port == 0 {
+		rep.options.Port = addr.Port
 	}
 
 	if rep.options.Open {

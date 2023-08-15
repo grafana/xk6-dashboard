@@ -78,7 +78,7 @@ func buildRootCmd(opts *options, uiFS fs.FS) *cobra.Command {
 	opts = new(options)
 
 	flags.StringVar(&opts.Host, flagHost, defaultHost, "Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)")
-	flags.IntVar(&opts.Port, flagPort, defaultPort, "TCP port for HTTP endpoint (default: 5665), example: 8080")
+	flags.IntVar(&opts.Port, flagPort, defaultPort, "TCP port for HTTP endpoint (default: 5665; 0=random, -1=no HTTP), example: 8080")
 	flags.DurationVar(&opts.Period, flagPeriod, defaultPeriod, "Event emitting frequency (default: `10s`), example: `1m`")
 	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window automatically")
 	flags.StringVar(&opts.Config, flagConfig, defaultHost, "UI configuration file location (default: '.dashboard.js')")

@@ -29,7 +29,9 @@ func Test_newWebServer(t *testing.T) {
 
 	addr := getRandomAddr(t)
 
-	assert.NoError(t, srv.listenAndServe(addr))
+	_, err := srv.listenAndServe(addr)
+
+	assert.NoError(t, err)
 
 	base := "http://" + addr
 
@@ -57,8 +59,12 @@ func Test_webServer_used_addr(t *testing.T) {
 
 	addr := getRandomAddr(t)
 
-	assert.NoError(t, srv.listenAndServe(addr))
-	assert.Error(t, srv.listenAndServe(addr))
+	_, err := srv.listenAndServe(addr)
+	assert.NoError(t, err)
+
+	_, err = srv.listenAndServe(addr)
+
+	assert.Error(t, err)
 }
 
 func Test_uiHandler_no_config(t *testing.T) {

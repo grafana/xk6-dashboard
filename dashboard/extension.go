@@ -30,7 +30,7 @@ type Extension struct {
 
 	cumulative *meter
 
-	description string
+	name string
 
 	briefFS fs.FS
 }
@@ -49,7 +49,7 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 		briefFS:     briefFS,
 		logger:      params.Logger,
 		options:     opts,
-		description: fmt.Sprintf("%s (%s) %s", params.OutputType, opts.addr(), opts.url()),
+		name:        params.OutputType,
 		buffer:      nil,
 		server:      nil,
 		flusher:     nil,
@@ -61,7 +61,11 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 }
 
 func (ext *Extension) Description() string {
-	return ext.description
+	if ext.options.Port < 0 {
+		return ext.name
+	}
+
+	return fmt.Sprintf("%s (%s) %s", ext.name, ext.options.addr(), ext.options.url())
 }
 
 func (ext *Extension) Start() error {
@@ -85,11 +89,14 @@ func (ext *Extension) Start() error {
 		return err
 	}
 
-	go func() {
-		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {
-			ext.logger.Error(err)
-		}
-	}()
+	addr, err := ext.server.listenAndServe(ext.options.addr())
+	if err != nil {
+		return err
+	}
+
+	if ext.options.Port == 0 {
+		ext.options.Port = addr.Port
+	}
 
 	ext.buffer = new(output.SampleBuffer)
 

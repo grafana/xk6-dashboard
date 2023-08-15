@@ -123,7 +123,7 @@ The following parameters are recognized:
 parameter | description
 ----------|------------
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
-port      | TCP port for HTTP endpoint (default: `5665`), example: `8080`
+port      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no HTTP), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
 open      | Set to `true` (or empty) for opening browser window automatically
 config    | UI configuration file location (default: `.dashboard.js`) (see [Customization](#customization))

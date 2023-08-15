@@ -41,10 +41,10 @@ func newWebServer(uiFS fs.FS, uiConfig []byte, logger logrus.FieldLogger) *webSe
 	return srv
 }
 
-func (srv *webServer) listenAndServe(addr string) error {
+func (srv *webServer) listenAndServe(addr string) (*net.TCPAddr, error) {
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	go func() {
@@ -55,7 +55,9 @@ func (srv *webServer) listenAndServe(addr string) error {
 		}
 	}()
 
-	return nil
+	a, _ := listener.Addr().(*net.TCPAddr)
+
+	return a, nil
 }
 
 func rootHandler(uiPath string) http.HandlerFunc {
