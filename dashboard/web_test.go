@@ -25,7 +25,7 @@ func Test_newWebServer(t *testing.T) {
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
-	assert.NotNil(t, srv.eventSource)
+	assert.NotNil(t, srv.eventEmitter)
 
 	addr := getRandomAddr(t)
 

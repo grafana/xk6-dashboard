@@ -16,6 +16,8 @@ import (
 )
 
 type Extension struct {
+	*eventSource
+
 	buffer *output.SampleBuffer
 
 	flusher *output.PeriodicFlusher
@@ -49,6 +51,7 @@ func New(params output.Params, uiFS fs.FS) (*Extension, error) {
 		server:      nil,
 		flusher:     nil,
 		cumulative:  nil,
+		eventSource: new(eventSource),
 	}
 
 	return ext, nil
@@ -67,6 +70,7 @@ func (ext *Extension) Start() error {
 	ext.cumulative = newMeter(0, time.Now())
 
 	ext.server = newWebServer(ext.uiFS, config, ext.logger)
+	ext.addEventListener(ext.server)
 
 	go func() {
 		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {
@@ -116,5 +120,5 @@ func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *met
 		return
 	}
 
-	ext.server.sendEvent(event, data)
+	ext.fireEvent(event, data)
 }

@@ -19,7 +19,7 @@ import (
 func Test_sendEvent(t *testing.T) {
 	t.Parallel()
 
-	src := newEventSource("events", logrus.StandardLogger())
+	src := newEventEmitter("events", logrus.StandardLogger())
 	rec := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1/events", nil)
 	ctx, cancel := context.WithCancel(context.TODO())
@@ -43,7 +43,7 @@ func Test_sendEvent(t *testing.T) {
 
 	time.Sleep(time.Millisecond)
 
-	src.sendEvent("foo", map[string]interface{}{"answer": 42})
+	src.onEvent("foo", map[string]interface{}{"answer": 42})
 
 	time.Sleep(time.Millisecond)
 
@@ -63,9 +63,9 @@ func Test_sendEvent(t *testing.T) {
 func Test_send_earlier_events(t *testing.T) {
 	t.Parallel()
 
-	src := newEventSource("events", logrus.StandardLogger())
+	src := newEventEmitter("events", logrus.StandardLogger())
 
-	src.sendEvent("foo", map[string]interface{}{"answer": 42})
+	src.onEvent("foo", map[string]interface{}{"answer": 42})
 
 	rec := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1/events", nil)

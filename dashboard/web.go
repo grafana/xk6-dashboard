@@ -24,17 +24,17 @@ const (
 )
 
 type webServer struct {
-	*eventSource
+	*eventEmitter
 	*http.ServeMux
 }
 
 func newWebServer(uiFS fs.FS, uiConfig []byte, logger logrus.FieldLogger) *webServer { //nolint:ireturn
 	srv := &webServer{
-		eventSource: newEventSource(eventChannel, logger),
-		ServeMux:    http.NewServeMux(),
+		eventEmitter: newEventEmitter(eventChannel, logger),
+		ServeMux:     http.NewServeMux(),
 	}
 
-	srv.Handle(pathEvents, srv.eventSource)
+	srv.Handle(pathEvents, srv.eventEmitter)
 	srv.HandleFunc(pathUI, uiHandler(pathUI, uiFS, uiConfig))
 	srv.HandleFunc("/", rootHandler(pathUI))
 

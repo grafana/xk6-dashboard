@@ -24,6 +24,8 @@ import (
 )
 
 type replayer struct {
+	*eventSource
+
 	buffer *output.SampleBuffer
 
 	logger logrus.FieldLogger
@@ -50,6 +52,8 @@ func replay(opts *options, uiFS fs.FS, filename string) error {
 	rep.options = opts
 	rep.logger = logrus.StandardLogger()
 	rep.server = newWebServer(uiFS, config, rep.logger)
+	rep.eventSource = new(eventSource)
+	rep.addEventListener(rep.server)
 
 	if err := rep.server.listenAndServe(rep.options.addr()); err != nil {
 		return err
@@ -92,7 +96,7 @@ func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, m *mete
 		return
 	}
 
-	rep.server.sendEvent(event, data)
+	rep.fireEvent(event, data)
 }
 
 type addMetricSamplesFunc func([]metrics.SampleContainer)
