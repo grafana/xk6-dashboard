@@ -7,6 +7,7 @@ package dashboard
 import (
 	"embed"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/szkiba/xk6-dashboard/assets"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
@@ -78,4 +80,43 @@ func TestExtension(t *testing.T) {
 	assert.True(t, strings.HasPrefix(lines[5], dataPrefix))
 
 	assert.NoError(t, ext.Stop())
+}
+
+func TestExtension_report(t *testing.T) {
+	t.Parallel()
+
+	file, err := os.CreateTemp("", "")
+
+	assert.NoError(t, err)
+	assert.NoError(t, file.Close())
+
+	var params output.Params
+
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "period=10ms&port=0&report=" + file.Name() + ".gz"
+
+	ext, err := New(params, embed.FS{}, assets.DirBrief())
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.NoError(t, ext.Start())
+
+	time.Sleep(time.Millisecond)
+
+	go func() {
+		sample := testSample(t, "foo", metrics.Counter, 1)
+
+		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
+	}()
+
+	assert.NoError(t, ext.Stop())
+
+	st, err := os.Stat(file.Name() + ".gz")
+
+	assert.NoError(t, err)
+
+	assert.Greater(t, st.Size(), int64(1024))
+
+	assert.NoError(t, os.Remove(file.Name()+".gz"))
 }

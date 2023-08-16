@@ -6,10 +6,12 @@ package dashboard
 
 import (
 	"embed"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/szkiba/xk6-dashboard/assets"
 	"go.k6.io/k6/metrics"
 )
 
@@ -54,6 +56,34 @@ func Test_replay(t *testing.T) {
 	lines := readSSE(t, 5, "http://"+opts.addr()+"/events")
 
 	assert.Equal(t, 5, len(lines))
+}
+
+func Test_replay_report(t *testing.T) {
+	t.Parallel()
+
+	file, err := os.CreateTemp("", "")
+
+	assert.NoError(t, err)
+	assert.NoError(t, file.Close())
+
+	opts := &options{
+		Port:   0,
+		Host:   "",
+		Period: time.Second,
+		Open:   false,
+		Config: "",
+		Report: file.Name(),
+	}
+
+	assert.NoError(t, replay(opts, embed.FS{}, assets.DirBrief(), "testdata/result.gz"))
+
+	st, err := os.Stat(file.Name())
+
+	assert.NoError(t, err)
+
+	assert.Greater(t, st.Size(), int64(1024))
+
+	assert.NoError(t, os.Remove(file.Name()))
 }
 
 func Test_feeder_processMetric(t *testing.T) {
