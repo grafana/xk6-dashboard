@@ -68,6 +68,7 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 - [Usage](#usage)
 - [Parameters](#parameters)
 - [Docker](#docker)
+- [Save report](#save-report)
 - [Events](#events)
 - [Customization](#customization)
   - [Examples](#examples)
@@ -136,6 +137,7 @@ port      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no
 period    | Event emitting frequency (default: `10s`), example: `1m`
 open      | Set to `true` (or empty) for opening browser window automatically
 config    | UI configuration file location (default: `.dashboard.js`) (see [Customization](#customization))
+report    | File name to save the report (dafault: "", empty, the report will not be saved)
 
 ## Docker
 
@@ -154,6 +156,22 @@ docker run -v %cd%:/scripts -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:l
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
+
+## Save report
+
+The test run report can be exported to a responsive self-contained HTML file. For export, the file name must be specified in the `report` parameter. If the file name ends with `.gz`, the HTML report will automatically be gzip compressed.
+
+```plain
+k6 run --out dashboard=report=test-report.html script.js
+```
+
+The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
+
+By using the `--report` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-restult.json`).
+
+```plain
+k6 dashboard replay --report test-report.html test-result.json
+```
 
 ## Events
 
@@ -294,11 +312,12 @@ Usage:
   k6 dashboard replay file [flags]
 
 Flags:
-      --config string   UI configuration file location (default: '.dashboard.js')
+      --config string   UI configuration file location (default ".dashboard.js")
       --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
       --open            Open browser window automatically
-      --period 10s      Event emitting frequency (default: 10s), example: `1m` (default 10s)
-      --port int        TCP port for HTTP endpoint (default: 5665), example: 8080 (default 5665)
+      --period 1m       Event emitting frequency, example: 1m (default 10s)
+      --port int        TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080 (default 5665)
+      --report string   Report file location (default: '', no report)
   -h, --help            help for replay
 ```
 
