@@ -64,9 +64,13 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 	brf.mu.Lock()
 	defer brf.mu.Unlock()
 
-	if name == "cumulative" {
+	if name == cumulativeEvent {
 		brf.cumulative = data
 
+		return
+	}
+
+	if name != snapshotEvent {
 		return
 	}
 
