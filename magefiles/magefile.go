@@ -169,6 +169,10 @@ func Report() error {
 	return xk6run(`--out dashboard='period=100ms&report=test_result_report.html' scripts/test.js`).Run()
 }
 
+func ReportGZ() error {
+	return xk6run(`--out dashboard='period=100ms&report=test_result_report.html.gz' scripts/test.js`).Run()
+}
+
 func Hour() error {
 	return xk6run(`--out dashboard='report=test_result_hour.html' script-hour.js`).Run()
 }

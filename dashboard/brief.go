@@ -12,6 +12,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/sirupsen/logrus"
@@ -53,8 +54,22 @@ func (brf *briefer) onStop() error {
 		return err
 	}
 
-	if err := brf.exportHTML(file); err != nil {
+	compress := filepath.Ext(brf.output) == ".gz"
+
+	var out io.WriteCloser = file
+
+	if compress {
+		out = gzip.NewWriter(file)
+	}
+
+	if err := brf.exportHTML(out); err != nil {
 		return err
+	}
+
+	if compress {
+		if err := out.Close(); err != nil {
+			return err
+		}
 	}
 
 	return file.Close()
