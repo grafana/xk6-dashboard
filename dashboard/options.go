@@ -6,6 +6,7 @@ package dashboard
 
 import (
 	"errors"
+	"math"
 	"net"
 	"net/url"
 	"os"
@@ -112,5 +113,21 @@ func (opts *options) url() string {
 
 	return "http://" + net.JoinHostPort(host, strconv.Itoa(opts.Port))
 }
+
+// period adjusts period, limit points per test run to 'points'.
+func (opts *options) period(duration time.Duration) time.Duration {
+	if duration == 0 {
+		return opts.Period
+	}
+
+	optimal := float64(duration) / float64(points)
+
+	return time.Duration(math.Ceil(optimal/float64(opts.Period))) * opts.Period
+}
+
+/*
+approx. 1MB max report size, 8 hours test run with 10sec event period.
+*/
+const points = 2880
 
 var errInvalidDuration = errors.New("invalid duration")

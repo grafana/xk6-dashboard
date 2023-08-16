@@ -55,3 +55,24 @@ func Test_getopts(t *testing.T) {
 	assert.Equal(t, "http://localhost:1", opts.url())
 	assert.Equal(t, "localhost:1", opts.addr())
 }
+
+func Test_options_pack_calc(t *testing.T) {
+	t.Parallel()
+
+	opts, _ := getopts("period=1s")
+
+	assert.Equal(t, time.Second, opts.period(0))
+
+	assert.Equal(t, time.Second, opts.period(points*time.Second))
+	assert.Equal(t, 2*time.Second, opts.period(2*points*time.Second))
+	assert.Equal(t, 3*time.Second, opts.period(3*points*time.Second))
+
+	opts, _ = getopts("")
+
+	assert.Equal(t, 10*time.Second, opts.period(time.Second))
+	assert.Equal(t, 10*time.Second, opts.period(4*time.Hour))
+	assert.Equal(t, 10*time.Second, opts.period(8*time.Hour))
+	assert.Equal(t, 20*time.Second, opts.period(9*time.Hour))
+	assert.Equal(t, 20*time.Second, opts.period(16*time.Hour))
+	assert.Equal(t, 30*time.Second, opts.period(24*time.Hour))
+}

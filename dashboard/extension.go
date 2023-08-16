@@ -11,6 +11,7 @@ import (
 
 	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/lib"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
@@ -30,6 +31,8 @@ type Extension struct {
 
 	cumulative *meter
 
+	period time.Duration
+
 	name string
 
 	briefFS fs.FS
@@ -44,6 +47,8 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 		return nil, err
 	}
 
+	offset, _ := lib.GetEndOffset(params.ExecutionPlan)
+
 	ext := &Extension{
 		uiFS:        uiFS,
 		briefFS:     briefFS,
@@ -54,6 +59,7 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 		server:      nil,
 		flusher:     nil,
 		cumulative:  nil,
+		period:      opts.period(offset),
 		eventSource: new(eventSource),
 	}
 
@@ -100,7 +106,7 @@ func (ext *Extension) Start() error {
 
 	ext.buffer = new(output.SampleBuffer)
 
-	flusher, err := output.NewPeriodicFlusher(ext.options.Period, ext.flush)
+	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
 	if err != nil {
 		return err
 	}
@@ -128,7 +134,7 @@ func (ext *Extension) flush() {
 	samples := ext.buffer.GetBufferedSamples()
 	now := time.Now()
 
-	ext.updateAndSend(samples, newMeter(ext.options.Period, now), snapshotEvent, now)
+	ext.updateAndSend(samples, newMeter(ext.period, now), snapshotEvent, now)
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
