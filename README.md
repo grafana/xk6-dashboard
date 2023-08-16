@@ -52,6 +52,15 @@ The report tab contains a test run report in a printable (or saveable to PDF) fo
 
 See [sample PDF report](screenshot/k6-dashboard-report.pdf)
 
+**HTML Report**
+
+The report can be saved in a single HTML file.
+
+*Single file HTML report*
+![k6 dashboard HTML report](screenshot/k6-dashboard-html-report.png)
+
+See [sample HTML report](screenshot/k6-dashboard-html-report.html)
+
 **Table of Contents**
 
 - [Download](#download)
