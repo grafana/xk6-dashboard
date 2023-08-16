@@ -54,12 +54,12 @@ See [sample PDF report](screenshot/k6-dashboard-report.pdf)
 
 **HTML Report**
 
-The report can be saved in a single HTML file.
+The report can be saved in a single responsive HTML file.
 
 *Single file HTML report*
 ![k6 dashboard HTML report](screenshot/k6-dashboard-html-report.png)
 
-See [sample HTML report](screenshot/k6-dashboard-html-report.html)
+See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/szkiba/xk6-dashboard/feature/report/screenshot/k6-dashboard-html-report.html)
 
 **Table of Contents**
 
