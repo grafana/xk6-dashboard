@@ -173,6 +173,11 @@ By using the `--report` switch of the `dashboard replay` command, the report can
 k6 dashboard replay --report test-report.html test-result.json
 ```
 
+*Example HTML report*
+![k6 dashboard HTML report](screenshot/k6-dashboard-html-report.png)
+
+See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/szkiba/xk6-dashboard/master/screenshot/k6-dashboard-html-report.html)
+
 ## Events
 
 The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE event source endpoint. Using this event source you can create your own dashboard UI.
