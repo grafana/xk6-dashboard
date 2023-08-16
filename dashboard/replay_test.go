@@ -47,7 +47,7 @@ func Test_replay(t *testing.T) {
 		Report: "",
 	}
 
-	assert.NoError(t, replay(opts, embed.FS{}, "testdata/result.gz"))
+	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
 
 	time.Sleep(time.Millisecond)
 

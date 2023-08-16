@@ -41,7 +41,7 @@ type replayer struct {
 	once sync.Once
 }
 
-func replay(opts *options, uiFS fs.FS, filename string) error {
+func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	config, err := opts.config()
 	if err != nil {
 		return err
@@ -54,6 +54,12 @@ func replay(opts *options, uiFS fs.FS, filename string) error {
 	rep.server = newWebServer(uiFS, config, rep.logger)
 	rep.eventSource = new(eventSource)
 	rep.addEventListener(rep.server)
+
+	if len(opts.Report) != 0 {
+		brf := newBriefer(briefFS, config, opts.Report, rep.logger)
+
+		rep.addEventListener(brf)
+	}
 
 	addr, err := rep.server.listenAndServe(rep.options.addr())
 	if err != nil {
@@ -68,7 +74,16 @@ func replay(opts *options, uiFS fs.FS, filename string) error {
 		browser.OpenURL(rep.options.url()) // nolint:errcheck
 	}
 
-	return feed(filename, rep.addMetricSamples)
+	if err := rep.fireStart(); err != nil {
+		return err
+	}
+
+	err = feed(filename, rep.addMetricSamples)
+	if err != nil {
+		return err
+	}
+
+	return rep.fireStop()
 }
 
 func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {

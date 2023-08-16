@@ -15,10 +15,10 @@ import (
 	"go.k6.io/k6/lib/consts"
 )
 
-func Execute(uiFS fs.FS) {
+func Execute(uiFS fs.FS, briefFS fs.FS) {
 	opts := new(options)
 
-	if err := buildRootCmd(opts, uiFS).Execute(); err != nil {
+	if err := buildRootCmd(opts, uiFS, briefFS).Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -32,12 +32,13 @@ const (
 	flagPeriod = "period"
 	flagOpen   = "open"
 	flagConfig = "config"
+	flagReport = "report"
 
 	typeMetric = "Metric"
 	typePoint  = "Point"
 )
 
-func buildRootCmd(opts *options, uiFS fs.FS) *cobra.Command {
+func buildRootCmd(opts *options, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
 	rootCmd := &cobra.Command{ // nolint:exhaustruct
 		Use:   "k6",
 		Short: "a next-generation load generator",
@@ -57,7 +58,7 @@ func buildRootCmd(opts *options, uiFS fs.FS) *cobra.Command {
 		Long:  "The replay command load the saved JSON results and replay it for the dashboard UI.\nThe compressed file will be automatically decompressed if the file extension is .gz",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := replay(opts, uiFS, args[0]); err != nil {
+			if err := replay(opts, uiFS, briefFS, args[0]); err != nil {
 				return err
 			}
 
@@ -78,10 +79,11 @@ func buildRootCmd(opts *options, uiFS fs.FS) *cobra.Command {
 	opts = new(options)
 
 	flags.StringVar(&opts.Host, flagHost, defaultHost, "Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)")
-	flags.IntVar(&opts.Port, flagPort, defaultPort, "TCP port for HTTP endpoint (default: 5665; 0=random, -1=no HTTP), example: 8080")
-	flags.DurationVar(&opts.Period, flagPeriod, defaultPeriod, "Event emitting frequency (default: `10s`), example: `1m`")
+	flags.IntVar(&opts.Port, flagPort, defaultPort, "TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080")
+	flags.DurationVar(&opts.Period, flagPeriod, defaultPeriod, "Event emitting frequency, example: `1m`")
 	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window automatically")
-	flags.StringVar(&opts.Config, flagConfig, defaultHost, "UI configuration file location (default: '.dashboard.js')")
+	flags.StringVar(&opts.Config, flagConfig, defaultConfig, "UI configuration file location")
+	flags.StringVar(&opts.Report, flagReport, defaultReport, "Report file location (default: '', no report)")
 
 	dashboardCmd.AddCommand(replayCmd)
 

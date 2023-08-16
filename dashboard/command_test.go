@@ -17,7 +17,7 @@ func Test_buildRootCmd(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, embed.FS{})
+	cmd := buildRootCmd(opts, embed.FS{}, embed.FS{})
 
 	assert.NotNil(t, cmd)
 

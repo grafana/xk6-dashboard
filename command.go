@@ -16,5 +16,5 @@ func init() {
 		return
 	}
 
-	dashboard.Execute(assets.DirUI())
+	dashboard.Execute(assets.DirUI(), assets.DirBrief())
 }
