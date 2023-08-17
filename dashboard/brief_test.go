@@ -183,6 +183,34 @@ func Test_briefer_injectConfig_error(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func Test_briefer_onEvent(t *testing.T) {
+	t.Parallel()
+
+	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+
+	data := make(map[string]interface{})
+
+	brf.onEvent(snapshotEvent, data)
+
+	assert.Equal(t, "{}\n", brf.buff.String())
+
+	brf.onEvent(snapshotEvent, data)
+
+	assert.Equal(t, "{}\n,{}\n", brf.buff.String())
+
+	data["bad"] = recursiveJSON(t)
+
+	brf.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
+
+	assert.Equal(t, "{}\n,{}\n,null\n", brf.buff.String())
+
+	data["foo"] = "bar"
+
+	brf.onEvent(cumulativeEvent, data)
+
+	assert.Equal(t, data, brf.cumulative)
+}
+
 const (
 	emptyData       = `{"cumulative":null,"snapshot":[]}`
 	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKs5LLCjOyC9RsoqOrQUEAAD//4mab6shAAAA`

@@ -76,3 +76,27 @@ func Test_options_pack_calc(t *testing.T) {
 	assert.Equal(t, 20*time.Second, opts.period(16*time.Hour))
 	assert.Equal(t, 30*time.Second, opts.period(24*time.Hour))
 }
+
+func Test_options_addr(t *testing.T) {
+	t.Parallel()
+
+	opts := new(options)
+
+	assert.Equal(t, ":0", opts.addr())
+
+	opts.Port = -1
+
+	assert.Equal(t, "", opts.addr())
+}
+
+func Test_options_url(t *testing.T) {
+	t.Parallel()
+
+	opts := new(options)
+
+	assert.Equal(t, "http://127.0.0.1:0", opts.url())
+
+	opts.Port = -1
+
+	assert.Equal(t, "", opts.url())
+}
