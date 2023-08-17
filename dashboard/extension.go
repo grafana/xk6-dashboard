@@ -80,10 +80,25 @@ func (ext *Extension) Start() error {
 		return err
 	}
 
-	ext.cumulative = newMeter(0, time.Now())
+	if ext.options.Port >= 0 {
+		ext.server = newWebServer(ext.uiFS, config, ext.logger)
+		ext.addEventListener(ext.server)
 
-	ext.server = newWebServer(ext.uiFS, config, ext.logger)
-	ext.addEventListener(ext.server)
+		addr, err := ext.server.listenAndServe(ext.options.addr())
+		if err != nil {
+			return err
+		}
+
+		if ext.options.Port == 0 {
+			ext.options.Port = addr.Port
+		}
+
+		if ext.options.Open {
+			browser.OpenURL(ext.options.url()) // nolint:errcheck
+		}
+	}
+
+	ext.cumulative = newMeter(0, time.Now())
 
 	if len(ext.options.Report) != 0 {
 		brf := newBriefer(ext.briefFS, config, ext.options.Report, ext.logger)
@@ -95,15 +110,6 @@ func (ext *Extension) Start() error {
 		return err
 	}
 
-	addr, err := ext.server.listenAndServe(ext.options.addr())
-	if err != nil {
-		return err
-	}
-
-	if ext.options.Port == 0 {
-		ext.options.Port = addr.Port
-	}
-
 	ext.buffer = new(output.SampleBuffer)
 
 	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
@@ -112,10 +118,6 @@ func (ext *Extension) Start() error {
 	}
 
 	ext.flusher = flusher
-
-	if ext.options.Open {
-		browser.OpenURL(ext.options.url()) // nolint:errcheck
-	}
 
 	return nil
 }
