@@ -4,7 +4,7 @@
 
 k6
 
-test_result.*
+test_result*
 
 coverage.txt
 

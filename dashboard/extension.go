@@ -11,11 +11,14 @@ import (
 
 	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/lib"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
 
 type Extension struct {
+	*eventSource
+
 	buffer *output.SampleBuffer
 
 	flusher *output.PeriodicFlusher
@@ -28,61 +31,93 @@ type Extension struct {
 
 	cumulative *meter
 
-	description string
+	period time.Duration
+
+	name string
+
+	briefFS fs.FS
 }
 
 var _ output.Output = (*Extension)(nil)
 
 // New creates Extension instance using the passwd uiFS as source of web UI.
-func New(params output.Params, uiFS fs.FS) (*Extension, error) {
+func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
 		return nil, err
 	}
 
+	offset, _ := lib.GetEndOffset(params.ExecutionPlan)
+
 	ext := &Extension{
 		uiFS:        uiFS,
+		briefFS:     briefFS,
 		logger:      params.Logger,
 		options:     opts,
-		description: fmt.Sprintf("%s (%s) %s", params.OutputType, opts.addr(), opts.url()),
+		name:        params.OutputType,
 		buffer:      nil,
 		server:      nil,
 		flusher:     nil,
 		cumulative:  nil,
+		period:      opts.period(offset),
+		eventSource: new(eventSource),
 	}
 
 	return ext, nil
 }
 
 func (ext *Extension) Description() string {
-	return ext.description
+	if ext.options.Port < 0 {
+		return ext.name
+	}
+
+	return fmt.Sprintf("%s (%s) %s", ext.name, ext.options.addr(), ext.options.url())
 }
 
 func (ext *Extension) Start() error {
-	var err error
+	config, err := ext.options.config()
+	if err != nil {
+		return err
+	}
+
+	if ext.options.Port >= 0 {
+		ext.server = newWebServer(ext.uiFS, config, ext.logger)
+		ext.addEventListener(ext.server)
+
+		addr, err := ext.server.listenAndServe(ext.options.addr())
+		if err != nil {
+			return err
+		}
+
+		if ext.options.Port == 0 {
+			ext.options.Port = addr.Port
+		}
+
+		if ext.options.Open {
+			browser.OpenURL(ext.options.url()) // nolint:errcheck
+		}
+	}
 
 	ext.cumulative = newMeter(0, time.Now())
 
-	ext.server = newWebServer(ext.uiFS, ext.options.Config, ext.logger)
+	if len(ext.options.Report) != 0 {
+		brf := newBriefer(ext.briefFS, config, ext.options.Report, ext.logger)
 
-	go func() {
-		if err := ext.server.listenAndServe(ext.options.addr()); err != nil {
-			ext.logger.Error(err)
-		}
-	}()
+		ext.addEventListener(brf)
+	}
+
+	if err := ext.fireStart(); err != nil {
+		return err
+	}
 
 	ext.buffer = new(output.SampleBuffer)
 
-	flusher, err := output.NewPeriodicFlusher(ext.options.Period, ext.flush)
+	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
 	if err != nil {
 		return err
 	}
 
 	ext.flusher = flusher
-
-	if ext.options.Open {
-		browser.OpenURL(ext.options.url()) // nolint:errcheck
-	}
 
 	return nil
 }
@@ -90,7 +125,7 @@ func (ext *Extension) Start() error {
 func (ext *Extension) Stop() error {
 	ext.flusher.Stop()
 
-	return nil
+	return ext.fireStop()
 }
 
 func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
@@ -101,7 +136,7 @@ func (ext *Extension) flush() {
 	samples := ext.buffer.GetBufferedSamples()
 	now := time.Now()
 
-	ext.updateAndSend(samples, newMeter(ext.options.Period, now), snapshotEvent, now)
+	ext.updateAndSend(samples, newMeter(ext.period, now), snapshotEvent, now)
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
@@ -113,5 +148,5 @@ func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *met
 		return
 	}
 
-	ext.server.sendEvent(event, data)
+	ext.fireEvent(event, data)
 }

@@ -12,45 +12,55 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type eventSource struct {
+type eventEmitter struct {
 	*sse.Server
 	logger  logrus.FieldLogger
 	channel string
 }
 
-func newEventSource(channel string, logger logrus.FieldLogger) *eventSource {
-	esrc := &eventSource{
+var _ eventListener = (*eventEmitter)(nil)
+
+func newEventEmitter(channel string, logger logrus.FieldLogger) *eventEmitter {
+	emitter := &eventEmitter{
 		channel: channel,
 		logger:  logger,
 		Server:  sse.New(),
 	}
 
-	esrc.CreateStream(channel)
+	emitter.CreateStream(channel)
 
-	return esrc
+	return emitter
 }
 
-func (esrc *eventSource) sendEvent(name string, data interface{}) {
+func (emitter *eventEmitter) onStart() error {
+	return nil
+}
+
+func (emitter *eventEmitter) onStop() error {
+	return nil
+}
+
+func (emitter *eventEmitter) onEvent(name string, data interface{}) {
 	buff, err := json.Marshal(data)
 	if err != nil {
-		esrc.logger.Error(err)
+		emitter.logger.Error(err)
 
 		return
 	}
 
-	ok := esrc.TryPublish(esrc.channel, &sse.Event{Event: []byte(name), Data: buff}) // nolint:exhaustruct
+	ok := emitter.TryPublish(emitter.channel, &sse.Event{Event: []byte(name), Data: buff}) // nolint:exhaustruct
 	if !ok {
-		esrc.logger.Warn("Event dropped")
+		emitter.logger.Warn("Event dropped")
 	}
 }
 
-func (esrc *eventSource) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (emitter *eventEmitter) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	values := req.URL.Query()
 
-	values.Add("stream", esrc.channel)
+	values.Add("stream", emitter.channel)
 	req.URL.RawQuery = values.Encode()
 
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 
-	esrc.Server.ServeHTTP(res, req)
+	emitter.Server.ServeHTTP(res, req)
 }
