@@ -7,7 +7,6 @@ package dashboard
 import (
 	"embed"
 	"fmt"
-	"net"
 	"os"
 	"strconv"
 	"strings"
@@ -46,13 +45,10 @@ func TestNewExtension(t *testing.T) {
 func TestExtension(t *testing.T) {
 	t.Parallel()
 
-	port := getRandomPort(t)
-	addr := net.JoinHostPort("127.0.0.1", strconv.Itoa(port))
-
 	var params output.Params
 
 	params.Logger = logrus.StandardLogger()
-	params.ConfigArgument = "period=10ms&port=" + strconv.Itoa(port)
+	params.ConfigArgument = "period=10ms&port=0"
 
 	ext, err := New(params, embed.FS{}, embed.FS{})
 
@@ -69,7 +65,7 @@ func TestExtension(t *testing.T) {
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
 	}()
 
-	lines := readSSE(t, 7, "http://"+addr+"/events")
+	lines := readSSE(t, 7, "http://"+ext.options.addr()+"/events")
 
 	assert.NotNil(t, lines)
 	assert.Equal(t, "event: snapshot", lines[2])
