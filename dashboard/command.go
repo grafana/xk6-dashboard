@@ -62,6 +62,10 @@ func buildRootCmd(opts *options, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
 				return err
 			}
 
+			if opts.Port < 0 {
+				return nil
+			}
+
 			done := make(chan os.Signal, 1)
 
 			signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)

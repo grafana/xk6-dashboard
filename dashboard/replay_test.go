@@ -58,6 +58,67 @@ func Test_replay(t *testing.T) {
 	assert.Equal(t, 5, len(lines))
 }
 
+func Test_replay_random_port(t *testing.T) {
+	t.Parallel()
+
+	opts := &options{
+		Port:   0,
+		Host:   "127.0.0.1",
+		Period: time.Second,
+		Open:   false,
+		Config: "",
+		Report: "",
+	}
+
+	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+
+	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
+}
+
+func Test_replay_open(t *testing.T) { //nolint:paralleltest
+	opts := &options{
+		Port:   0,
+		Host:   "127.0.0.1",
+		Period: time.Second,
+		Open:   true,
+		Config: "",
+		Report: "",
+	}
+
+	t.Setenv("PATH", "")
+
+	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+
+	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
+}
+
+func Test_replay_error_config(t *testing.T) { //nolint:paralleltest
+	opts := &options{
+		Port:   0,
+		Host:   "127.0.0.1",
+		Period: time.Second,
+		Open:   false,
+		Config: "no_such_file",
+		Report: "",
+	}
+
+	assert.Error(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+}
+
+func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
+	opts := &options{
+		Port:   getRandomPort(t),
+		Host:   "127.0.0.1",
+		Period: time.Second,
+		Open:   false,
+		Config: "",
+		Report: "",
+	}
+
+	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+	assert.Error(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+}
+
 func Test_replay_report(t *testing.T) {
 	t.Parallel()
 

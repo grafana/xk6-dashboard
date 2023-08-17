@@ -6,6 +6,7 @@ package dashboard
 
 import (
 	"embed"
+	"fmt"
 	"net"
 	"os"
 	"strconv"
@@ -82,6 +83,111 @@ func TestExtension(t *testing.T) {
 	assert.NoError(t, ext.Stop())
 }
 
+func TestExtension_no_http(t *testing.T) {
+	t.Parallel()
+
+	var params output.Params
+
+	params.OutputType = "bar"
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "port=-1"
+
+	ext, err := New(params, embed.FS{}, embed.FS{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.NoError(t, ext.Start())
+
+	assert.Equal(t, -1, ext.options.Port)
+	assert.Equal(t, "bar", ext.Description())
+
+	assert.NoError(t, ext.Stop())
+}
+
+func TestExtension_random_port(t *testing.T) {
+	t.Parallel()
+
+	var params output.Params
+
+	params.OutputType = "foo"
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "port=0"
+
+	ext, err := New(params, embed.FS{}, embed.FS{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.NoError(t, ext.Start())
+
+	assert.Greater(t, ext.options.Port, 0)
+
+	assert.Equal(t, fmt.Sprintf("foo (%s) %s", ext.options.addr(), ext.options.url()), ext.Description())
+
+	assert.NoError(t, ext.Stop())
+}
+
+func TestExtension_error_used_port(t *testing.T) {
+	t.Parallel()
+
+	port := getRandomPort(t)
+
+	var params output.Params
+
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "port=" + strconv.Itoa(port)
+
+	ext, err := New(params, embed.FS{}, embed.FS{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.NoError(t, ext.Start())
+
+	ext2, err := New(params, embed.FS{}, embed.FS{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext2)
+
+	assert.Error(t, ext2.Start())
+
+	assert.NoError(t, ext.Stop())
+}
+
+func TestExtension_error_missing_config(t *testing.T) {
+	t.Parallel()
+
+	var params output.Params
+
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "port=-1&config=no_such_file"
+
+	ext, err := New(params, embed.FS{}, embed.FS{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.Error(t, ext.Start())
+}
+
+func TestExtension_open(t *testing.T) { //nolint:paralleltest
+	var params output.Params
+
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "port=0&open"
+
+	ext, err := New(params, embed.FS{}, embed.FS{})
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	t.Setenv("PATH", "")
+
+	assert.NoError(t, ext.Start())
+	assert.NoError(t, ext.Stop())
+}
+
 func TestExtension_report(t *testing.T) {
 	t.Parallel()
 
@@ -93,7 +199,7 @@ func TestExtension_report(t *testing.T) {
 	var params output.Params
 
 	params.Logger = logrus.StandardLogger()
-	params.ConfigArgument = "period=10ms&port=0&report=" + file.Name() + ".gz"
+	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
 
 	ext, err := New(params, embed.FS{}, assets.DirBrief())
 
