@@ -98,6 +98,8 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 	}
 
 	if err := brf.encoder.Encode(data); err != nil {
+		brf.encoder.Encode(nil) //nolint:errcheck,errchkjson
+
 		brf.logger.Error(err)
 	}
 }

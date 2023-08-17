@@ -106,6 +106,10 @@ func (opts *options) addr() string {
 }
 
 func (opts *options) url() string {
+	if opts.Port < 0 {
+		return ""
+	}
+
 	host := opts.Host
 	if host == "" {
 		host = "127.0.0.1"
