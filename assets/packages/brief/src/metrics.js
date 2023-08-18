@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: MIT
 
-import React from 'react'
-import { useSSE } from 'react-hooks-sse'
 import { roundTo } from 'round-to'
 
 const propTime = 'time'
@@ -18,20 +16,11 @@ class Metrics {
     this.lastEventId = lastEventId
   }
 
-  _filterDuplicate (data) {
-    const timeSeries = this.values[propTime]
-    const timeValue = data[propTime]
-
-    if (!timeValue || !Array.isArray(timeSeries) || timeSeries.length == 0) {
-      return false
-    }
-
-    return timeSeries.slice(-1) == timeValue
-  }
-
   pushOne (key, value) {
     if (!this.values.hasOwnProperty(key)) {
       this.values[key] = Array(this.length)
+    } else if (this.values[key].length < this.length) {
+      this.values[key][this.length-1] = undefined
     }
 
     this.values[key].push(roundTo(value, 4))
@@ -42,11 +31,6 @@ class Metrics {
   }
 
   push (data) {
-    if (this._filterDuplicate(data)) {
-      // react or sse component call twice...
-      return
-    }
-
     for (const key in data) {
       if (key == propTime) {
         this.pushOne(key, Math.floor(data[key].sample.value / 1000))
@@ -68,36 +52,6 @@ class Metrics {
       this.length++
     }
   }
-
-  static reducer (state, action) {
-    var newState
-
-    var lastEventId = parseInt(action.event.lastEventId)
-    if (isNaN(lastEventId)) {
-      lastEventId = 0
-    }
-
-    if (state.lastEventId > lastEventId) {
-      newState = new Metrics()
-    } else {
-      newState = new Metrics(state)
-    }
-
-    newState.push(action.data)
-    newState.lastEventId = lastEventId
-
-    return newState
-  }
 }
 
-function useEvent (name) {
-  return useSSE(name, new Metrics(), {
-    parser: JSON.parse,
-    stateReducer: Metrics.reducer
-  })
-}
-
-const MetricsContext = React.createContext(new Metrics())
-MetricsContext.displayName = 'Metrics'
-
-export { MetricsContext, useEvent, propTime }
+export { Metrics, propTime }

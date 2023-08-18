@@ -35,3 +35,29 @@ linters:
     - sqlclosecheck
     - wastedassign
 
+linters-settings:
+  depguard:
+    rules:
+      main:
+        files:
+        - $all
+        - "!$test"
+        allow:
+          - $gostd
+          - github.com/sirupsen/logrus
+          - github.com/spf13/cobra
+          - github.com/pkg/browser
+          - github.com/gorilla/schema
+          - github.com/tidwall/gjson
+          - github.com/r3labs/sse/v2
+          - github.com/grafana/xk6-dashboard/assets
+          - github.com/grafana/xk6-dashboard/dashboard
+      test:
+        files:
+        - $test
+        allow:
+        - $gostd
+        - github.com/stretchr/testify/assert
+        - github.com/sirupsen/logrus
+        - github.com/grafana/xk6-dashboard/assets
+        - github.com/grafana/xk6-dashboard/dashboard

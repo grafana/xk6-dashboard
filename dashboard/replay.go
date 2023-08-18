@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Iván Szkiba
+//
+// SPDX-License-Identifier: MIT
+
 package dashboard
 
 import (
@@ -20,6 +24,8 @@ import (
 )
 
 type replayer struct {
+	*eventSource
+
 	buffer *output.SampleBuffer
 
 	logger logrus.FieldLogger
@@ -35,22 +41,53 @@ type replayer struct {
 	once sync.Once
 }
 
-func replay(opts *options, uiFS fs.FS, filename string) error {
+func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
+	config, err := opts.config()
+	if err != nil {
+		return err
+	}
+
 	rep := new(replayer)
 
 	rep.options = opts
 	rep.logger = logrus.StandardLogger()
-	rep.server = newWebServer(uiFS, rep.options.Config, rep.logger)
+	rep.eventSource = new(eventSource)
 
-	if err := rep.server.listenAndServe(rep.options.addr()); err != nil {
+	if len(opts.Report) != 0 {
+		brf := newBriefer(briefFS, config, opts.Report, rep.logger)
+
+		rep.addEventListener(brf)
+	}
+
+	if opts.Port >= 0 {
+		rep.server = newWebServer(uiFS, config, rep.logger)
+
+		rep.addEventListener(rep.server)
+
+		addr, err := rep.server.listenAndServe(rep.options.addr())
+		if err != nil {
+			return err
+		}
+
+		if rep.options.Port == 0 {
+			rep.options.Port = addr.Port
+		}
+
+		if rep.options.Open {
+			browser.OpenURL(rep.options.url()) // nolint:errcheck
+		}
+	}
+
+	if err := rep.fireStart(); err != nil {
 		return err
 	}
 
-	if rep.options.Open {
-		browser.OpenURL(rep.options.url()) // nolint:errcheck
+	err = feed(filename, rep.addMetricSamples)
+	if err != nil {
+		return err
 	}
 
-	return feed(filename, rep.addMetricSamples)
+	return rep.fireStop()
 }
 
 func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
@@ -83,7 +120,7 @@ func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, m *mete
 		return
 	}
 
-	rep.server.sendEvent(event, data)
+	rep.fireEvent(event, data)
 }
 
 type addMetricSamplesFunc func([]metrics.SampleContainer)

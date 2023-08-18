@@ -8,7 +8,6 @@ import (
 	"io/fs"
 	"net"
 	"net/http"
-	"os"
 	"path"
 	"time"
 
@@ -25,27 +24,27 @@ const (
 )
 
 type webServer struct {
-	*eventSource
+	*eventEmitter
 	*http.ServeMux
 }
 
-func newWebServer(uiFS fs.FS, uiConfig string, logger logrus.FieldLogger) *webServer { //nolint:ireturn
+func newWebServer(uiFS fs.FS, uiConfig []byte, logger logrus.FieldLogger) *webServer { //nolint:ireturn
 	srv := &webServer{
-		eventSource: newEventSource(eventChannel, logger),
-		ServeMux:    http.NewServeMux(),
+		eventEmitter: newEventEmitter(eventChannel, logger),
+		ServeMux:     http.NewServeMux(),
 	}
 
-	srv.Handle(pathEvents, srv.eventSource)
-	srv.HandleFunc(pathUI, uiHandler(pathUI, uiFS, uiConfig, logger))
+	srv.Handle(pathEvents, srv.eventEmitter)
+	srv.HandleFunc(pathUI, uiHandler(pathUI, uiFS, uiConfig))
 	srv.HandleFunc("/", rootHandler(pathUI))
 
 	return srv
 }
 
-func (srv *webServer) listenAndServe(addr string) error {
+func (srv *webServer) listenAndServe(addr string) (*net.TCPAddr, error) {
 	listener, err := net.Listen("tcp", addr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	go func() {
@@ -56,7 +55,9 @@ func (srv *webServer) listenAndServe(addr string) error {
 		}
 	}()
 
-	return nil
+	a, _ := listener.Addr().(*net.TCPAddr)
+
+	return a, nil
 }
 
 func rootHandler(uiPath string) http.HandlerFunc {
@@ -71,7 +72,7 @@ func rootHandler(uiPath string) http.HandlerFunc {
 	}
 }
 
-func uiHandler(uiPath string, uiFS fs.FS, uiConfig string, logger logrus.FieldLogger) http.HandlerFunc {
+func uiHandler(uiPath string, uiFS fs.FS, uiConfig []byte) http.HandlerFunc {
 	handler := http.StripPrefix(uiPath, http.FileServer(http.FS(uiFS)))
 
 	if len(uiConfig) == 0 {
@@ -85,18 +86,8 @@ func uiHandler(uiPath string, uiFS fs.FS, uiConfig string, logger logrus.FieldLo
 			return
 		}
 
-		// try to read on every request to allow dynamic reload
-		content, err := os.ReadFile(uiConfig)
-		if err != nil {
-			logger.WithError(err).Debugf("ignoring ui config file: %s", uiConfig)
-
-			handler.ServeHTTP(res, req)
-
-			return
-		}
-
 		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
 		res.WriteHeader(http.StatusOK)
-		res.Write(content) // nolint:errcheck
+		res.Write(uiConfig) // nolint:errcheck
 	}
 }

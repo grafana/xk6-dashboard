@@ -8,27 +8,30 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/szkiba/xk6-dashboard/ui"
 )
 
 func Test_newWebServer(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(ui.GetFS(), "", logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), []byte{}, logrus.StandardLogger())
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
-	assert.NotNil(t, srv.eventSource)
+	assert.NotNil(t, srv.eventEmitter)
 
 	addr := getRandomAddr(t)
 
-	assert.NoError(t, srv.listenAndServe(addr))
+	_, err := srv.listenAndServe(addr)
+
+	assert.NoError(t, err)
 
 	base := "http://" + addr
 
@@ -52,39 +55,22 @@ func Test_newWebServer(t *testing.T) {
 func Test_webServer_used_addr(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(ui.GetFS(), "", logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), []byte{}, logrus.StandardLogger())
 
 	addr := getRandomAddr(t)
 
-	assert.NoError(t, srv.listenAndServe(addr))
-	assert.Error(t, srv.listenAndServe(addr))
+	_, err := srv.listenAndServe(addr)
+	assert.NoError(t, err)
+
+	_, err = srv.listenAndServe(addr)
+
+	assert.Error(t, err)
 }
 
 func Test_uiHandler_no_config(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", ui.GetFS(), "", logrus.StandardLogger())
-
-	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
-
-	handler(rec, req)
-
-	res := rec.Result() // nolint:bodyclose
-
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Contains(t, res.Header.Get("Content-Type"), "/javascript")
-
-	body, err := io.ReadAll(res.Body)
-
-	assert.NoError(t, err)
-	assert.Equal(t, "export default defaultConfig", strings.TrimSpace(string(body)))
-}
-
-func Test_uiHandler_missing_config(t *testing.T) {
-	t.Parallel()
-
-	handler := uiHandler("/foo/", ui.GetFS(), "no-such-file", logrus.StandardLogger())
+	handler := uiHandler("/foo/", assets.DirUI(), []byte{})
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)
@@ -105,7 +91,11 @@ func Test_uiHandler_missing_config(t *testing.T) {
 func Test_uiHandler(t *testing.T) {
 	t.Parallel()
 
-	handler := uiHandler("/foo/", ui.GetFS(), filepath.Join("..", ".dashboard.js"), logrus.StandardLogger())
+	config, err := os.ReadFile(filepath.Join("..", ".dashboard.js"))
+
+	assert.NoError(t, err)
+
+	handler := uiHandler("/foo/", assets.DirUI(), config)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/foo/config.js", nil)

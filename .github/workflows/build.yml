@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - feature/*
+      - bugfix/*
 
 jobs:
   build:
@@ -25,4 +26,4 @@ jobs:
         id: build
         uses: szkiba/xk6bundler@v0
         with:
-          with: github.com/szkiba/xk6-dashboard=/github/workspace
+          with: github.com/grafana/xk6-dashboard=/github/workspace
