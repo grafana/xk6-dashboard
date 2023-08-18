@@ -32,6 +32,8 @@ class Metrics {
   pushOne (key, value) {
     if (!this.values.hasOwnProperty(key)) {
       this.values[key] = Array(this.length)
+    } else if (this.values[key].length < this.length) {
+      this.values[key][this.length-1] = undefined
     }
 
     this.values[key].push(roundTo(value, 4))
