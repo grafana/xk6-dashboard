@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/szkiba/xk6-dashboard/assets"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
