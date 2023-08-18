@@ -37,7 +37,7 @@ func Test() error {
 }
 
 func Build() error {
-	return shellcmd.Command(`xk6 build --with github.com/szkiba/xk6-dashboard=.`).Run()
+	return shellcmd.Command(`xk6 build --with github.com/grafana/xk6-dashboard=.`).Run()
 }
 
 func It() error {

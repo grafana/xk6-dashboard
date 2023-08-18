@@ -1,6 +1,6 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/szkiba/xk6-dashboard)](https://goreportcard.com/report/github.com/szkiba/xk6-dashboard)
-[![GitHub Actions](https://github.com/szkiba/xk6-dashboard/workflows/Test/badge.svg)](https://github.com/szkiba/xk6-dashboard/actions?query=workflow%3ATest+branch%3Amaster)
-[![codecov](https://codecov.io/gh/szkiba/xk6-dashboard/branch/master/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/szkiba/xk6-dashboard)
+[![Go Report Card](https://goreportcard.com/badge/github.com/grafana/xk6-dashboard)](https://goreportcard.com/report/github.com/grafana/xk6-dashboard)
+[![GitHub Actions](https://github.com/grafana/xk6-dashboard/workflows/Test/badge.svg)](https://github.com/grafana/xk6-dashboard/actions?query=workflow%3ATest+branch%3Amaster)
+[![codecov](https://codecov.io/gh/grafana/xk6-dashboard/branch/master/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/grafana/xk6-dashboard)
 
 
 # xk6-dashboard <!-- omit in toc -->
@@ -61,7 +61,7 @@ The report can be saved in a single responsive HTML file.
 *Single file HTML report*
 ![k6 dashboard HTML report](screenshot/k6-dashboard-html-report.png)
 
-See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/szkiba/xk6-dashboard/master/screenshot/k6-dashboard-html-report.html)
+See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/grafana/xk6-dashboard/master/screenshot/k6-dashboard-html-report.html)
 
 **Table of Contents**
 
@@ -79,7 +79,7 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 
 ## Download
 
-You can download pre-built k6 binaries from [Releases](https://github.com/szkiba/xk6-dashboard/releases/) page. Check [Packages](https://github.com/szkiba/xk6-dashboard/pkgs/container/xk6-dashboard) page for pre-built k6 Docker images.
+You can download pre-built k6 binaries from [Releases](https://github.com/grafana/xk6-dashboard/releases/) page. Check [Packages](https://github.com/grafana/xk6-dashboard/pkgs/container/xk6-dashboard) page for pre-built k6 Docker images.
 
 ## Build
 
@@ -97,7 +97,7 @@ Then:
 
 2. Build the binary:
   ```bash
-  $ xk6 build --with github.com/szkiba/xk6-dashboard@latest
+  $ xk6 build --with github.com/grafana/xk6-dashboard@latest
   ```
 
 ## Usage
@@ -148,13 +148,13 @@ You can also use pre-built k6 image within a Docker container. In order to do th
 **Linux**
 
 ```plain
-docker run -v $(pwd):/scripts -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=dashboard /scripts/script.js
+docker run -v $(pwd):/scripts -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=dashboard /scripts/script.js
 ```
 
 **Windows**
 
 ```plain
-docker run -v %cd%:/scripts -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=dashboard /scripts/script.js
+docker run -v %cd%:/scripts -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=dashboard /scripts/script.js
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
@@ -178,7 +178,7 @@ k6 dashboard replay --report test-report.html test-result.json
 *Example HTML report*
 ![k6 dashboard HTML report](screenshot/k6-dashboard-html-report.png)
 
-See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/szkiba/xk6-dashboard/master/screenshot/k6-dashboard-html-report.html)
+See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/grafana/xk6-dashboard/master/screenshot/k6-dashboard-html-report.html)
 
 ## Events
 
@@ -345,15 +345,15 @@ You can also use pre-built k6 image within a Docker container. In order to do th
 **Linux**
 
 ```plain
-docker run -v $(pwd):/work -v /tmp:/tmp/work -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
-docker run -v /tmp:/tmp/work -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
+docker run -v $(pwd):/work -v /tmp:/tmp/work -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
+docker run -v /tmp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
 ```
 
 **Windows**
 
 ```plain
-docker run -v %cd%:/work -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -it --rm ghcr.io/szkiba/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
-docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm ghcr.io/szkiba/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
+docker run -v %cd%:/work -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
+docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665

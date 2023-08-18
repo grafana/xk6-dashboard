@@ -7,8 +7,8 @@ package dashboard
 import (
 	"os"
 
-	"github.com/szkiba/xk6-dashboard/assets"
-	"github.com/szkiba/xk6-dashboard/dashboard"
+	"github.com/grafana/xk6-dashboard/assets"
+	"github.com/grafana/xk6-dashboard/dashboard"
 )
 
 func init() {

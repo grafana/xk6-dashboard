@@ -1,4 +1,4 @@
-module github.com/szkiba/xk6-dashboard
+module github.com/grafana/xk6-dashboard
 
 go 1.19
 

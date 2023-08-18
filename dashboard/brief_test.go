@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/szkiba/xk6-dashboard/assets"
 )
 
 type errorWriter struct {
