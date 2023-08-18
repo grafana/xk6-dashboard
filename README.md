@@ -5,9 +5,9 @@
 
 # xk6-dashboard <!-- omit in toc -->
 
-A [k6 extension](https://k6.io/docs/extensions/) that enables creating web based metrics dashboard for [k6](https://k6.io).
+A [k6 extension](https://k6.io/docs/extensions/) that enables creating a web based metrics dashboard for [k6](https://k6.io).
 
-By using **xk6-dashboard** output extension you can access metrics from [k6](https://k6.io) process via [Server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom [k6](https://k6.io) metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/),[Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/),[Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/),[Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [build-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) will be accessible in the event stream.
+By using the **xk6-dashboard** output extension you can access metrics from [k6](https://k6.io) process via [server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom [k6](https://k6.io) metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/), [Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/), [Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/), [Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [built-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) are accessible in the event stream.
 
 The test run report can be exported to a responsive self-contained HTML file, which can be displayed even without an Internet connection.
 
@@ -15,7 +15,7 @@ The test run report can be exported to a responsive self-contained HTML file, wh
 
 *Overview*
 
-The overview tabs provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.
+The overview tab provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.
 
 ![k6 dashboard overview snapshot](screenshot/k6-dashboard-overview-snapshot.png)
 
@@ -24,7 +24,7 @@ The overview tabs provides an overview of the most important metrics of the test
 
 *Timings*
 
-The timings tabs provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.
+The timings tab provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.
 
 ![k6 dashboard timings snapshot](screenshot/k6-dashboard-timings-snapshot.png)
 
@@ -39,7 +39,7 @@ Example of customizing the display of metrics.
 
 *Summary Tab*
 
-Summary tab contains a summary of the test run metrics. The tables contains the aggregated values of the metrics for the entire test run.
+The summary tab contains a summary of the test run metrics. The tables contain the aggregated values of the metrics for the entire test run.
 
 ![k6 dashboard summary](screenshot/k6-dashboard-summary.png)
 
@@ -52,7 +52,7 @@ The report tab contains a test run report in a printable (or saveable to PDF) fo
 
 *Report PDF*
 
-See [sample PDF report](screenshot/k6-dashboard-report.pdf)
+See [sample PDF report](screenshot/k6-dashboard-report.pdf).
 
 **HTML Report**
 
@@ -79,7 +79,7 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 
 ## Download
 
-You can download pre-built k6 binaries from [Releases](https://github.com/grafana/xk6-dashboard/releases/) page. Check [Packages](https://github.com/grafana/xk6-dashboard/pkgs/container/xk6-dashboard) page for pre-built k6 Docker images.
+You can download pre-built k6 binaries from the [Releases](https://github.com/grafana/xk6-dashboard/releases/) page. Check the [Packages](https://github.com/grafana/xk6-dashboard/pkgs/container/xk6-dashboard) page for pre-built k6 Docker images.
 
 ## Build
 
@@ -128,7 +128,7 @@ The output extension accepts parameters in a standard query string format:
 k6 run --out 'dashboard=param1=value1&param2=value2&param3=value3'
 ```
 
-> Note apostrophe (`'`) characters around the `--out` parameter! You should use it for escape `&` characters from shell (or use backslash before `&` characters).
+> Note the apostrophes (`'`) around the `--out` parameter! You should use it to escape `&` characters from the shell (or use backslash before `&`).
 
 The following parameters are recognized:
 
@@ -137,13 +137,13 @@ parameter | description
 host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
 port      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no HTTP), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
-open      | Set to `true` (or empty) for opening browser window automatically
+open      | Set to `true` (or empty) to open the browser window automatically
 config    | UI configuration file location (default: `.dashboard.js`) (see [Customization](#customization))
 report    | File name to save the report (dafault: "", empty, the report will not be saved)
 
 ## Docker
 
-You can also use pre-built k6 image within a Docker container. In order to do that, you will need to execute something like the following:
+You can also use pre-built k6 image within a Docker container. In order to do that you will need to execute something like the following:
 
 **Linux**
 
@@ -182,9 +182,9 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 
 ## Events
 
-The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE event source endpoint. Using this event source you can create your own dashboard UI.
+The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE source endpoint. Using this event source you can create your own dashboard UI.
 
-Events will be emitted periodically, based on `period` parameter (default: `10s`). The event's `data` is a JSON object, with metric names as property names and metric values as property values. The format is similar to [List Metrics](https://k6.io/docs/misc/k6-rest-api/#list-metrics) response format from [k6 REST API](https://k6.io/docs/misc/k6-rest-api/).
+Events will be emitted periodically based on the `period` parameter (default: `10s`). The event's `data` is a JSON object with metric names as property names and metric values as property values. The format is similar to the [List Metrics](https://k6.io/docs/misc/k6-rest-api/#list-metrics) response format from the [k6 REST API](https://k6.io/docs/misc/k6-rest-api/).
 
 Two kind of events will be emitted:
   - `snapshot` contains metric values from last period
@@ -307,13 +307,13 @@ Flags:
 Use "k6 dashboard [command] --help" for more information about a command.
 ```
 
-At the moment, the `dashboard` command has only one subcommand, `replay`, which can be used to play back test run results previously saved in JSON format for the dashboard.
+At the moment, the `dashboard` command has only one subcommand, `replay`, which can be used to play back test run results previously saved in JSON format from k6.
 
 ```sh
 $ ./k6 dashboard replay --help
 
-The replay command load the saved JSON results and replay it for the dashboard UI.
-The compressed file will be automatically decompressed if the file extension is .gz
+The replay command will load the saved JSON results and replay it in the dashboard UI.
+The compressed file will automatically be decompressed if the file extension is .gz
 
 Usage:
   k6 dashboard replay file [flags]
@@ -331,7 +331,7 @@ Flags:
 The `replay` command expects a JSON (or gzip-compressed JSON) file as an argument. Flags with the same name and meaning as the extension parameters can be used in the `replay` command.
 
 
-Visualization of the result of a previous test run:
+To visualize the result of a previous test run:
 
 ```
 ./k6 run --out json=test_result.json script.js
@@ -357,4 +357,3 @@ docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm g
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
-
