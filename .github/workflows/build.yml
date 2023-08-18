@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - feature/*
+      - bugfix/*
 
 jobs:
   build:
