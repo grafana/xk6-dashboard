@@ -7,6 +7,7 @@ package dashboard
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/r3labs/sse/v2"
 	"github.com/sirupsen/logrus"
@@ -48,7 +49,13 @@ func (emitter *eventEmitter) onEvent(name string, data interface{}) {
 		return
 	}
 
-	ok := emitter.TryPublish(emitter.channel, &sse.Event{Event: []byte(name), Data: buff}) // nolint:exhaustruct
+	var retry []byte
+
+	if name == stopEvent {
+		retry = []byte(strconv.Itoa(maxSafeInteger))
+	}
+
+	ok := emitter.TryPublish(emitter.channel, &sse.Event{Event: []byte(name), Data: buff, Retry: retry}) // nolint:exhaustruct
 	if !ok {
 		emitter.logger.Warn("Event dropped")
 	}
@@ -64,3 +71,5 @@ func (emitter *eventEmitter) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	emitter.Server.ServeHTTP(res, req)
 }
+
+const maxSafeInteger = 9007199254740991
