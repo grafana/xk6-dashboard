@@ -112,6 +112,10 @@ func (ext *Extension) Start() error {
 
 	ext.buffer = new(output.SampleBuffer)
 
+	now := time.Now()
+
+	ext.updateAndSend(ext.buffer.GetBufferedSamples(), newMeter(ext.period, now), startEvent, now)
+
 	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
 	if err != nil {
 		return err
@@ -124,6 +128,10 @@ func (ext *Extension) Start() error {
 
 func (ext *Extension) Stop() error {
 	ext.flusher.Stop()
+
+	now := time.Now()
+
+	ext.updateAndSend(ext.buffer.GetBufferedSamples(), newMeter(ext.period, now), stopEvent, now)
 
 	return ext.fireStop()
 }

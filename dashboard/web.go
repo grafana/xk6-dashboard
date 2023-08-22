@@ -21,6 +21,8 @@ const (
 	eventChannel    = "events"
 	snapshotEvent   = "snapshot"
 	cumulativeEvent = "cumulative"
+	startEvent      = "start"
+	stopEvent       = "stop"
 )
 
 type webServer struct {
