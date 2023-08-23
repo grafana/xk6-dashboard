@@ -43,7 +43,7 @@ const overviewCharts = [
     title: 'VUs',
     series: {
       vus_gauge_value: { label: 'VUs', width: 2, scale: 'n' },
-      http_reqs_counter_rate: { label: 'request rate', scale: '1/s' }
+      http_reqs_counter_rate: { label: 'HTTP request rate', scale: '1/s' }
     },
     axes: [{}, { scale: 'n' }, { scale: '1/s', side: 1 }],
     scales: [{}, {}, {}]
@@ -141,10 +141,11 @@ const defaultConfig = {
   title: 'k6 dashboard',
   tabs: [
     tabOverview('snapshot'),
-    tabOverview('cumulative'),
     tabTimings('snapshot'),
-    tabTimings('cumulative'),
   ],
+
+  tabOverview,
+  tabTimings,
 
   tab (id) {
     let tab = null

@@ -10,7 +10,7 @@ function addP99 (chart) {
 function durationPanel (suffix) {
   return {
     id: `http_req_duration_${suffix}`,
-    title: `Request Duration ${suffix}`,
+    title: `HTTP Request Duration ${suffix}`,
     metric: `http_req_duration_trend_${suffix}`,
     format: 'duration'
   }
@@ -34,6 +34,10 @@ const durationChart = { ...overview.chart('http_req_duration') }
 
 // ... and add p(99)
 addP99(durationChart)
+
+// uncomment to add cumulative tabs
+// defaultConfig.tabs.push(defaultConfig.tabOverview('cumulative'))
+// defaultConfig.tabs.push(defaultConfig.tabTimings('cumulative'))
 
 // define custom tab
 const customTab = {

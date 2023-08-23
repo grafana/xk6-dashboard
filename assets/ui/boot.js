@@ -1,25 +1,25 @@
 const overviewPanels = [
   {
     id: 'iterations',
-    title: 'Iterations',
-    metric: 'iterations_counter_count',
-    format: 'counter'
+    title: 'Iteration Rate',
+    metric: 'iterations_counter_rate',
+    format: 'rps'
   },
   {
     id: 'vus',
-    title: 'Virtual Users',
+    title: 'VUs',
     metric: 'vus_gauge_value',
     format: 'counter'
   },
   {
     id: 'http_reqs',
-    title: 'Request Rate',
+    title: 'HTTP Request Rate',
     metric: 'http_reqs_counter_rate',
     format: 'rps'
   },
   {
     id: 'http_req_duration',
-    title: 'Request Duration',
+    title: 'HTTP Request Duration',
     metric: 'http_req_duration_trend_avg',
     format: 'duration'
   },
@@ -40,10 +40,10 @@ const overviewPanels = [
 const overviewCharts = [
   {
     id: 'http_reqs',
-    title: 'Generated Load',
+    title: 'VUs',
     series: {
-      vus_gauge_value: { label: 'user count', width: 2, scale: 'n' },
-      http_reqs_counter_rate: { label: 'request rate', scale: '1/s' }
+      vus_gauge_value: { label: 'VUs', width: 2, scale: 'n' },
+      http_reqs_counter_rate: { label: 'HTTP request rate', scale: '1/s' }
     },
     axes: [{}, { scale: 'n' }, { scale: '1/s', side: 1 }],
     scales: [{}, {}, {}]
@@ -64,7 +64,7 @@ const overviewCharts = [
   },
   {
     id: 'http_req_duration',
-    title: 'Request Duration (ms)',
+    title: 'HTTP Request Duration (ms)',
     series: {
       http_req_duration_trend_avg: { label: 'avg', width: 2 },
       'http_req_duration_trend_p(90)': { label: 'p(90)' },
@@ -124,12 +124,12 @@ function tabTimings (event) {
     title: `Timings${suffix(event)}`,
     event: event,
     charts: [
-      chartTimings('http_req_duration', 'Request Duration (ms)'),
-      chartTimings('http_req_waiting', 'Request Waiting (ms)'),
-      chartTimings('http_req_tls_handshaking', 'TLS handshaking (ms)'),
-      chartTimings('http_req_sending', 'Request Sending (ms)'),
-      chartTimings('http_req_connecting', 'Request Connecting (ms)'),
-      chartTimings('http_req_receiving', 'Request Receiving (ms)')
+      chartTimings('http_req_duration', 'HTTP Request Duration (ms)'),
+      chartTimings('http_req_waiting', 'HTTP Request Waiting (ms)'),
+      chartTimings('http_req_tls_handshaking', 'HTTP TLS handshaking (ms)'),
+      chartTimings('http_req_sending', 'HTTP Request Sending (ms)'),
+      chartTimings('http_req_connecting', 'HTTP Request Connecting (ms)'),
+      chartTimings('http_req_receiving', 'HTTP Request Receiving (ms)')
     ],
     report: reportable(event),
     description:
@@ -141,10 +141,11 @@ const defaultConfig = {
   title: 'k6 dashboard',
   tabs: [
     tabOverview('snapshot'),
-    tabOverview('cumulative'),
     tabTimings('snapshot'),
-    tabTimings('cumulative'),
   ],
+
+  tabOverview,
+  tabTimings,
 
   tab (id) {
     let tab = null
