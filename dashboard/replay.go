@@ -78,7 +78,7 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 		}
 	}
 
-	if err := rep.fireStart(); err != nil {
+	if err := rep.start(); err != nil {
 		return err
 	}
 
@@ -86,6 +86,22 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	if err != nil {
 		return err
 	}
+
+	return rep.stop()
+}
+
+func (rep *replayer) start() error {
+	now := time.Now()
+
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
+
+	return rep.fireStop()
+}
+
+func (rep *replayer) stop() error {
+	now := time.Now()
+
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now), stopEvent, now)
 
 	return rep.fireStop()
 }
