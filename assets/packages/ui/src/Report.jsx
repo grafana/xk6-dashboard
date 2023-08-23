@@ -10,6 +10,8 @@ import { MetricsContext, useEvent } from './metrics';
 import { SummaryContext, useSummary } from './summary';
 import { Grid, Fab, Typography, Box } from '@mui/material'
 import { ReactComponent as PrintIcon } from './icons/print.svg'
+import { ReactComponent as DownloadIcon } from './icons/download.svg'
+import { ReactComponent as OpenIcon } from './icons/open.svg'
 
 import { Digest } from './Digest';
 
@@ -98,6 +100,8 @@ function Report(props) {
     <>
       <Box className='FabBox' sx={{ '& > :not(style)': { m: 1 } }}>
         <Fab color="primary" aria-label="Print" size="small" onClick={window.print}><PrintIcon /></Fab>
+        <Fab color="primary" aria-label="Download" size="small" download="k6-report.html" href="/report"><DownloadIcon /></Fab>
+        <Fab color="primary" aria-label="Open" size="small" onClick={()=>window.open("/report")}><OpenIcon /></Fab>
       </Box>
       <div className="Report">
         <Typography className="PageHeader" component="div">k6 report</Typography>

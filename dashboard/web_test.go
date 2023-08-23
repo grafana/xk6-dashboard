@@ -21,7 +21,7 @@ import (
 func Test_newWebServer(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(assets.DirUI(), []byte{}, logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), []byte{}, http.NotFoundHandler(), logrus.StandardLogger())
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
@@ -55,7 +55,7 @@ func Test_newWebServer(t *testing.T) {
 func Test_webServer_used_addr(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(assets.DirUI(), []byte{}, logrus.StandardLogger())
+	srv := newWebServer(assets.DirUI(), []byte{}, http.NotFoundHandler(), logrus.StandardLogger())
 
 	addr := getRandomAddr(t)
 

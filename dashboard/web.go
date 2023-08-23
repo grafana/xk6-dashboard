@@ -17,6 +17,7 @@ import (
 const (
 	pathEvents = "/events"
 	pathUI     = "/ui/"
+	pathReport = "/report"
 
 	eventChannel    = "events"
 	snapshotEvent   = "snapshot"
@@ -30,7 +31,7 @@ type webServer struct {
 	*http.ServeMux
 }
 
-func newWebServer(uiFS fs.FS, uiConfig []byte, logger logrus.FieldLogger) *webServer { //nolint:ireturn
+func newWebServer(uiFS fs.FS, uiConfig []byte, reportHandler http.Handler, logger logrus.FieldLogger) *webServer { //nolint:ireturn
 	srv := &webServer{
 		eventEmitter: newEventEmitter(eventChannel, logger),
 		ServeMux:     http.NewServeMux(),
@@ -38,6 +39,8 @@ func newWebServer(uiFS fs.FS, uiConfig []byte, logger logrus.FieldLogger) *webSe
 
 	srv.Handle(pathEvents, srv.eventEmitter)
 	srv.HandleFunc(pathUI, uiHandler(pathUI, uiFS, uiConfig))
+	srv.Handle(pathReport, reportHandler)
+
 	srv.HandleFunc("/", rootHandler(pathUI))
 
 	return srv

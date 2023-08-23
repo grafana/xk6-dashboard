@@ -53,14 +53,12 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	rep.logger = logrus.StandardLogger()
 	rep.eventSource = new(eventSource)
 
-	if len(opts.Report) != 0 {
-		brf := newBriefer(briefFS, config, opts.Report, rep.logger)
+	brf := newBriefer(briefFS, config, opts.Report, rep.logger)
 
-		rep.addEventListener(brf)
-	}
+	rep.addEventListener(brf)
 
 	if opts.Port >= 0 {
-		rep.server = newWebServer(uiFS, config, rep.logger)
+		rep.server = newWebServer(uiFS, config, brf, rep.logger)
 
 		rep.addEventListener(rep.server)
 

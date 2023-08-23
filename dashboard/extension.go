@@ -80,8 +80,12 @@ func (ext *Extension) Start() error {
 		return err
 	}
 
+	brf := newBriefer(ext.briefFS, config, ext.options.Report, ext.logger)
+
+	ext.addEventListener(brf)
+
 	if ext.options.Port >= 0 {
-		ext.server = newWebServer(ext.uiFS, config, ext.logger)
+		ext.server = newWebServer(ext.uiFS, config, brf, ext.logger)
 		ext.addEventListener(ext.server)
 
 		addr, err := ext.server.listenAndServe(ext.options.addr())
@@ -100,12 +104,6 @@ func (ext *Extension) Start() error {
 
 	ext.cumulative = newMeter(0, time.Now())
 
-	if len(ext.options.Report) != 0 {
-		brf := newBriefer(ext.briefFS, config, ext.options.Report, ext.logger)
-
-		ext.addEventListener(brf)
-	}
-
 	if err := ext.fireStart(); err != nil {
 		return err
 	}
@@ -114,7 +112,7 @@ func (ext *Extension) Start() error {
 
 	now := time.Now()
 
-	ext.updateAndSend(ext.buffer.GetBufferedSamples(), newMeter(ext.period, now), startEvent, now)
+	ext.updateAndSend(nil, newMeter(ext.period, now), startEvent, now)
 
 	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
 	if err != nil {
@@ -131,7 +129,7 @@ func (ext *Extension) Stop() error {
 
 	now := time.Now()
 
-	ext.updateAndSend(ext.buffer.GetBufferedSamples(), newMeter(ext.period, now), stopEvent, now)
+	ext.updateAndSend(nil, newMeter(ext.period, now), stopEvent, now)
 
 	return ext.fireStop()
 }
