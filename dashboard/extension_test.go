@@ -65,16 +65,19 @@ func TestExtension(t *testing.T) {
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
 	}()
 
-	lines := readSSE(t, 7, "http://"+ext.options.addr()+"/events")
+	lines := readSSE(t, 11, "http://"+ext.options.addr()+"/events")
 
 	assert.NotNil(t, lines)
-	assert.Equal(t, "event: snapshot", lines[2])
-	assert.Equal(t, "event: cumulative", lines[6])
+	assert.Equal(t, "event: start", lines[2])
+	assert.Equal(t, "event: snapshot", lines[6])
+	assert.Equal(t, "event: cumulative", lines[10])
 
 	dataPrefix := `data: {"foo":{`
+	dataTimePrefix := `data: {"time":{`
 
-	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[1], dataTimePrefix))
 	assert.True(t, strings.HasPrefix(lines[5], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[9], dataPrefix))
 
 	assert.NoError(t, ext.Stop())
 }
