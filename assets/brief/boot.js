@@ -42,45 +42,46 @@ const overviewCharts = [
     id: 'http_reqs',
     title: 'VUs',
     series: {
-      vus_gauge_value: { label: 'VUs', width: 2, scale: 'n' },
-      http_reqs_counter_rate: { label: 'HTTP request rate', scale: '1/s' }
+      vus_gauge_value: { label: 'VUs', width: 2, scale: 'n', format: 'counter' },
+      http_reqs_counter_rate: { label: 'HTTP request rate', scale: '1/s', format: 'rps' }
     },
-    axes: [{}, { scale: 'n' }, { scale: '1/s', side: 1 }],
+    axes: [{}, { scale: 'n' }, { scale: '1/s', side: 1, format: 'rps' }],
     scales: [{}, {}, {}]
   },
   {
     id: 'data',
-    title: 'Transfer Rate (byte/sec)',
+    title: 'Transfer Rate',
     series: {
-      data_sent_counter_rate: { label: 'data sent', rate: true, scale: 'sent' },
+      data_sent_counter_rate: { label: 'data sent', rate: true, scale: 'sent', format: 'bps' },
       data_received_counter_rate: {
         label: 'data received',
         rate: true,
         with: 2,
-        scale: 'received'
+        scale: 'received',
+        format: 'bps'
       }
     },
-    axes: [{}, { scale: 'sent' }, { scale: 'received', side: 1 }]
+    axes: [{}, { scale: 'sent', format: 'bps' }, { scale: 'received', side: 1, format: 'bps' }]
   },
   {
     id: 'http_req_duration',
-    title: 'HTTP Request Duration (ms)',
+    title: 'HTTP Request Duration',
     series: {
-      http_req_duration_trend_avg: { label: 'avg', width: 2 },
-      'http_req_duration_trend_p(90)': { label: 'p(90)' },
-      'http_req_duration_trend_p(95)': { label: 'p(95)' }
+      http_req_duration_trend_avg: { label: 'avg', width: 2, format: 'duration' },
+      'http_req_duration_trend_p(90)': { label: 'p(90)', format: 'duration' },
+      'http_req_duration_trend_p(95)': { label: 'p(95)', format: 'duration' }
     },
-    axes: [{}, {}, { side: 1 }]
+    axes: [{}, {format: 'duration'}, { side: 1, format: 'duration' }]
   },
   {
     id: 'iteration_duration',
-    title: 'Iteration Duration (ms)',
+    title: 'Iteration Duration',
     series: {
-      iteration_duration_trend_avg: { label: 'avg', width: 2 },
-      'iteration_duration_trend_p(90)': { label: 'p(90)' },
-      'iteration_duration_trend_p(95)': { label: 'p(95)' }
+      iteration_duration_trend_avg: { label: 'avg', width: 2, format: 'duration' },
+      'iteration_duration_trend_p(90)': { label: 'p(90)', format: 'duration' },
+      'iteration_duration_trend_p(95)': { label: 'p(95)', format: 'duration' }
     },
-    axes: [{}, {}, { side: 1 }]
+    axes: [{}, {format: 'duration'}, { side: 1, format: 'duration' }]
   }
 ]
 
@@ -109,11 +110,11 @@ function chartTimings (metric, title) {
     id: metric,
     title: title,
     series: {
-      [`${metric}_trend_avg`]: { label: 'avg', width: 2 },
-      [`${metric}_trend_p(90)`]: { label: 'p(90)' },
-      [`${metric}_trend_p(95)`]: { label: 'p(95)' }
+      [`${metric}_trend_avg`]: { label: 'avg', width: 2, format: 'duration' },
+      [`${metric}_trend_p(90)`]: { label: 'p(90)', format: 'duration' },
+      [`${metric}_trend_p(95)`]: { label: 'p(95)', format: 'duration' }
     },
-    axes: [{}, {}, { side: 1 }],
+    axes: [{}, {format: 'duration'}, { side: 1, format: 'duration' }],
     height: 224
   }
 }
@@ -124,12 +125,12 @@ function tabTimings (event) {
     title: `Timings${suffix(event)}`,
     event: event,
     charts: [
-      chartTimings('http_req_duration', 'HTTP Request Duration (ms)'),
-      chartTimings('http_req_waiting', 'HTTP Request Waiting (ms)'),
-      chartTimings('http_req_tls_handshaking', 'HTTP TLS handshaking (ms)'),
-      chartTimings('http_req_sending', 'HTTP Request Sending (ms)'),
-      chartTimings('http_req_connecting', 'HTTP Request Connecting (ms)'),
-      chartTimings('http_req_receiving', 'HTTP Request Receiving (ms)')
+      chartTimings('http_req_duration', 'HTTP Request Duration'),
+      chartTimings('http_req_waiting', 'HTTP Request Waiting'),
+      chartTimings('http_req_tls_handshaking', 'HTTP TLS handshaking'),
+      chartTimings('http_req_sending', 'HTTP Request Sending'),
+      chartTimings('http_req_connecting', 'HTTP Request Connecting'),
+      chartTimings('http_req_receiving', 'HTTP Request Receiving')
     ],
     report: reportable(event),
     description:

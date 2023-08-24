@@ -8,3 +8,17 @@
 .u-label {
   font-weight: 300 !important;
 }
+
+.u-tooltip {
+  font-size: small;
+  position: absolute;
+  display: none;
+  background: white;
+  padding: 0.2rem;
+  color: black;
+  border: 1px solid #7b65fa;
+  box-shadow: 2px 2px lightgrey;
+  z-index: 10;
+  pointer-events: none;
+  margin: 0.5rem;
+}

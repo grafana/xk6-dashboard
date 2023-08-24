@@ -26,7 +26,7 @@ function Panel(props) {
   const seria = summaries.values[props.metric]
 
   var value = Array.isArray(seria) && seria.length != 0 ? Number(seria.slice(-1)) : 0
-  value = format(props.format, value)
+  value = format(props.format, value, true)
 
 
   let options = {

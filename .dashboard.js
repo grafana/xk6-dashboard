@@ -2,7 +2,7 @@
 function addP99 (chart) {
   chart.series = {
     ...chart.series,
-    'http_req_duration_trend_p(99)': { label: 'p(99)' }
+    'http_req_duration_trend_p(99)': { label: 'p(99)', format: 'duration' }
   }
 }
 
