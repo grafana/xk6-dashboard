@@ -19,17 +19,11 @@ The overview tab provides an overview of the most important metrics of the test 
 
 ![k6 dashboard overview snapshot](screenshot/k6-dashboard-overview-snapshot.png)
 
-*Overview Cumulative*
-![k6 dashboard overview cumulative](screenshot/k6-dashboard-overview-cumulative.png)
-
 *Timings*
 
 The timings tab provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.
 
 ![k6 dashboard timings snapshot](screenshot/k6-dashboard-timings-snapshot.png)
-
-*Timings Cumulative*
-![k6 dashboard timings cumulative](screenshot/k6-dashboard-timings-cumulative.png)
 
 *Custom Tab*
 
@@ -68,6 +62,7 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 - [Download](#download)
 - [Build](#build)
 - [Usage](#usage)
+- [Exit](#exit)
 - [Parameters](#parameters)
 - [Docker](#docker)
 - [Save report](#save-report)
@@ -120,6 +115,12 @@ $ ./k6 run --out dashboard script.js
 
 > Using `--out dashboard=open` will automatically open a new browser window.
 
+## Exit
+
+The k6 process waits to exit as long as there is at least one open browser window for the dashboard extension. In this way, the report can be downloaded, for example, even after the test has been completed.
+
+In certain environments, it is not allowed that the k6 process does not exit after the test run (eg CI/CD pipeline). In this case, it is advisable to disable the HTTP port (with the `-1` value of  `port` parameter).
+
 ## Parameters
 
 The output extension accepts parameters in a standard query string format:
@@ -170,6 +171,8 @@ k6 run --out dashboard=report=test-report.html script.js
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
 
 By using the `--report` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
+
+The report can also be viewed and downloaded from the dashboard UI using the buttons on the "Report" tab.
 
 ```plain
 k6 dashboard replay --report test-report.html test-result.json
