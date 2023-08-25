@@ -169,7 +169,7 @@ k6 run --out dashboard=report=test-report.html script.js
 
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
 
-By using the `--report` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-restult.json`).
+By using the `--report` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
 
 ```plain
 k6 dashboard replay --report test-report.html test-result.json
