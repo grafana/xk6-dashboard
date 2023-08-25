@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import { propTime } from './metrics'
+import { format } from './format'
 
 const palette = [
   '#7b65fa',
@@ -22,6 +23,12 @@ const palette = [
   '#a6761d',
   '#666666'
 ]
+
+function formatter(kind) {
+  return function(self, val, seriesIdx, dataIdx) {
+    return dataIdx == null ? "--" : val == null ? "" : format(kind, val);
+  }
+}
 
 class MetricsUplot {
   constructor (samples, series) {
@@ -54,7 +61,7 @@ class MetricsUplot {
   }
 
   static buildSeries (data, input) {
-    const series = [{}]
+    const series = [{value: formatter('timestamp')}]
     const keys = Object.keys(input)
 
     for (var i = 0; i < keys.length; i++) {
@@ -63,6 +70,7 @@ class MetricsUplot {
       series.push({
         stroke: palette[pidx],
         fill: `${palette[pidx]}20`,
+        value: formatter(input[keys[i]].format),
         ...input[keys[i]],
         show: data.length > i && Array.isArray(data[i + 1])
       })

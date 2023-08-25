@@ -53,14 +53,12 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	rep.logger = logrus.StandardLogger()
 	rep.eventSource = new(eventSource)
 
-	if len(opts.Report) != 0 {
-		brf := newBriefer(briefFS, config, opts.Report, rep.logger)
+	brf := newBriefer(briefFS, config, opts.Report, rep.logger)
 
-		rep.addEventListener(brf)
-	}
+	rep.addEventListener(brf)
 
 	if opts.Port >= 0 {
-		rep.server = newWebServer(uiFS, config, rep.logger)
+		rep.server = newWebServer(uiFS, config, brf, rep.logger)
 
 		rep.addEventListener(rep.server)
 
@@ -78,7 +76,7 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 		}
 	}
 
-	if err := rep.fireStart(); err != nil {
+	if err := rep.start(); err != nil {
 		return err
 	}
 
@@ -86,6 +84,22 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	if err != nil {
 		return err
 	}
+
+	return rep.stop()
+}
+
+func (rep *replayer) start() error {
+	now := time.Now()
+
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
+
+	return rep.fireStop()
+}
+
+func (rep *replayer) stop() error {
+	now := time.Now()
+
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now), stopEvent, now)
 
 	return rep.fireStop()
 }

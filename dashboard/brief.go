@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"io"
 	"io/fs"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
@@ -29,7 +30,10 @@ type briefer struct {
 	cumulative interface{}
 }
 
-var _ eventListener = (*briefer)(nil)
+var (
+	_ eventListener = (*briefer)(nil)
+	_ http.Handler  = (*briefer)(nil)
+)
 
 func newBriefer(assets fs.FS, uiConfig []byte, output string, logger logrus.FieldLogger) *briefer {
 	brf := &briefer{ // nolint:exhaustruct
@@ -49,6 +53,10 @@ func (brf *briefer) onStart() error {
 }
 
 func (brf *briefer) onStop() error {
+	if len(brf.output) == 0 {
+		return nil
+	}
+
 	file, err := os.Create(brf.output)
 	if err != nil {
 		return err
@@ -101,6 +109,14 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 		brf.encoder.Encode(nil) //nolint:errcheck,errchkjson
 
 		brf.logger.Error(err)
+	}
+}
+
+func (brf *briefer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	if err := brf.exportHTML(res); err != nil {
+		http.Error(res, err.Error(), http.StatusInternalServerError)
 	}
 }
 
