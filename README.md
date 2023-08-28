@@ -219,57 +219,61 @@ Before executing the configuration file, the `window.defaultConfig` object is cr
 In this example, a tab called *Custom* is defined, which contains six panels and two charts. The first two panels are just a reference to the two panels of the built-in *Overview* tab.
 
 ```js
-// helper for adding p(99) to existing chart
-function addP99 (chart) {
-  chart.series = {
-    ...chart.series,
-    'http_req_duration_trend_p(99)': { label: 'p(99)' }
+export default function (config) {
+  Array.prototype.getById = function (id) {
+    return this.filter(element => element.id == id).at(0)
   }
-}
 
-// define request duration panel
-function durationPanel (suffix) {
-  return {
-    id: `http_req_duration_${suffix}`,
-    title: `Request Duration ${suffix}`,
-    metric: `http_req_duration_trend_${suffix}`,
-    format: 'duration'
+  // helper for adding p(99) to existing chart
+  function addP99 (chart) {
+    chart.series = Object.assign({}, chart.series)
+    chart.series['http_req_duration_trend_p(99)'] = { label: 'p(99)', format: 'duration' }
   }
+
+  // define request duration panel
+  function durationPanel (suffix) {
+    return {
+      id: `http_req_duration_${suffix}`,
+      title: `HTTP Request Duration ${suffix}`,
+      metric: `http_req_duration_trend_${suffix}`,
+      format: 'duration'
+    }
+  }
+  
+  // copy vus and http_reqs panel from default config
+  const overview = config.tabs.getById('overview_snapshot')
+
+  // define custom panels
+  const customPanels = [
+    overview.panels.getById('vus'),
+    overview.panels.getById('http_reqs'),
+    durationPanel('avg'),
+    durationPanel('p(90)'),
+    durationPanel('p(95)'),
+    durationPanel('p(99)')
+  ]
+
+  // copy http_req_duration chart form default config...
+  const durationChart = Object.assign({}, overview.charts.getById('http_req_duration'))
+
+  // ... and add p(99)
+  addP99(durationChart)
+
+  // define custom tab
+  const customTab = {
+    id: 'custom',
+    title: 'Custom',
+    event: overview.event,
+    panels: customPanels,
+    charts: [overview.charts.getById('http_reqs'), durationChart],
+    description: 'Example of customizing the display of metrics.'
+  }
+
+  // add custom tab to configuration
+  config.tabs.push(customTab)
+
+  return config
 }
-
-// copy vus and http_reqs panel from default config
-const overview = defaultConfig.tab('overview_snapshot')
-
-// define custom panels
-const customPanels = [
-  overview.panel('vus'),
-  overview.panel('http_reqs'),
-  durationPanel('avg'),
-  durationPanel('p(90)'),
-  durationPanel('p(95)'),
-  durationPanel('p(99)')
-]
-
-// copy http_req_duration chart form default config...
-const durationChart = { ...overview.chart('http_req_duration') }
-
-// ... and add p(99)
-addP99(durationChart)
-
-// define custom tab
-const customTab = {
-  id: 'custom',
-  title: 'Custom',
-  event: overview.event,
-  panels: customPanels,
-  charts: [overview.chart('http_reqs'), durationChart],
-  description: 'Example of customizing the display of metrics.'
-}
-
-// add custom tab to configuration
-defaultConfig.tabs.push(customTab)
-
-export default defaultConfig
 ```
 
 **p(99)**
@@ -277,16 +281,21 @@ export default defaultConfig
 In this example, the 99th percentile value is added to the *Request Duration* chart on the built-in *Overview* tabs.
 
 ```js
-// helper for adding p(99) to existing chart
-function addP99 (chart) {
-  chart.series['http_req_duration_trend_p(99)'] = { label: 'p(99)' }
+export default function (config) {
+  Array.prototype.getById = function (id) {
+    return this.filter((element) => element.id == id).at(0);
+  };
+
+  // helper for adding p(99) to existing chart
+  function addP99(chart) {
+    chart.series["http_req_duration_trend_p(99)"] = { label: "p(99)" };
+  }
+
+  // add p(99) to overview panels request duration charts
+  addP99(config.tabs.getById("overview_snapshot").charts.getById("http_req_duration"));
+
+  return config
 }
-
-// add p(99) to overview panels request duration charts
-addP99(defaultConfig.tab('overview_snapshot').chart('http_req_duration'))
-addP99(defaultConfig.tab('overview_cumulative').chart('http_req_duration'))
-
-export default defaultConfig
 ```
 
 ## Command Line

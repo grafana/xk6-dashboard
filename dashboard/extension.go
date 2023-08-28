@@ -75,7 +75,7 @@ func (ext *Extension) Description() string {
 }
 
 func (ext *Extension) Start() error {
-	config, err := ext.options.config()
+	config, err := ext.options.config(ext.logger)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func (ext *Extension) Start() error {
 	ext.addEventListener(brf)
 
 	if ext.options.Port >= 0 {
-		ext.server = newWebServer(ext.uiFS, config, brf, ext.logger)
+		ext.server = newWebServer(ext.uiFS, brf, ext.logger)
 		ext.addEventListener(ext.server)
 
 		addr, err := ext.server.listenAndServe(ext.options.addr())
@@ -112,6 +112,7 @@ func (ext *Extension) Start() error {
 
 	now := time.Now()
 
+	ext.fireEvent(configEvent, config)
 	ext.updateAndSend(nil, newMeter(ext.period, now), startEvent, now)
 
 	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)

@@ -7,6 +7,7 @@ package dashboard
 import (
 	"bufio"
 	"compress/gzip"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -39,10 +40,14 @@ type replayer struct {
 	timestamp time.Time
 
 	once sync.Once
+
+	config json.RawMessage
 }
 
 func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
-	config, err := opts.config()
+	logger := logrus.StandardLogger()
+
+	config, err := opts.config(logger)
 	if err != nil {
 		return err
 	}
@@ -50,7 +55,8 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	rep := new(replayer)
 
 	rep.options = opts
-	rep.logger = logrus.StandardLogger()
+	rep.config = config
+	rep.logger = logger
 	rep.eventSource = new(eventSource)
 
 	brf := newBriefer(briefFS, config, opts.Report, rep.logger)
@@ -58,7 +64,7 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	rep.addEventListener(brf)
 
 	if opts.Port >= 0 {
-		rep.server = newWebServer(uiFS, config, brf, rep.logger)
+		rep.server = newWebServer(uiFS, brf, rep.logger)
 
 		rep.addEventListener(rep.server)
 
@@ -91,6 +97,7 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 func (rep *replayer) start() error {
 	now := time.Now()
 
+	rep.fireEvent(configEvent, rep.config)
 	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
 
 	return rep.fireStop()

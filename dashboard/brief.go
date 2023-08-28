@@ -176,12 +176,12 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 		return err
 	}
 
-	html, err = brf.injectConfig(out, html)
+	html, err = brf.inject(out, html, configTag, brf.exportConfig)
 	if err != nil {
 		return err
 	}
 
-	html, err = brf.injectData(out, html)
+	html, err = brf.inject(out, html, dataTag, brf.exportBase64)
 	if err != nil {
 		return err
 	}
@@ -193,64 +193,26 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 	return nil
 }
 
-func (brf *briefer) injectFile(out io.Writer, filename string) error {
-	file, err := brf.assets.Open(filename)
-	if err != nil {
-		return err
-	}
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return err
-	}
-
-	_, err = out.Write(data)
+func (brf *briefer) exportConfig(out io.Writer) error {
+	_, err := out.Write(brf.uiConfig)
 
 	return err
 }
 
-func (brf *briefer) injectConfig(out io.Writer, html []byte) ([]byte, error) {
-	idx := bytes.Index(html, configTag)
+func (brf *briefer) inject(out io.Writer, html []byte, tag []byte, dataFunc func(io.Writer) error) ([]byte, error) {
+	idx := bytes.Index(html, tag)
 
 	if idx < 0 {
-		panic("invalid brief HTML, no config tag")
+		panic("invalid brief HTML, no tag: " + string(tag))
 	}
 
-	idx += len(configTag)
+	idx += len(tag)
 
 	if _, err := out.Write(html[:idx]); err != nil {
 		return nil, err
 	}
 
-	if err := brf.injectFile(out, "boot.js"); err != nil {
-		return nil, err
-	}
-
-	if _, err := out.Write(brf.uiConfig); err != nil {
-		return nil, err
-	}
-
-	if err := brf.injectFile(out, "init.js"); err != nil {
-		return nil, err
-	}
-
-	return html[idx:], nil
-}
-
-func (brf *briefer) injectData(out io.Writer, html []byte) ([]byte, error) {
-	idx := bytes.Index(html, dataTag)
-
-	if idx < 0 {
-		panic("invalid brief HTML, no data tag")
-	}
-
-	idx += len(dataTag)
-
-	if _, err := out.Write(html[:idx]); err != nil {
-		return nil, err
-	}
-
-	if err := brf.exportBase64(out); err != nil {
+	if err := dataFunc(out); err != nil {
 		return nil, err
 	}
 
@@ -258,6 +220,6 @@ func (brf *briefer) injectData(out io.Writer, html []byte) ([]byte, error) {
 }
 
 var (
-	configTag = []byte(`<script id="init" type="module">`)
+	configTag = []byte(`<script id="config" type="application/json; charset=utf-8">`)
 	dataTag   = []byte(`<script id="data" type="application/json; charset=utf-8; gzip; base64">`)
 )

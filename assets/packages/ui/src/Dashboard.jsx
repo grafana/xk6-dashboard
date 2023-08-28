@@ -5,6 +5,7 @@
 import React from 'react';
 import './Dashboard.css'
 import { MetricsContext, useEvent } from './metrics';
+import { useConfig } from './config';
 import { Grid, Typography, Tabs, Tab, Box } from '@mui/material'
 import { PropTypes } from 'prop-types';
 
@@ -97,27 +98,27 @@ function a11yProps(index) {
 function tabContents(conf, value) {
   const all = []
 
-  if (!iterable(conf)) {
+  if (!iterable(conf())) {
     return all
   }
 
   let ctx = { snapshot: useEvent('snapshot'), cumulative: useEvent('cumulative') }
 
-  for (let i = 0; i < conf.length; i++) {
+  for (let i = 0; i < conf().length; i++) {
     all.push(
-      <MetricsContext.Provider key={i} value={ctx[conf[i].event]}>
+      <MetricsContext.Provider key={i} value={ctx[conf()[i].event]}>
         <TabContent value={value} index={i}>
-          <ContentPanel panels={conf[i].panels} charts={conf[i].charts} />
+          <ContentPanel panels={conf()[i].panels} charts={conf()[i].charts} />
         </TabContent>
       </MetricsContext.Provider>
     )
   }
 
-  let idx = conf.length
+  let idx = conf().length
 
   all.push(
     <TabContent key={idx} value={value} index={idx}>
-      <Summary />
+      <Summary conf={conf}/>
     </TabContent>
   )
 
@@ -125,7 +126,7 @@ function tabContents(conf, value) {
 
   all.push(
     <TabContent key={idx} value={value} index={idx}>
-      <Report tabs={conf} />
+      <Report conf={conf} />
     </TabContent>
   )
 
@@ -135,17 +136,17 @@ function tabContents(conf, value) {
 function tabs(conf) {
   const all = []
 
-  if (!iterable(conf)) {
+  if (!iterable(conf())) {
     return all
   }
 
-  for (let i = 0; i < conf.length; i++) {
+  for (let i = 0; i < conf().length; i++) {
     all.push(
-      <Tab key={i} label={conf[i].title} {...a11yProps(i)} />
+      <Tab key={i} label={conf()[i].title} {...a11yProps(i)} />
     )
   }
 
-  let idx = conf.length
+  let idx = conf().length
 
   all.push(
     <Tab key={idx} label={"summary"} {...a11yProps(idx)} />
@@ -160,8 +161,9 @@ function tabs(conf) {
   return all
 }
 
-function Dashboard(props) {
+function Dashboard() {
   const [value, setValue] = React.useState(0);
+  const config = useConfig()
 
   function handleChange(event, newValue) {
     setValue(newValue);
@@ -169,14 +171,14 @@ function Dashboard(props) {
 
   return (
     <>
-      <Header {...props} />
+      <Header conf={() => config} />
       <div className="Dashboard">
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={value} onChange={handleChange}>
-            {tabs(props.tabs)}
+            {tabs(()=>config.tabs)}
           </Tabs>
         </Box>
-        {tabContents(props.tabs, value)}
+        {tabContents(()=>config.tabs, value)}
       </div>
     </>
   )

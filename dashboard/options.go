@@ -5,6 +5,7 @@
 package dashboard
 
 import (
+	"encoding/json"
 	"errors"
 	"math"
 	"net"
@@ -15,6 +16,7 @@ import (
 	"time"
 
 	"github.com/gorilla/schema"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -24,6 +26,8 @@ const (
 	defaultOpen   = false
 	defaultConfig = ".dashboard.js"
 	defaultReport = ""
+
+	defaultAltConfig = ".dashboard.json"
 )
 
 type options struct {
@@ -84,17 +88,25 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 	return opts, err
 }
 
-func (opts *options) config() ([]byte, error) {
-	if len(opts.Config) == 0 {
-		return []byte{}, nil
+func exists(filename string) bool {
+	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+		return false
 	}
 
-	data, err := os.ReadFile(opts.Config)
-	if err != nil && os.IsNotExist(err) && opts.Config == defaultConfig {
-		return []byte{}, nil
+	return true
+}
+
+func (opts *options) config(logger logrus.FieldLogger) (json.RawMessage, error) {
+	if opts.Config == defaultConfig {
+		if !exists(opts.Config) {
+			opts.Config = defaultAltConfig
+			if !exists(opts.Config) {
+				opts.Config = ""
+			}
+		}
 	}
 
-	return data, err
+	return loadConfig(opts.Config, logger)
 }
 
 func (opts *options) addr() string {

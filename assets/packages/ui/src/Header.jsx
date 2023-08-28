@@ -12,7 +12,7 @@ export default function Header(props) {
     <div className="Header">
       <AppBar position="sticky">
         <Toolbar variant="dense">
-          <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>{props.title}</Typography>
+          <Typography variant="h6" component="div" align="center" sx={{ flexGrow: 1 }}>{props.conf().title}</Typography>
         </Toolbar>
       </AppBar>
     </div>

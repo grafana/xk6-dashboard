@@ -3,6 +3,7 @@ module github.com/grafana/xk6-dashboard
 go 1.19
 
 require (
+	github.com/dop251/goja v0.0.0-20230531210528-d7324b2d74f7
 	github.com/gorilla/schema v1.2.0
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/r3labs/sse/v2 v2.10.0
@@ -15,7 +16,10 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dlclark/regexp2 v1.9.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
+	github.com/go-sourcemap/sourcemap v2.1.4-0.20211119122758-180fcef48034+incompatible // indirect
+	github.com/google/pprof v0.0.0-20230207041349-798e818bf904 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

@@ -65,19 +65,32 @@ func TestExtension(t *testing.T) {
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
 	}()
 
-	lines := readSSE(t, 11, "http://"+ext.options.addr()+"/events")
+	lines := readSSE(t, 16, "http://"+ext.options.addr()+"/events")
 
 	assert.NotNil(t, lines)
-	assert.Equal(t, "event: start", lines[2])
-	assert.Equal(t, "event: snapshot", lines[6])
-	assert.Equal(t, "event: cumulative", lines[10])
 
-	dataPrefix := `data: {"foo":{`
-	dataTimePrefix := `data: {"time":{`
+	dataPrefix := `data: {"`
+	idPrefix := `id: `
 
-	assert.True(t, strings.HasPrefix(lines[1], dataTimePrefix))
+	assert.True(t, strings.HasPrefix(lines[0], idPrefix))
+	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
+	assert.Equal(t, "event: config", lines[2])
+	assert.Empty(t, lines[3])
+
+	assert.True(t, strings.HasPrefix(lines[4], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[5], dataPrefix))
+	assert.Equal(t, "event: start", lines[6])
+	assert.Empty(t, lines[7])
+
+	assert.True(t, strings.HasPrefix(lines[8], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[9], dataPrefix))
+	assert.Equal(t, "event: snapshot", lines[10])
+	assert.Empty(t, lines[11])
+
+	assert.True(t, strings.HasPrefix(lines[12], idPrefix))
+	assert.True(t, strings.HasPrefix(lines[13], dataPrefix))
+	assert.Equal(t, "event: cumulative", lines[14])
+	assert.Empty(t, lines[15])
 
 	assert.NoError(t, ext.Stop())
 }

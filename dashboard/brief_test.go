@@ -1,7 +1,6 @@
 package dashboard
 
 import (
-	"embed"
 	"io"
 	"math"
 	"strings"
@@ -112,7 +111,7 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 	assert.Equal(t, emptyDataBase64, out.String())
 }
 
-func Test_briefer_injectData_error(t *testing.T) {
+func Test_briefer_inject_error(t *testing.T) {
 	t.Parallel()
 
 	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
@@ -128,57 +127,14 @@ func Test_briefer_injectData_error(t *testing.T) {
 	out := newErrorWriter(t)
 
 	assert.Panics(t, func() {
-		brf.injectData(out, []byte{}) //nolint:errcheck
+		brf.inject(out, []byte{}, dataTag, nil) //nolint:errcheck
 	})
 
-	_, err = brf.injectData(out, html)
+	_, err = brf.inject(out, html, dataTag, func(out io.Writer) error {
+		_, err := out.Write([]byte("Hello, World!"))
 
-	assert.Error(t, err)
-
-	brf.cumulative = recursiveJSON(t)
-	_, err = brf.injectData(io.Discard, html)
-
-	assert.Error(t, err)
-
-	brf.cumulative = nil
-
-	_, err = brf.injectData(out.reset(math.MaxInt), html)
-
-	assert.NoError(t, err)
-
-	assert.True(t, strings.HasSuffix(out.String(), emptyDataScript))
-}
-
-func Test_briefer_injectConfig_error(t *testing.T) {
-	t.Parallel()
-
-	brf := newBriefer(embed.FS{}, nil, "", logrus.StandardLogger())
-
-	file, err := assets.DirBrief().Open("index.html")
-
-	assert.NoError(t, err)
-
-	html, err := io.ReadAll(file)
-
-	assert.NoError(t, err)
-
-	out := newErrorWriter(t)
-
-	assert.Panics(t, func() {
-		brf.injectConfig(out, []byte{}) //nolint:errcheck
+		return err
 	})
-
-	_, err = brf.injectConfig(out, html)
-
-	assert.Error(t, err)
-
-	_, err = brf.injectConfig(out.reset(math.MaxInt), html)
-
-	assert.Error(t, err)
-
-	brf.assets = assets.DirBrief()
-
-	_, err = brf.injectConfig(out.reset(2), html)
 
 	assert.Error(t, err)
 }
