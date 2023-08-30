@@ -29,6 +29,7 @@ type briefer struct {
 	encoder    *json.Encoder
 	cumulative interface{}
 	metrics    map[string]metricData
+	param      interface{}
 }
 
 var (
@@ -95,6 +96,12 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 		return
 	}
 
+	if name == paramEvent {
+		brf.param = data
+
+		return
+	}
+
 	if name == metricEvent {
 		if metrics, ok := data.(map[string]metricData); ok {
 			for key, value := range metrics {
@@ -152,6 +159,14 @@ func (brf *briefer) exportJSON(out io.Writer) error {
 	}
 
 	if err := encodeJSON(out, brf.cumulative); err != nil {
+		return err
+	}
+
+	if _, err := out.Write([]byte(`,"param":`)); err != nil {
+		return err
+	}
+
+	if err := encodeJSON(out, brf.param); err != nil {
 		return err
 	}
 

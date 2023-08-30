@@ -5,6 +5,7 @@
 package dashboard
 
 import (
+	"math"
 	"time"
 
 	"go.k6.io/k6/metrics"
@@ -79,10 +80,50 @@ func (m *meter) format(dur time.Duration) map[string]sampleData {
 			sample[pc99Name] = sink.P(pc99)
 		}
 
+		for name, value := range sample {
+			sample[name] = significant(value)
+		}
+
 		out[name] = sample
 	}
 
 	return out
+}
+
+func significant(num float64) float64 {
+	const (
+		ten1 = float64(10)
+		ten2 = ten1 * 10
+		ten3 = ten2 * 10
+		ten4 = ten3 * 10
+		ten5 = ten4 * 10
+	)
+
+	if num == float64(int(num)) {
+		return num
+	}
+
+	if num > ten4 {
+		return math.Trunc(num)
+	}
+
+	if num > ten3 {
+		return math.Trunc(num*ten1) / ten1
+	}
+
+	if num > ten2 {
+		return math.Trunc(num*ten2) / ten2
+	}
+
+	if num > ten1 {
+		return math.Trunc(num*ten3) / ten3
+	}
+
+	if num > 1 {
+		return math.Trunc(num*ten4) / ten4
+	}
+
+	return math.Trunc(num*ten5) / ten5
 }
 
 func (m *meter) newbies(seen map[string]struct{}) map[string]metricData {

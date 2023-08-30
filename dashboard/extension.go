@@ -38,6 +38,8 @@ type Extension struct {
 	name string
 
 	briefFS fs.FS
+
+	param *paramData
 }
 
 var _ output.Output = (*Extension)(nil)
@@ -50,6 +52,7 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 	}
 
 	offset, _ := lib.GetEndOffset(params.ExecutionPlan)
+	period := opts.period(offset)
 
 	ext := &Extension{
 		uiFS:        uiFS,
@@ -62,7 +65,8 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 		flusher:     nil,
 		cumulative:  nil,
 		seenMetrics: nil,
-		period:      opts.period(offset),
+		param:       newParamData(&params).withPeriod(period).withEndOffest(offset),
+		period:      period,
 		eventSource: new(eventSource),
 	}
 
@@ -75,6 +79,10 @@ func (ext *Extension) Description() string {
 	}
 
 	return fmt.Sprintf("%s (%s) %s", ext.name, ext.options.addr(), ext.options.url())
+}
+
+func (ext *Extension) SetThresholds(thresholds map[string]metrics.Thresholds) {
+	ext.param.withThresholds(thresholds)
 }
 
 func (ext *Extension) Start() error {
@@ -117,6 +125,8 @@ func (ext *Extension) Start() error {
 	now := time.Now()
 
 	ext.fireEvent(configEvent, config)
+	ext.fireEvent(paramEvent, ext.param)
+
 	ext.updateAndSend(nil, newMeter(ext.period, now), startEvent, now)
 
 	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
@@ -165,4 +175,53 @@ func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, met *m
 	}
 
 	ext.fireEvent(event, data)
+}
+
+type paramData struct {
+	Thresholds map[string][]string `json:"thresholds,omitempty"`
+	Scenarios  []string            `json:"scenarios,omitempty"`
+	EndOffset  time.Duration       `json:"endOffset,omitempty"`
+	Period     time.Duration       `json:"period,omitempty"`
+}
+
+func newParamData(params *output.Params) *paramData {
+	param := new(paramData)
+
+	for name := range params.ScriptOptions.Scenarios {
+		param.Scenarios = append(param.Scenarios, name)
+	}
+
+	return param
+}
+
+func (param *paramData) withThresholds(thresholds map[string]metrics.Thresholds) *paramData {
+	if len(thresholds) == 0 {
+		return param
+	}
+
+	param.Thresholds = make(map[string][]string, len(thresholds))
+
+	for name, value := range thresholds {
+		tre := make([]string, 0, len(value.Thresholds))
+
+		for _, threshold := range value.Thresholds {
+			tre = append(tre, threshold.Source)
+		}
+
+		param.Thresholds[name] = tre
+	}
+
+	return param
+}
+
+func (param *paramData) withPeriod(period time.Duration) *paramData {
+	param.Period = time.Duration(period.Milliseconds())
+
+	return param
+}
+
+func (param *paramData) withEndOffest(offset time.Duration) *paramData {
+	param.EndOffset = time.Duration(offset.Milliseconds())
+
+	return param
 }

@@ -18,6 +18,10 @@ export let options = {
       gracefulRampDown: "0s",
     },
   },
+  thresholds: {
+    http_req_duration: ["p(90) < 400"],
+    iteration_duration: ["avg < 3500"],
+  },
 };
 
 export default function () {

@@ -16,6 +16,7 @@ import (
 	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"go.k6.io/k6/lib"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
@@ -42,8 +43,8 @@ func TestNewExtension(t *testing.T) {
 	assert.Error(t, err)
 }
 
-func TestExtension(t *testing.T) {
-	t.Parallel()
+func testReadSSE(t *testing.T, nlines int) []string {
+	t.Helper()
 
 	var params output.Params
 
@@ -63,9 +64,19 @@ func TestExtension(t *testing.T) {
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
 	}()
 
-	lines := readSSE(t, 24, "http://"+ext.options.addr()+"/events")
+	lines := readSSE(t, nlines, "http://"+ext.options.addr()+"/events")
 
 	assert.NotNil(t, lines)
+
+	assert.NoError(t, ext.Stop())
+
+	return lines
+}
+
+func TestExtension(t *testing.T) {
+	t.Parallel()
+
+	lines := testReadSSE(t, 28)
 
 	dataPrefix := `data: {"`
 	idPrefix := `id: `
@@ -77,30 +88,33 @@ func TestExtension(t *testing.T) {
 
 	assert.True(t, strings.HasPrefix(lines[4], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[5], dataPrefix))
-	assert.Equal(t, "event: metric", lines[6])
+	assert.Equal(t, "event: param", lines[6])
 	assert.Empty(t, lines[7])
 
 	assert.True(t, strings.HasPrefix(lines[8], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[9], dataPrefix))
-	assert.Equal(t, "event: start", lines[10])
+	assert.Equal(t, "event: metric", lines[10])
 	assert.Empty(t, lines[11])
 
 	assert.True(t, strings.HasPrefix(lines[12], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[13], dataPrefix))
-	assert.Equal(t, "event: metric", lines[14])
+	assert.Equal(t, "event: start", lines[14])
 	assert.Empty(t, lines[15])
 
 	assert.True(t, strings.HasPrefix(lines[16], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[17], dataPrefix))
-	assert.Equal(t, "event: snapshot", lines[18])
+	assert.Equal(t, "event: metric", lines[18])
 	assert.Empty(t, lines[19])
 
 	assert.True(t, strings.HasPrefix(lines[20], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[21], dataPrefix))
-	assert.Equal(t, "event: cumulative", lines[22])
+	assert.Equal(t, "event: snapshot", lines[22])
 	assert.Empty(t, lines[23])
 
-	assert.NoError(t, ext.Stop())
+	assert.True(t, strings.HasPrefix(lines[24], idPrefix))
+	assert.True(t, strings.HasPrefix(lines[25], dataPrefix))
+	assert.Equal(t, "event: cumulative", lines[26])
+	assert.Empty(t, lines[27])
 }
 
 func TestExtension_no_http(t *testing.T) {
@@ -245,4 +259,78 @@ func TestExtension_report(t *testing.T) {
 	assert.Greater(t, st.Size(), int64(1024))
 
 	assert.NoError(t, os.Remove(file.Name()+".gz"))
+}
+
+func Test_newParamData(t *testing.T) {
+	t.Parallel()
+
+	params := new(output.Params)
+
+	params.ScriptOptions.Scenarios = lib.ScenarioConfigs{
+		"foo": nil,
+		"bar": nil,
+	}
+
+	param := newParamData(params)
+
+	assert.Len(t, param.Scenarios, 2)
+
+	params.ScriptOptions.Scenarios = nil
+
+	param = newParamData(params)
+
+	assert.Len(t, param.Scenarios, 0)
+}
+
+func Test_paramData_With(t *testing.T) {
+	t.Parallel()
+
+	param := new(paramData)
+
+	period := time.Hour
+
+	assert.Same(t, param, param.withPeriod(period))
+
+	assert.Equal(t, time.Duration(period.Milliseconds()), param.Period)
+	assert.Empty(t, param.EndOffset)
+
+	param = new(paramData)
+
+	assert.Same(t, param, param.withEndOffest(period))
+	assert.Equal(t, time.Duration(period.Milliseconds()), param.EndOffset)
+	assert.Empty(t, param.Period)
+
+	param = new(paramData)
+
+	thresholds := map[string]metrics.Thresholds{}
+
+	assert.Same(t, param, param.withThresholds(thresholds))
+	assert.Nil(t, param.Thresholds)
+
+	thresholds["foo"] = metrics.Thresholds{ //nolint:exhaustruct
+		Thresholds: []*metrics.Threshold{ //nolint:exhaustruct
+			{Source: "a > 2"},
+			{Source: "b > 3"},
+		},
+	}
+
+	thresholds["bar"] = metrics.Thresholds{ //nolint:exhaustruct
+		Thresholds: []*metrics.Threshold{ //nolint:exhaustruct
+			{Source: "c > 1"},
+			{Source: "d > 0"},
+		},
+	}
+
+	assert.Same(t, param, param.withThresholds(thresholds))
+	assert.Equal(t, []string{"a > 2", "b > 3"}, param.Thresholds["foo"])
+	assert.Equal(t, []string{"c > 1", "d > 0"}, param.Thresholds["bar"])
+	assert.Len(t, param.Thresholds, 2)
+
+	ext := new(Extension)
+
+	ext.param = new(paramData)
+
+	ext.SetThresholds(thresholds)
+
+	assert.Equal(t, param, ext.param)
 }

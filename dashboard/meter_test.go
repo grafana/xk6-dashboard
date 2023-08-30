@@ -139,3 +139,20 @@ func Test_meter_format(t *testing.T) {
 	assert.Contains(t, data, "foo")
 	assert.Contains(t, data, "bar")
 }
+
+func Test_significant(t *testing.T) {
+	t.Parallel()
+
+	assert.Equal(t, 123456.0, significant(123456.7890))
+	assert.Equal(t, 12345.0, significant(12345.678))
+	assert.Equal(t, 1234.5, significant(1234.5678))
+	assert.Equal(t, 123.45, significant(123.45678))
+	assert.Equal(t, 12.345, significant(12.345678))
+	assert.Equal(t, 1.2345, significant(1.2345678))
+	assert.Equal(t, 0.12345, significant(0.12345678))
+	assert.Equal(t, 0.01234, significant(0.012345678))
+	assert.Equal(t, 0.00123, significant(0.0012345678))
+	assert.Equal(t, 0.00012, significant(0.00012345678))
+	assert.Equal(t, 0.00001, significant(0.000012345678))
+	assert.Equal(t, 0.0, significant(0.0000012345678))
+}

@@ -101,6 +101,13 @@ func (rep *replayer) start() error {
 	now := time.Now()
 
 	rep.fireEvent(configEvent, rep.config)
+
+	param := new(paramData)
+
+	param.Period = time.Duration(rep.options.Period.Milliseconds())
+
+	rep.fireEvent(paramEvent, param)
+
 	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
 
 	return rep.fireStart()

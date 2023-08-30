@@ -90,8 +90,10 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 	assert.Error(t, brf.exportJSON(out.reset(4)))
 	assert.Error(t, brf.exportJSON(out.reset(5)))
 	assert.Error(t, brf.exportJSON(out.reset(6)))
+	assert.Error(t, brf.exportJSON(out.reset(7)))
+	assert.Error(t, brf.exportJSON(out.reset(8)))
 
-	assert.NoError(t, brf.exportJSON(out.reset(7)))
+	assert.NoError(t, brf.exportJSON(out.reset(9)))
 	assert.Equal(t, emptyData, out.String())
 }
 
@@ -170,7 +172,7 @@ func Test_briefer_onEvent(t *testing.T) {
 }
 
 const (
-	emptyData       = `{"cumulative":null,"metrics":{},"snapshot":[]}`
-	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRyk0tKcpMLlayqq7VUSrOSywozsgvUbKKjq0FBAAA///KwnyFLgAAAA==`
+	emptyData       = `{"cumulative":null,"param":null,"metrics":{},"snapshot":[]}`
+	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKkgsSsyFcXJTS4oyk4uVrKprdZSK8xILijPyS5SsomNrAQEAAP//yATdEDsAAAA=`
 	emptyDataScript = `<script id="data" type="application/json; charset=utf-8; gzip; base64">` + emptyDataBase64
 )
