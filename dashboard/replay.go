@@ -136,15 +136,15 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	rep.buffer.AddMetricSamples(samples)
 }
 
-func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, m *meter, event string, now time.Time) {
-	data, err := m.update(containers, now)
+func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, met *meter, event string, now time.Time) {
+	data, err := met.update(containers, now)
 	if err != nil {
 		rep.logger.WithError(err).Warn("Error while processing samples")
 
 		return
 	}
 
-	newbies := m.newbies(rep.seenMetrics)
+	newbies := met.newbies(rep.seenMetrics)
 	if len(newbies) != 0 {
 		rep.fireEvent(metricEvent, newbies)
 	}
