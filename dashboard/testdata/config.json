@@ -11,12 +11,12 @@
           "id": "http_reqs",
           "scales": [{}, {}, {}],
           "series": {
-            "http_reqs_counter_rate": {
+            "http_reqs.rate": {
               "format": "rps",
               "label": "HTTP request rate",
               "scale": "1/s"
             },
-            "vus_gauge_value": {
+            "vus.value": {
               "format": "counter",
               "label": "VUs",
               "scale": "n",
@@ -33,20 +33,20 @@
           ],
           "id": "http_req_duration",
           "series": {
-            "http_req_duration_trend_avg": {
+            "http_req_duration.avg": {
               "format": "duration",
               "label": "avg",
               "width": 2
             },
-            "http_req_duration_trend_p(90)": {
+            "http_req_duration.p(90)": {
               "format": "duration",
               "label": "p(90)"
             },
-            "http_req_duration_trend_p(95)": {
+            "http_req_duration.p(95)": {
               "format": "duration",
               "label": "p(95)"
             },
-            "http_req_duration_trend_p(99)": {
+            "http_req_duration.p(99)": {
               "format": "duration",
               "label": "p(99)"
             }
@@ -61,37 +61,37 @@
         {
           "format": "counter",
           "id": "vus",
-          "metric": "vus_gauge_value",
+          "metric": "vus.value",
           "title": "VUs"
         },
         {
           "format": "rps",
           "id": "http_reqs",
-          "metric": "http_reqs_counter_rate",
+          "metric": "http_reqs.rate",
           "title": "HTTP Request Rate"
         },
         {
           "format": "duration",
-          "id": "http_req_duration_avg",
-          "metric": "http_req_duration_trend_avg",
+          "id": "http_req_duration.avg",
+          "metric": "http_req_duration.avg",
           "title": "HTTP Request Duration avg"
         },
         {
           "format": "duration",
-          "id": "http_req_duration_p(90)",
-          "metric": "http_req_duration_trend_p(90)",
+          "id": "http_req_duration.p(90)",
+          "metric": "http_req_duration.p(90)",
           "title": "HTTP Request Duration p(90)"
         },
         {
           "format": "duration",
-          "id": "http_req_duration_p(95)",
-          "metric": "http_req_duration_trend_p(95)",
+          "id": "http_req_duration.p(95)",
+          "metric": "http_req_duration.p(95)",
           "title": "HTTP Request Duration p(95)"
         },
         {
           "format": "duration",
-          "id": "http_req_duration_p(99)",
-          "metric": "http_req_duration_trend_p(99)",
+          "id": "http_req_duration.p(99)",
+          "metric": "http_req_duration.p(99)",
           "title": "HTTP Request Duration p(99)"
         }
       ],

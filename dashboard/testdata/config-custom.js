@@ -26,7 +26,7 @@ export default function (config) {
 
   // helper for adding p(99) to existing chart
   function addP99(chart) {
-    chart.series["http_req_duration_trend_p(99)"] = { label: "p(99)" };
+    chart.series["http_req_duration.p(99)"] = { label: "p(99)" };
   }
 
   // add p(99) to overview panels request duration charts

@@ -16,7 +16,7 @@ const propertyNames = {
 export function Digest(props) {
   const { summary, type, series } = props
 
-  const filter = (key) => (!iterable(series) || series.includes(key)) && (summary.values[key].type == type)
+  const filter = (key) => (!iterable(series) || series.includes(key)) && (summary.values[key].meta.type == type)
 
   return (
     <table class="table table-hover caption-top">

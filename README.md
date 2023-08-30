@@ -227,7 +227,7 @@ export default function (config) {
   // helper for adding p(99) to existing chart
   function addP99 (chart) {
     chart.series = Object.assign({}, chart.series)
-    chart.series['http_req_duration_trend_p(99)'] = { label: 'p(99)', format: 'duration' }
+    chart.series['http_req_duration.p(99)'] = { label: 'p(99)', format: 'duration' }
   }
 
   // define request duration panel
@@ -235,7 +235,7 @@ export default function (config) {
     return {
       id: `http_req_duration_${suffix}`,
       title: `HTTP Request Duration ${suffix}`,
-      metric: `http_req_duration_trend_${suffix}`,
+      metric: `http_req_duration.${suffix}`,
       format: 'duration'
     }
   }
@@ -288,7 +288,7 @@ export default function (config) {
 
   // helper for adding p(99) to existing chart
   function addP99(chart) {
-    chart.series["http_req_duration_trend_p(99)"] = { label: "p(99)" };
+    chart.series["http_req_duration.p(99)"] = { label: "p(99)" };
   }
 
   // add p(99) to overview panels request duration charts

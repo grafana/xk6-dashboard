@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useContext, useRef } from 'react'
-import { MetricsContext } from './metrics'
+import { SamplesContext } from './samples'
 import { MetricsUplot } from './metrics-uplot'
 import './Chart.css'
 import UplotReact from 'uplot-react';
@@ -17,7 +17,7 @@ import {format} from './format'
 const sync = uPlot.sync("chart");
 
 function Chart(props) {
-  const model = new MetricsUplot(useContext(MetricsContext), props.series)
+  const model = new MetricsUplot(useContext(SamplesContext), props.series)
   const ref = useRef(null);
   const { width } = useParentSize(ref);
 
@@ -78,6 +78,6 @@ const dateFormats = [
     [60,                "{HH}:{mm}",      "\n{YYYY}-{MM}-{DD}",            null,    "\n{MM}-{DD}",            null,    null,           null,        1],
     [1,                 ":{ss}",          "\n{YYYY}-{MM}-{DD} {HH}:{mm}",  null,    "\n{MM}-{DD} {HH}:{mm}",  null,    "\n{HH}:{mm}",  null,        1],
     [0.001,             ":{ss}.{fff}",    "\n{YYYY}-{MM}-{DD} {HH}:{mm}",  null,    "\n{MM}-{DD} {HH}:{mm}",  null,    "\n{HH}:{mm}",  null,        1],
-  ]
+]
 
 export { Chart }

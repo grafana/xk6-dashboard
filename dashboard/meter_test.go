@@ -89,13 +89,13 @@ func Test_meter_update(t *testing.T) {
 	assert.Contains(t, data, "bar")
 	assert.Contains(t, data, "time")
 
-	metric, ok := data["foo"]
+	sample, ok := data["foo"]
 
 	assert.True(t, ok)
-	assert.Contains(t, metric.Sample, "count")
-	assert.Contains(t, metric.Sample, "rate")
-	assert.Equal(t, 1.0, metric.Sample["count"])
-	assert.Equal(t, 1.0, metric.Sample["rate"])
+	assert.Contains(t, sample, "count")
+	assert.Contains(t, sample, "rate")
+	assert.Equal(t, 1.0, sample["count"])
+	assert.Equal(t, 1.0, sample["rate"])
 }
 
 func Test_meter_update_no_period(t *testing.T) {
@@ -104,8 +104,8 @@ func Test_meter_update_no_period(t *testing.T) {
 	now := time.Now()
 	met := newMeter(0, now)
 
-	sample := testSample(t, "foo", metrics.Counter, 1)
-	data, err := met.update(testSampleContainer(t, sample).toArray(), now)
+	aSample := testSample(t, "foo", metrics.Counter, 1)
+	data, err := met.update(testSampleContainer(t, aSample).toArray(), now)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, data)
@@ -114,9 +114,28 @@ func Test_meter_update_no_period(t *testing.T) {
 	assert.Contains(t, data, "foo")
 	assert.Contains(t, data, "time")
 
-	metric, ok := data["foo"]
+	sample, ok := data["foo"]
 
 	assert.True(t, ok)
-	assert.Contains(t, metric.Sample, "count")
-	assert.Contains(t, metric.Sample, "rate")
+	assert.Contains(t, sample, "count")
+	assert.Contains(t, sample, "rate")
+}
+
+func Test_meter_format(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	met := newMeter(0, now)
+
+	met.registry.getOrNew("foo", metrics.Counter, metrics.Data) // nolint:errcheck
+	met.registry.getOrNew("bar", metrics.Counter, metrics.Data) // nolint:errcheck
+
+	data := met.format(time.Second)
+
+	assert.NotNil(t, data)
+
+	assert.Equal(t, 3, len(data))
+	assert.Contains(t, data, "time")
+	assert.Contains(t, data, "foo")
+	assert.Contains(t, data, "bar")
 }

@@ -6,9 +6,6 @@ import React from 'react';
 
 import './Report.css'
 
-import { MetricsContext, useEvent } from './metrics';
-import { SummaryContext, useSummary } from './summary';
-import { useConfig } from './config';
 import { Grid, Fab, Typography, Box } from '@mui/material'
 import { ReactComponent as PrintIcon } from './icons/print.svg'
 import { ReactComponent as DownloadIcon } from './icons/download.svg'
@@ -26,17 +23,13 @@ function reportSections(conf) {
     return all
   }
 
-  let ctx = { snapshot: useEvent('snapshot'), cumulative: useEvent('cumulative') }
-
   for (let i = 0; i < conf().length; i++) {
     if (conf()[i].event != 'snapshot') {
       continue
     }
 
     all.push(
-      <MetricsContext.Provider key={i} value={ctx[conf()[i].event]}>
-        <ReportSection conf={()=> conf()[i]} />
-      </MetricsContext.Provider>
+      <ReportSection key={"report_section" + i} conf={() => conf()[i]} />
     )
   }
 
@@ -60,13 +53,13 @@ function charts(conf) {
   return all
 }
 
-function ReportSection({conf}) {
+function ReportSection({ conf }) {
   return (
     <>
       <Typography variant="h5" component="h2" align="center" sx={{ paddingBottom: '1em', paddingTop: '0.5em' }}>{conf().title}</Typography>
       <Typography paragraph sx={{ marginLeft: '2em', marginRight: '2em' }}>{conf().description}</Typography>
       <Grid container spacing={3} columns={2}>
-        {charts(()=>conf().charts)}
+        {charts(() => conf().charts)}
       </Grid>
     </>
   )
@@ -78,18 +71,16 @@ function SummarySection(props) {
       <Typography variant="h5" component="h2" align="center" sx={{ paddingBottom: '1em', paddingTop: '0.5em' }}>{props.title}</Typography>
       <Typography paragraph sx={{ marginLeft: '2em', marginRight: '2em' }}>{props.description}</Typography>
       <Box className="Summary" sx={{ marginLeft: '2em', marginRight: '2em' }}>
-        <SummaryContext.Provider key={"summary"} value={useSummary()}>
-          <Grid container spacing={3} columns={12}>
-            <Grid key={"trends"} item xs={12}><Digest type="trend" plain caption="Trends" /></Grid>
-            <Grid key={"counters"} item xs={7}><Digest type="counter" plain caption="Counters" /></Grid>
-            <Grid item xs={5}>
-              <Grid container spacing={3} columns={1}>
-                <Grid key={"rates"} item xs={1}><Digest type="rate" plain caption="Rates" /></Grid>
-                <Grid key={"gauges"} item xs={1}><Digest type="gauge" plain caption="Gauges" /></Grid>
-              </Grid>
+        <Grid container spacing={3} columns={12}>
+          <Grid key={"trends"} item xs={12}><Digest type="trend" plain caption="Trends" /></Grid>
+          <Grid key={"counters"} item xs={7}><Digest type="counter" plain caption="Counters" /></Grid>
+          <Grid item xs={5}>
+            <Grid container spacing={3} columns={1}>
+              <Grid key={"rates"} item xs={1}><Digest type="rate" plain caption="Rates" /></Grid>
+              <Grid key={"gauges"} item xs={1}><Digest type="gauge" plain caption="Gauges" /></Grid>
             </Grid>
           </Grid>
-        </SummaryContext.Provider>
+        </Grid>
       </Box>
     </>
   )
@@ -102,7 +93,7 @@ function Report(props) {
       <Box className='FabBox' sx={{ '& > :not(style)': { m: 1 } }}>
         <Fab color="primary" aria-label="Print" size="small" onClick={window.print}><PrintIcon /></Fab>
         <Fab color="primary" aria-label="Download" size="small" download="k6-report.html" href="/report"><DownloadIcon /></Fab>
-        <Fab color="primary" aria-label="Open" size="small" onClick={()=>window.open("/report")}><OpenIcon /></Fab>
+        <Fab color="primary" aria-label="Open" size="small" onClick={() => window.open("/report")}><OpenIcon /></Fab>
       </Box>
       <div className="Report">
         <Typography className="PageHeader" component="div">k6 report</Typography>

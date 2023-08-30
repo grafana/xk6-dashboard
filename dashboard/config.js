@@ -15,37 +15,37 @@ const overviewPanels = [
   {
     id: "iterations",
     title: "Iteration Rate",
-    metric: "iterations_counter_rate",
+    metric: "iterations.rate",
     format: "rps",
   },
   {
     id: "vus",
     title: "VUs",
-    metric: "vus_gauge_value",
+    metric: "vus.value",
     format: "counter",
   },
   {
     id: "http_reqs",
     title: "HTTP Request Rate",
-    metric: "http_reqs_counter_rate",
+    metric: "http_reqs.rate",
     format: "rps",
   },
   {
     id: "http_req_duration",
     title: "HTTP Request Duration",
-    metric: "http_req_duration_trend_avg",
+    metric: "http_req_duration.avg",
     format: "duration",
   },
   {
     id: "data_received",
     title: "Received Rate",
-    metric: "data_received_counter_rate",
+    metric: "data_received.rate",
     format: "bps",
   },
   {
     id: "data_sent",
     title: "Sent Rate",
-    metric: "data_sent_counter_rate",
+    metric: "data_sent.rate",
     format: "bps",
   },
 ];
@@ -59,13 +59,13 @@ const overviewCharts = [
     id: "http_reqs",
     title: "VUs",
     series: {
-      vus_gauge_value: {
+      "vus.value": {
         label: "VUs",
         width: 2,
         scale: "n",
         format: "counter",
       },
-      http_reqs_counter_rate: {
+      "http_reqs.rate": {
         label: "HTTP request rate",
         scale: "1/s",
         format: "rps",
@@ -78,13 +78,13 @@ const overviewCharts = [
     id: "data",
     title: "Transfer Rate",
     series: {
-      data_sent_counter_rate: {
+      "data_sent.rate": {
         label: "data sent",
         rate: true,
         scale: "sent",
         format: "bps",
       },
-      data_received_counter_rate: {
+      "data_received.rate": {
         label: "data received",
         rate: true,
         width: 2,
@@ -102,13 +102,13 @@ const overviewCharts = [
     id: "http_req_duration",
     title: "HTTP Request Duration",
     series: {
-      http_req_duration_trend_avg: {
+      "http_req_duration.avg": {
         label: "avg",
         width: 2,
         format: "duration",
       },
-      "http_req_duration_trend_p(90)": { label: "p(90)", format: "duration" },
-      "http_req_duration_trend_p(95)": { label: "p(95)", format: "duration" },
+      "http_req_duration.p(90)": { label: "p(90)", format: "duration" },
+      "http_req_duration.p(95)": { label: "p(95)", format: "duration" },
     },
     axes: [{}, { format: "duration" }, { side: 1, format: "duration" }],
   },
@@ -116,13 +116,13 @@ const overviewCharts = [
     id: "iteration_duration",
     title: "Iteration Duration",
     series: {
-      iteration_duration_trend_avg: {
+      "iteration_duration.avg": {
         label: "avg",
         width: 2,
         format: "duration",
       },
-      "iteration_duration_trend_p(90)": { label: "p(90)", format: "duration" },
-      "iteration_duration_trend_p(95)": { label: "p(95)", format: "duration" },
+      "iteration_duration.p(90)": { label: "p(90)", format: "duration" },
+      "iteration_duration.p(95)": { label: "p(95)", format: "duration" },
     },
     axes: [{}, { format: "duration" }, { side: 1, format: "duration" }],
   },
@@ -175,9 +175,9 @@ function chartTimings(metric, title) {
     id: metric,
     title: title,
     series: {
-      [`${metric}_trend_avg`]: { label: "avg", width: 2, format: "duration" },
-      [`${metric}_trend_p(90)`]: { label: "p(90)", format: "duration" },
-      [`${metric}_trend_p(95)`]: { label: "p(95)", format: "duration" },
+      [`${metric}.avg`]: { label: "avg", width: 2, format: "duration" },
+      [`${metric}.p(90)`]: { label: "p(90)", format: "duration" },
+      [`${metric}.p(95)`]: { label: "p(95)", format: "duration" },
     },
     axes: [{}, { format: "duration" }, { side: 1, format: "duration" }],
     height: 224,

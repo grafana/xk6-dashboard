@@ -5,9 +5,6 @@
 package dashboard
 
 import (
-	"time"
-
-	v1 "go.k6.io/k6/api/v1"
 	"go.k6.io/k6/metrics"
 )
 
@@ -51,29 +48,16 @@ func (reg *registry) mustGetOrNew(name string, typ metrics.MetricType, valTyp ..
 	return metric
 }
 
-// format creates k6 REST API v1 compatible output map from all registered metrics.
-func (reg *registry) format(dur time.Duration) map[string]v1.Metric {
-	out := make(map[string]v1.Metric, len(reg.names))
+// newbies return newly registered names since last seen.
+func (reg *registry) newbies(seen map[string]struct{}) []string {
+	var names []string
 
 	for _, name := range reg.names {
-		metric := reg.Get(name)
-		if metric == nil {
-			continue
+		if _, ok := seen[name]; !ok {
+			names = append(names, name)
+			seen[name] = struct{}{}
 		}
-
-		v1metric := v1.NewMetric(metric, dur)
-
-		if sink, ok := metric.Sink.(*metrics.TrendSink); ok {
-			v1metric.Sample[pc99Name] = sink.P(pc99)
-		}
-
-		out[name] = v1metric
 	}
 
-	return out
+	return names
 }
-
-const (
-	pc99     = 0.99
-	pc99Name = "p(99)"
-)

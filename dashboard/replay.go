@@ -42,6 +42,8 @@ type replayer struct {
 	once sync.Once
 
 	config json.RawMessage
+
+	seenMetrics map[string]struct{}
 }
 
 func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
@@ -58,6 +60,7 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 	rep.config = config
 	rep.logger = logger
 	rep.eventSource = new(eventSource)
+	rep.seenMetrics = make(map[string]struct{})
 
 	brf := newBriefer(briefFS, config, opts.Report, rep.logger)
 
@@ -100,7 +103,7 @@ func (rep *replayer) start() error {
 	rep.fireEvent(configEvent, rep.config)
 	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
 
-	return rep.fireStop()
+	return rep.fireStart()
 }
 
 func (rep *replayer) stop() error {
@@ -139,6 +142,11 @@ func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, m *mete
 		rep.logger.WithError(err).Warn("Error while processing samples")
 
 		return
+	}
+
+	newbies := m.newbies(rep.seenMetrics)
+	if len(newbies) != 0 {
+		rep.fireEvent(metricEvent, newbies)
 	}
 
 	rep.fireEvent(event, data)

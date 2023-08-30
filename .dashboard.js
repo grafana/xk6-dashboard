@@ -30,7 +30,7 @@ export default function (config) {
    */
   function addP99 (chart) {
     chart.series = Object.assign({}, chart.series)
-    chart.series['http_req_duration_trend_p(99)'] = { label: 'p(99)', format: 'duration' }
+    chart.series['http_req_duration.p(99)'] = { label: 'p(99)', format: 'duration' }
   }
 
   /**

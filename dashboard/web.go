@@ -25,6 +25,7 @@ const (
 	startEvent      = "start"
 	stopEvent       = "stop"
 	configEvent     = "config"
+	metricEvent     = "metric"
 )
 
 type webServer struct {

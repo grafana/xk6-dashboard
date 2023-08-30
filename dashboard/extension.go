@@ -31,6 +31,8 @@ type Extension struct {
 
 	cumulative *meter
 
+	seenMetrics map[string]struct{}
+
 	period time.Duration
 
 	name string
@@ -59,6 +61,7 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 		server:      nil,
 		flusher:     nil,
 		cumulative:  nil,
+		seenMetrics: nil,
 		period:      opts.period(offset),
 		eventSource: new(eventSource),
 	}
@@ -103,6 +106,7 @@ func (ext *Extension) Start() error {
 	}
 
 	ext.cumulative = newMeter(0, time.Now())
+	ext.seenMetrics = make(map[string]struct{})
 
 	if err := ext.fireStart(); err != nil {
 		return err
@@ -147,12 +151,17 @@ func (ext *Extension) flush() {
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
-func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, m *meter, event string, now time.Time) {
-	data, err := m.update(containers, now)
+func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, met *meter, event string, now time.Time) {
+	data, err := met.update(containers, now)
 	if err != nil {
 		ext.logger.WithError(err).Warn("Error while processing samples")
 
 		return
+	}
+
+	newbies := met.newbies(ext.seenMetrics)
+	if len(newbies) != 0 {
+		ext.fireEvent(metricEvent, newbies)
 	}
 
 	ext.fireEvent(event, data)

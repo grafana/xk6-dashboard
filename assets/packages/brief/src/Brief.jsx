@@ -34,7 +34,7 @@ function charts(samples, conf) {
   }
 
   for (const chart of conf) {
-    let c = { ...chart, metrics: samples };
+    let c = { ...chart, samples };
     all.push(<div className="col">{Chart(c)}</div>);
   }
 
@@ -47,7 +47,7 @@ function ReportSection(props) {
       <h2 id={props.id ? props.id : props.title}>{props.title}</h2>
       <p>{props.description}</p>
       <div className="row row-cols-1 row-cols-sm-1 row-cols-md-2 row-cols-lg-2">
-      {charts(props.samples, props.charts)}
+        {charts(props.samples, props.charts)}
       </div>
     </section>
   );
@@ -56,9 +56,9 @@ function ReportSection(props) {
 function UsageSection(props) {
   return (
     <section className="usage container">
-      <hr/>
+      <hr />
       <p className="usage">
-      Select a time interval by holding down the mouse on any graph to zoom. To cancel zoom, double click on any graph.
+        Select a time interval by holding down the mouse on any graph to zoom. To cancel zoom, double click on any graph.
       </p>
     </section>
   );
@@ -68,13 +68,13 @@ export function Brief(props) {
   return (
     <section className="container brief">
       <h1>k6 report</h1>
-      <div>{reportSections(props.data.metrics, props.config.tabs)}</div>
+      <div>{reportSections(props.data.samples, props.config.tabs)}</div>
       <SummarySection
         summary={props.data.summary}
         title="Summary"
         description="This section provides a summary of the test run metrics. The tables contains the aggregated values of the metrics for the entire test run."
       />
-      <UsageSection/>
+      <UsageSection />
     </section>
   );
 }
