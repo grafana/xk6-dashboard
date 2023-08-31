@@ -334,3 +334,12 @@ func Test_paramData_With(t *testing.T) {
 
 	assert.Equal(t, param, ext.param)
 }
+
+func Test_paramData_withTags(t *testing.T) {
+	t.Parallel()
+
+	param := new(paramData)
+
+	assert.Same(t, param, param.withTags([]string{"foo", "bar"}))
+	assert.Equal(t, []string{"foo", "bar"}, param.Tags)
+}

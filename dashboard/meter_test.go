@@ -16,7 +16,7 @@ func Test_newMeter(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(time.Second, now)
+	met := newMeter(time.Second, now, nil)
 
 	assert.NotNil(t, met)
 	assert.NotNil(t, met.registry)
@@ -29,7 +29,7 @@ func Test_meter_add_error(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(time.Second, now)
+	met := newMeter(time.Second, now, nil)
 
 	sample := metrics.Sample{ // nolint:exhaustruct
 		TimeSeries: metrics.TimeSeries{ // nolint:exhaustruct
@@ -46,7 +46,7 @@ func Test_meter_add(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(time.Second, now)
+	met := newMeter(time.Second, now, nil)
 
 	sample := testSample(t, "foo", metrics.Counter, 1)
 
@@ -62,7 +62,7 @@ func Test_meter_update_error(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(time.Second, now)
+	met := newMeter(time.Second, now, nil)
 
 	sample := testSample(t, "", metrics.Gauge, 0)
 	data, err := met.update(testSampleContainer(t, sample).toArray(), now)
@@ -75,7 +75,7 @@ func Test_meter_update(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(time.Second, now)
+	met := newMeter(time.Second, now, nil)
 
 	foo := testSample(t, "foo", metrics.Counter, 1)
 	bar := testSample(t, "bar", metrics.Counter, 1)
@@ -102,7 +102,7 @@ func Test_meter_update_no_period(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(0, now)
+	met := newMeter(0, now, nil)
 
 	aSample := testSample(t, "foo", metrics.Counter, 1)
 	data, err := met.update(testSampleContainer(t, aSample).toArray(), now)
@@ -125,7 +125,7 @@ func Test_meter_format(t *testing.T) {
 	t.Parallel()
 
 	now := time.Now()
-	met := newMeter(0, now)
+	met := newMeter(0, now, nil)
 
 	met.registry.getOrNew("foo", metrics.Counter, metrics.Data) // nolint:errcheck
 	met.registry.getOrNew("bar", metrics.Counter, metrics.Data) // nolint:errcheck
@@ -138,6 +138,40 @@ func Test_meter_format(t *testing.T) {
 	assert.Contains(t, data, "time")
 	assert.Contains(t, data, "foo")
 	assert.Contains(t, data, "bar")
+}
+
+func Test_meter_update_tags(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	met := newMeter(time.Second, now, nil)
+
+	foo := testSample(t, "foo", metrics.Counter, 1)
+	bar := testSample(t, "bar", metrics.Counter, 1)
+
+	met.tags = []string{"answer"}
+
+	bar.Tags = met.registry.RootTagSet().With("answer", "42")
+	foo.Tags = met.registry.RootTagSet().With("color", "blue")
+
+	data, err := met.update(testSampleContainer(t, foo, bar).toArray(), now)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, data)
+
+	assert.Equal(t, 4, len(data))
+	assert.Contains(t, data, "foo")
+	assert.Contains(t, data, "bar")
+	assert.Contains(t, data, "bar{answer:42}")
+	assert.Contains(t, data, "time")
+
+	sample, ok := data["foo"]
+
+	assert.True(t, ok)
+	assert.Contains(t, sample, "count")
+	assert.Contains(t, sample, "rate")
+	assert.Equal(t, 1.0, sample["count"])
+	assert.Equal(t, 1.0, sample["rate"])
 }
 
 func Test_significant(t *testing.T) {

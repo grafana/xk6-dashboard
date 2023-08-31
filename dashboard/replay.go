@@ -108,7 +108,7 @@ func (rep *replayer) start() error {
 
 	rep.fireEvent(paramEvent, param)
 
-	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now, rep.options.Tags), startEvent, now)
 
 	return rep.fireStart()
 }
@@ -116,7 +116,7 @@ func (rep *replayer) start() error {
 func (rep *replayer) stop() error {
 	now := time.Now()
 
-	rep.updateAndSend(nil, newMeter(rep.options.Period, now), stopEvent, now)
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now, rep.options.Tags), stopEvent, now)
 
 	return rep.fireStop()
 }
@@ -125,7 +125,7 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	firstTime := samples[0].GetSamples()[0].Time
 
 	rep.once.Do(func() {
-		rep.cumulative = newMeter(0, firstTime)
+		rep.cumulative = newMeter(0, firstTime, rep.options.Tags)
 		rep.timestamp = firstTime
 		rep.buffer = new(output.SampleBuffer)
 	})
@@ -134,7 +134,7 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 		samples := rep.buffer.GetBufferedSamples()
 		now := firstTime
 
-		rep.updateAndSend(samples, newMeter(rep.options.Period, now), snapshotEvent, now)
+		rep.updateAndSend(samples, newMeter(rep.options.Period, now, rep.options.Tags), snapshotEvent, now)
 		rep.updateAndSend(samples, rep.cumulative, cumulativeEvent, now)
 
 		rep.timestamp = now
@@ -258,22 +258,41 @@ func (f *feeder) processPoint(data []byte) error {
 		return fmt.Errorf("%w: %s", errUnknownMetric, name)
 	}
 
+	tags := f.tagSetFrom(gjson.GetBytes(data, "data.tags"))
+
 	sample := metrics.Sample{ //nolint:exhaustruct
 		Time:  timestamp,
 		Value: gjson.GetBytes(data, "data.value").Float(),
 		TimeSeries: metrics.TimeSeries{ //nolint:exhaustruct
 			Metric: metric,
+			Tags:   tags,
 		},
 	}
 
 	container := metrics.ConnectedSamples{ //nolint:exhaustruct
 		Samples: []metrics.Sample{sample},
 		Time:    sample.Time,
+		Tags:    tags,
 	}
 
 	f.callback([]metrics.SampleContainer{container})
 
 	return nil
+}
+
+func (f *feeder) tagSetFrom(res gjson.Result) *metrics.TagSet {
+	asMap := res.Map()
+	if len(asMap) == 0 {
+		return nil
+	}
+
+	set := f.registry.Registry.RootTagSet()
+
+	for key, value := range asMap {
+		set = set.With(key, value.String())
+	}
+
+	return set
 }
 
 var errUnknownMetric = errors.New("unknown metric")

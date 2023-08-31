@@ -113,7 +113,7 @@ func (ext *Extension) Start() error {
 		}
 	}
 
-	ext.cumulative = newMeter(0, time.Now())
+	ext.cumulative = newMeter(0, time.Now(), ext.options.Tags)
 	ext.seenMetrics = make(map[string]struct{})
 
 	if err := ext.fireStart(); err != nil {
@@ -127,7 +127,7 @@ func (ext *Extension) Start() error {
 	ext.fireEvent(configEvent, config)
 	ext.fireEvent(paramEvent, ext.param)
 
-	ext.updateAndSend(nil, newMeter(ext.period, now), startEvent, now)
+	ext.updateAndSend(nil, newMeter(ext.period, now, ext.cumulative.tags), startEvent, now)
 
 	flusher, err := output.NewPeriodicFlusher(ext.period, ext.flush)
 	if err != nil {
@@ -144,7 +144,7 @@ func (ext *Extension) Stop() error {
 
 	now := time.Now()
 
-	ext.updateAndSend(nil, newMeter(ext.period, now), stopEvent, now)
+	ext.updateAndSend(nil, newMeter(ext.period, now, ext.options.Tags), stopEvent, now)
 
 	return ext.fireStop()
 }
@@ -157,7 +157,7 @@ func (ext *Extension) flush() {
 	samples := ext.buffer.GetBufferedSamples()
 	now := time.Now()
 
-	ext.updateAndSend(samples, newMeter(ext.period, now), snapshotEvent, now)
+	ext.updateAndSend(samples, newMeter(ext.period, now, ext.options.Tags), snapshotEvent, now)
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
@@ -182,6 +182,7 @@ type paramData struct {
 	Scenarios  []string            `json:"scenarios,omitempty"`
 	EndOffset  time.Duration       `json:"endOffset,omitempty"`
 	Period     time.Duration       `json:"period,omitempty"`
+	Tags       []string            `json:"tags,omitempty"`
 }
 
 func newParamData(params *output.Params) *paramData {
@@ -190,6 +191,12 @@ func newParamData(params *output.Params) *paramData {
 	for name := range params.ScriptOptions.Scenarios {
 		param.Scenarios = append(param.Scenarios, name)
 	}
+
+	return param
+}
+
+func (param *paramData) withTags(tags []string) *paramData {
+	param.Tags = tags
 
 	return param
 }

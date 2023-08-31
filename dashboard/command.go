@@ -33,6 +33,7 @@ const (
 	flagOpen   = "open"
 	flagConfig = "config"
 	flagReport = "report"
+	flagTags   = "tags"
 
 	typeMetric = "Metric"
 	typePoint  = "Point"
@@ -88,6 +89,7 @@ func buildRootCmd(opts *options, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
 	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window automatically")
 	flags.StringVar(&opts.Config, flagConfig, defaultConfig, "UI configuration file location")
 	flags.StringVar(&opts.Report, flagReport, defaultReport, "Report file location (default: '', no report)")
+	flags.StringSliceVar(&opts.Tags, flagTags, defaultTags, "Precomputed metric tags, can be specified more than once")
 
 	dashboardCmd.AddCommand(replayCmd)
 

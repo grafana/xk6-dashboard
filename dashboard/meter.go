@@ -17,9 +17,10 @@ type meter struct {
 	clock  *metrics.GaugeSink
 	period time.Duration
 	start  time.Time
+	tags   []string
 }
 
-func newMeter(period time.Duration, now time.Time) *meter {
+func newMeter(period time.Duration, now time.Time, tags []string) *meter {
 	registry := newRegistry()
 	metric := registry.mustGetOrNew("time", metrics.Gauge, metrics.Time)
 	clock, _ := metric.Sink.(*metrics.GaugeSink)
@@ -32,6 +33,7 @@ func newMeter(period time.Duration, now time.Time) *meter {
 		start:    start,
 		clock:    clock,
 		period:   period,
+		tags:     tags,
 	}
 }
 
@@ -62,10 +64,42 @@ func (m *meter) add(sample metrics.Sample) error {
 
 	metric.Sink.Add(sample)
 
+	if sample.Tags == nil {
+		return nil
+	}
+
+	for _, tag := range m.tags {
+		val, ok := sample.Tags.Get(tag)
+		if !ok || len(val) == 0 {
+			continue
+		}
+
+		sub, err := metric.AddSubmetric(tag + ":" + val)
+		if err != nil {
+			return err
+		}
+
+		sub.Metric.Sink.Add(sample)
+	}
+
 	return nil
 }
 
 func (m *meter) format(dur time.Duration) map[string]sampleData {
+	fmt := func(met *metrics.Metric) map[string]float64 {
+		sample := met.Sink.Format(dur)
+
+		if sink, ok := met.Sink.(*metrics.TrendSink); ok {
+			sample[pc99Name] = sink.P(pc99)
+		}
+
+		for name, value := range sample {
+			sample[name] = significant(value)
+		}
+
+		return sample
+	}
+
 	out := make(map[string]sampleData, len(m.registry.names))
 
 	for _, name := range m.registry.names {
@@ -74,17 +108,11 @@ func (m *meter) format(dur time.Duration) map[string]sampleData {
 			continue
 		}
 
-		sample := metric.Sink.Format(dur)
+		out[name] = fmt(metric)
 
-		if sink, ok := metric.Sink.(*metrics.TrendSink); ok {
-			sample[pc99Name] = sink.P(pc99)
+		for _, sub := range metric.Submetrics {
+			out[sub.Name] = fmt(sub.Metric)
 		}
-
-		for name, value := range sample {
-			sample[name] = significant(value)
-		}
-
-		out[name] = sample
 	}
 
 	return out

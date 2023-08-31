@@ -13,6 +13,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/schema"
@@ -30,6 +31,8 @@ const (
 	defaultAltConfig = ".dashboard.json"
 )
 
+var defaultTags = []string{"group"}
+
 type options struct {
 	Port   int
 	Host   string
@@ -37,6 +40,8 @@ type options struct {
 	Open   bool
 	Config string
 	Report string
+	Tags   []string `schema:"tag"`
+	TagsS  string   `schema:"tags"`
 }
 
 func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
@@ -47,6 +52,8 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		Open:   defaultOpen,
 		Config: defaultConfig,
 		Report: defaultReport,
+		Tags:   defaultTags,
+		TagsS:  "",
 	}
 
 	if query == "" {
@@ -83,6 +90,10 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 
 	if value.Has("open") && len(value.Get("open")) == 0 {
 		opts.Open = true
+	}
+
+	if len(opts.TagsS) != 0 {
+		opts.Tags = append(opts.Tags, strings.Split(opts.TagsS, ",")...)
 	}
 
 	return opts, err
