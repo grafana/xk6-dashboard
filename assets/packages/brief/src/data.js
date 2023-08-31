@@ -24,5 +24,5 @@ export default async function () {
   summary.update(data.cumulative);
   summary.annotate(data.metrics);
 
-  return { metrics: data.metrics, samples, summary };
+  return { metrics: data.metrics, samples, summary, config: data.config };
 }

@@ -12,8 +12,4 @@ import './styles.scss'
 
 import './index.css'
 
-function getConfig() {
-    return JSON.parse(document.getElementById("config").innerText)
-}
-
-data().then(d => render(<Brief data={d} config={getConfig()}/>, document.getElementById('root')))
+data().then(d => render(<Brief data={d} config={d.config} />, document.getElementById('root')))

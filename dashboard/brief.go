@@ -20,16 +20,11 @@ import (
 )
 
 type briefer struct {
-	assets     fs.FS
-	uiConfig   []byte
-	output     string
-	logger     logrus.FieldLogger
-	buff       bytes.Buffer
-	mu         sync.RWMutex
-	encoder    *json.Encoder
-	cumulative interface{}
-	metrics    map[string]metricData
-	param      interface{}
+	assets fs.FS
+	data   *briefData
+	output string
+	logger logrus.FieldLogger
+	mu     sync.RWMutex
 }
 
 var (
@@ -37,16 +32,13 @@ var (
 	_ http.Handler  = (*briefer)(nil)
 )
 
-func newBriefer(assets fs.FS, uiConfig []byte, output string, logger logrus.FieldLogger) *briefer {
+func newBriefer(assets fs.FS, config json.RawMessage, output string, logger logrus.FieldLogger) *briefer {
 	brf := &briefer{ // nolint:exhaustruct
-		assets:   assets,
-		uiConfig: uiConfig,
-		output:   output,
-		logger:   logger,
-		metrics:  make(map[string]metricData),
+		data:   newBriefData(config),
+		assets: assets,
+		output: output,
+		logger: logger,
 	}
-
-	brf.encoder = json.NewEncoder(&brf.buff)
 
 	return brf
 }
@@ -91,13 +83,13 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 	defer brf.mu.Unlock()
 
 	if name == cumulativeEvent {
-		brf.cumulative = data
+		brf.data.cumulative = data
 
 		return
 	}
 
 	if name == paramEvent {
-		brf.param = data
+		brf.data.param = data
 
 		return
 	}
@@ -105,7 +97,7 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 	if name == metricEvent {
 		if metrics, ok := data.(map[string]metricData); ok {
 			for key, value := range metrics {
-				brf.metrics[key] = value
+				brf.data.metrics[key] = value
 			}
 		}
 
@@ -116,16 +108,16 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 		return
 	}
 
-	if brf.buff.Len() != 0 {
-		if _, err := brf.buff.WriteRune(','); err != nil {
+	if brf.data.buff.Len() != 0 {
+		if _, err := brf.data.buff.WriteRune(','); err != nil {
 			brf.logger.Error(err)
 
 			return
 		}
 	}
 
-	if err := brf.encoder.Encode(data); err != nil {
-		brf.encoder.Encode(nil) //nolint:errcheck,errchkjson
+	if err := brf.data.encoder.Encode(data); err != nil {
+		brf.data.encoder.Encode(nil) //nolint:errcheck,errchkjson
 
 		brf.logger.Error(err)
 	}
@@ -139,56 +131,11 @@ func (brf *briefer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func encodeJSON(out io.Writer, data interface{}) error {
-	bin, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-
-	_, err = out.Write(bin)
-
-	return err
-}
-
 func (brf *briefer) exportJSON(out io.Writer) error {
 	brf.mu.RLock()
 	defer brf.mu.RUnlock()
 
-	if _, err := out.Write([]byte(`{"cumulative":`)); err != nil {
-		return err
-	}
-
-	if err := encodeJSON(out, brf.cumulative); err != nil {
-		return err
-	}
-
-	if _, err := out.Write([]byte(`,"param":`)); err != nil {
-		return err
-	}
-
-	if err := encodeJSON(out, brf.param); err != nil {
-		return err
-	}
-
-	if _, err := out.Write([]byte(`,"metrics":`)); err != nil {
-		return err
-	}
-
-	if err := encodeJSON(out, brf.metrics); err != nil {
-		return err
-	}
-
-	if _, err := out.Write([]byte(`,"snapshot":[`)); err != nil {
-		return err
-	}
-
-	if _, err := out.Write(brf.buff.Bytes()); err != nil {
-		return err
-	}
-
-	_, err := out.Write([]byte("]}"))
-
-	return err
+	return brf.data.exportJSON(out)
 }
 
 func (brf *briefer) exportBase64(out io.Writer) error {
@@ -217,11 +164,6 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 		return err
 	}
 
-	html, err = brf.inject(out, html, configTag, brf.exportConfig)
-	if err != nil {
-		return err
-	}
-
 	html, err = brf.inject(out, html, dataTag, brf.exportBase64)
 	if err != nil {
 		return err
@@ -232,12 +174,6 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 	}
 
 	return nil
-}
-
-func (brf *briefer) exportConfig(out io.Writer) error {
-	_, err := out.Write(brf.uiConfig)
-
-	return err
 }
 
 func (brf *briefer) inject(out io.Writer, html []byte, tag []byte, dataFunc func(io.Writer) error) ([]byte, error) {
@@ -260,7 +196,78 @@ func (brf *briefer) inject(out io.Writer, html []byte, tag []byte, dataFunc func
 	return html[idx:], nil
 }
 
-var (
-	configTag = []byte(`<script id="config" type="application/json; charset=utf-8">`)
-	dataTag   = []byte(`<script id="data" type="application/json; charset=utf-8; gzip; base64">`)
-)
+type briefData struct {
+	config     json.RawMessage
+	param      interface{}
+	buff       bytes.Buffer
+	encoder    *json.Encoder
+	cumulative interface{}
+	metrics    map[string]metricData
+}
+
+func newBriefData(config []byte) *briefData {
+	data := new(briefData)
+
+	data.config = config
+	data.metrics = make(map[string]metricData)
+	data.encoder = json.NewEncoder(&data.buff)
+
+	return data
+}
+
+func encodeJSONprop(out io.Writer, prefix string, name string, value interface{}) error {
+	if _, err := out.Write([]byte(prefix + `"` + name + `":`)); err != nil {
+		return err
+	}
+
+	if raw, ok := value.(json.RawMessage); ok {
+		if len(raw) == 0 {
+			raw = []byte("null")
+		}
+
+		_, err := out.Write(raw)
+
+		return err
+	}
+
+	bin, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	_, err = out.Write(bin)
+
+	return err
+}
+
+func (data *briefData) exportJSON(out io.Writer) error {
+	if err := encodeJSONprop(out, "{", "cumulative", data.cumulative); err != nil {
+		return err
+	}
+
+	if err := encodeJSONprop(out, ",", "param", data.param); err != nil {
+		return err
+	}
+
+	if err := encodeJSONprop(out, ",", "config", data.config); err != nil {
+		return err
+	}
+
+	if err := encodeJSONprop(out, ",", "metrics", data.metrics); err != nil {
+		return err
+	}
+
+	if _, err := out.Write([]byte(`,"snapshot":[`)); err != nil {
+		return err
+	}
+
+	if _, err := out.Write(data.buff.Bytes()); err != nil {
+		return err
+	}
+
+	_, err := out.Write([]byte("]}"))
+
+	return err
+}
+
+var dataTag = []byte(`<script id="data" type="application/json; charset=utf-8; gzip; base64">`)

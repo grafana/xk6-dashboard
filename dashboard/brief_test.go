@@ -75,11 +75,11 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 
 	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
 
-	brf.cumulative = recursiveJSON(t)
+	brf.data.cumulative = recursiveJSON(t)
 
 	assert.Error(t, brf.exportJSON(io.Discard))
 
-	brf.cumulative = nil
+	brf.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
@@ -92,8 +92,10 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 	assert.Error(t, brf.exportJSON(out.reset(6)))
 	assert.Error(t, brf.exportJSON(out.reset(7)))
 	assert.Error(t, brf.exportJSON(out.reset(8)))
+	assert.Error(t, brf.exportJSON(out.reset(9)))
+	assert.Error(t, brf.exportJSON(out.reset(10)))
 
-	assert.NoError(t, brf.exportJSON(out.reset(9)))
+	assert.NoError(t, brf.exportJSON(out.reset(11)))
 	assert.Equal(t, emptyData, out.String())
 }
 
@@ -102,11 +104,11 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 
 	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
 
-	brf.cumulative = recursiveJSON(t)
+	brf.data.cumulative = recursiveJSON(t)
 
 	assert.Error(t, brf.exportBase64(io.Discard))
 
-	brf.cumulative = nil
+	brf.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
@@ -152,27 +154,27 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	brf.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n", brf.buff.String())
+	assert.Equal(t, "{}\n", brf.data.buff.String())
 
 	brf.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n,{}\n", brf.buff.String())
+	assert.Equal(t, "{}\n,{}\n", brf.data.buff.String())
 
 	data["bad"] = recursiveJSON(t)
 
 	brf.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
 
-	assert.Equal(t, "{}\n,{}\n,null\n", brf.buff.String())
+	assert.Equal(t, "{}\n,{}\n,null\n", brf.data.buff.String())
 
 	data["foo"] = "bar"
 
 	brf.onEvent(cumulativeEvent, data)
 
-	assert.Equal(t, data, brf.cumulative)
+	assert.Equal(t, data, brf.data.cumulative)
 }
 
 const (
-	emptyData       = `{"cumulative":null,"param":null,"metrics":{},"snapshot":[]}`
-	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKkgsSsyFcXJTS4oyk4uVrKprdZSK8xILijPyS5SsomNrAQEAAP//yATdEDsAAAA=`
+	emptyData       = `{"cumulative":null,"param":null,"config":null,"metrics":{},"snapshot":[]}`
+	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKkgsSsyFcZLz89Iy02G83NSSoszkYiWr6lodpeK8xILijPwSJavo2FpAAAAA///7qm9QSQAAAA==`
 	emptyDataScript = `<script id="data" type="application/json; charset=utf-8; gzip; base64">` + emptyDataBase64
 )
