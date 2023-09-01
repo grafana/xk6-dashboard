@@ -206,7 +206,8 @@ The embedded user interface can be customized using a single JavaScript configur
 The default configuration is loaded from the [dashboard/config.js](dashboard/config.js) file, which can give you ideas for creating your own configuration.
 
 > **Warning**
-> The format of the custom configuration has changed! > The stability of the configuration format is still not guaranteed, so you should check the changes before updating the version.
+> The format of the custom configuration has changed!
+> The stability of the configuration format is still not guaranteed, so you should check the changes before updating the version.
 > In addition, it is possible that the custom configuration will be limited or phased out in the future.
 
 ### Examples
