@@ -201,9 +201,13 @@ Two kind of events will be emitted:
 
 ## Customization
 
-The embedded user interface can be customized using a single JavaScript configuration file specified in the `config` parameter (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module that is executed in the browser. The module's default export is a JavaScript configuration object.
+The embedded user interface can be customized using a single JavaScript configuration file specified in the `config` parameter (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module. The module's default export is a JavaScript function which returns a configuration object. The default configuration is passed as argument to the exported function.
 
-Before executing the configuration file, the `window.defaultConfig` object is created with the default configuration. The default configuration is loaded from the [ui/assets/ui/public/boot.js](ui/assets/ui/public/boot.js) file, which can give you ideas for creating your own configuration.
+The default configuration is loaded from the [dashboard/config.js](dashboard/config.js) file, which can give you ideas for creating your own configuration.
+
+> **Warning**
+> The format of the custom configuration has changed! > The stability of the configuration format is still not guaranteed, so you should check the changes before updating the version.
+> In addition, it is possible that the custom configuration will be limited or phased out in the future.
 
 ### Examples
 
