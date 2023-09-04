@@ -139,7 +139,6 @@ host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen
 port      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no HTTP), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
 open      | Set to `true` (or empty) to open the browser window automatically
-config    | UI configuration file location (default: `.dashboard.js`) (see [Customization](#customization))
 report    | File name to save the report (default: "", empty, the report will not be saved)
 tag       | Precomputed metric tag name(s) (default: "group"), can be specified more than once
 
@@ -201,9 +200,9 @@ Two kind of events will be emitted:
 
 ## Customization
 
-The embedded user interface can be customized using a single JavaScript configuration file specified in the `config` parameter (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module. The module's default export is a JavaScript function which returns a configuration object. The default configuration is passed as argument to the exported function.
+The embedded user interface can be customized using a single JavaScript configuration file specified in the `XK6_DASHBOARD_CONFIG` environment variable (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module. The module's default export is a JavaScript function which returns a configuration object. The default configuration is passed as argument to the exported function.
 
-The default configuration is loaded from the [dashboard/config.js](dashboard/config.js) file, which can give you ideas for creating your own configuration.
+The default configuration is loaded from the [assets/packages/config/dist/config.json](assets/packages/config/dist/config.json) file, which can give you ideas for creating your own configuration.
 
 > **Warning**
 > The format of the custom configuration has changed!
@@ -330,7 +329,6 @@ Usage:
   k6 dashboard replay file [flags]
 
 Flags:
-      --config string   UI configuration file location (default ".dashboard.js")
       --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
       --open            Open browser window automatically
       --period 1m       Event emitting frequency, example: 1m (default 10s)

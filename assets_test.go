@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: MIT
 
-package assets
+package dashboard
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,10 +22,10 @@ func Test_dir(t *testing.T) {
 	})
 }
 
-func TestDirUI(t *testing.T) {
+func Test_dirUI(t *testing.T) {
 	t.Parallel()
 
-	fs := DirUI()
+	fs := dirUI()
 
 	assert.NotNil(t, fs)
 
@@ -36,10 +37,10 @@ func TestDirUI(t *testing.T) {
 	assert.NoError(t, file.Close())
 }
 
-func TestDirBrief(t *testing.T) {
+func Test_dirBrief(t *testing.T) {
 	t.Parallel()
 
-	fs := DirBrief()
+	fs := dirBrief()
 
 	assert.NotNil(t, fs)
 
@@ -49,4 +50,16 @@ func TestDirBrief(t *testing.T) {
 	assert.NotNil(t, file)
 
 	assert.NoError(t, file.Close())
+}
+
+func Test_fileConfig(t *testing.T) {
+	t.Parallel()
+
+	binary := fileConfig()
+
+	assert.NotNil(t, binary)
+
+	conf := map[string]interface{}{}
+
+	assert.NoError(t, json.Unmarshal(binary, &conf))
 }

@@ -17,7 +17,7 @@ func Test_buildRootCmd(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, embed.FS{}, embed.FS{})
+	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NotNil(t, cmd)
 
@@ -41,7 +41,7 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, embed.FS{}, embed.FS{})
+	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NotNil(t, cmd)
 
@@ -63,7 +63,7 @@ func Test_buildRootCmd_reply_error(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, embed.FS{}, embed.FS{})
+	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NotNil(t, cmd)
 

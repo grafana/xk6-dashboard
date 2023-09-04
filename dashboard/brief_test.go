@@ -6,7 +6,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -73,7 +72,7 @@ func recursiveJSON(t *testing.T) interface{} {
 func Test_briefer_exportJSON_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
 	brf.data.cumulative = recursiveJSON(t)
 
@@ -102,7 +101,7 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 func Test_briefer_exportBase64_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
 	brf.data.cumulative = recursiveJSON(t)
 
@@ -120,9 +119,9 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 func Test_briefer_inject_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
-	file, err := assets.DirBrief().Open("index.html")
+	file, err := testDirBrief(t).Open("index.html")
 
 	assert.NoError(t, err)
 
@@ -148,7 +147,7 @@ func Test_briefer_inject_error(t *testing.T) {
 func Test_briefer_onEvent(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
 	data := make(map[string]interface{})
 

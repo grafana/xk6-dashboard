@@ -1,6 +1,7 @@
-package dashboard
+package customize
 
 import (
+	_ "embed"
 	"testing"
 
 	"github.com/dop251/goja"
@@ -10,20 +11,21 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+//go:embed testdata/config/config.json
+var testconfig []byte
+
 func TestConfigInReadme(t *testing.T) {
 	t.Parallel()
 
-	conf, err := loadConfig("../.dashboard.js", logrus.StandardLogger())
+	conf, err := loadConfigJS("../.dashboard.js", testconfig, logrus.StandardLogger())
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	loader, err := newConfigLoader(logrus.StandardLogger())
+	loader, err := newConfigLoader(testconfig, logrus.StandardLogger())
 
 	assert.NoError(t, err)
-
-	assert.NoError(t, loader.loadDefaultConfig())
 
 	_, err = loader.load("testdata/config-custom.js")
 
@@ -71,28 +73,33 @@ func TestConfigConsoleJSON(t *testing.T) {
 	assertMessageAndLevel(t, `let obj = {foo:"bar"}; console.log(obj)`, `{"foo":"bar"}`, logrus.InfoLevel)
 }
 
-func Test_loadConfigJSON(t *testing.T) {
+func Test_loadConfigJS_error(t *testing.T) {
 	t.Parallel()
 
-	conf, err := loadConfig("testdata/config.json", logrus.StandardLogger())
+	conf, err := loadConfigJSON("testdata/config.json")
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	_, err = loadConfig("testdata/config-bad.json", logrus.StandardLogger())
+	_, err = loadConfigJS("testdata/config-bad.json", testconfig, logrus.StandardLogger())
 
 	assert.Error(t, err)
 
-	_, err = loadConfig("testdata/config-not-exists.json", logrus.StandardLogger())
+	_, err = loadConfigJS("testdata/config-not-exists.json", testconfig, logrus.StandardLogger())
 
+	assert.Error(t, err)
+
+	conf, err = loadConfigJS("testdata/config-custom.js", []byte("42='foo'"), logrus.StandardLogger())
+
+	assert.Nil(t, conf)
 	assert.Error(t, err)
 }
 
-func Test_configLoader_evel_error(t *testing.T) {
+func Test_configLoader_eval_error(t *testing.T) {
 	t.Parallel()
 
-	loader, err := newConfigLoader(logrus.StandardLogger())
+	loader, err := newConfigLoader(testconfig, logrus.StandardLogger())
 
 	assert.NoError(t, err)
 

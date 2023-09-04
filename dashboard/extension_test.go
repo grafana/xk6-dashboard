@@ -7,19 +7,52 @@ package dashboard
 import (
 	"embed"
 	"fmt"
+	"io/fs"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"go.k6.io/k6/lib"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
+
+//go:embed testdata/ui testdata/brief testdata/config/config.json
+var testdata embed.FS
+
+func testConfig(t *testing.T) []byte {
+	t.Helper()
+
+	content, err := testdata.ReadFile("testdata/config/config.json")
+
+	assert.NoError(t, err)
+
+	return content
+}
+
+func testDirBrief(t *testing.T) fs.FS {
+	t.Helper()
+
+	subfs, err := fs.Sub(testdata, "testdata/brief")
+
+	assert.NoError(t, err)
+
+	return subfs
+}
+
+func testDirUI(t *testing.T) fs.FS {
+	t.Helper()
+
+	subfs, err := fs.Sub(testdata, "testdata/ui")
+
+	assert.NoError(t, err)
+
+	return subfs
+}
 
 func TestNewExtension(t *testing.T) {
 	t.Parallel()
@@ -29,7 +62,7 @@ func TestNewExtension(t *testing.T) {
 	params.ConfigArgument = "port=1&host=localhost"
 	params.OutputType = "dashboard"
 
-	ext, err := New(params, embed.FS{}, embed.FS{})
+	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -38,7 +71,7 @@ func TestNewExtension(t *testing.T) {
 
 	params.ConfigArgument = "period=2"
 
-	_, err = New(params, embed.FS{}, embed.FS{})
+	_, err = New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.Error(t, err)
 }
@@ -51,7 +84,7 @@ func testReadSSE(t *testing.T, nlines int) []string {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=0"
 
-	ext, err := New(params, embed.FS{}, embed.FS{})
+	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NoError(t, ext.Start())
@@ -126,7 +159,7 @@ func TestExtension_no_http(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=-1"
 
-	ext, err := New(params, embed.FS{}, embed.FS{})
+	ext, err := New(params, nil, embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -148,7 +181,7 @@ func TestExtension_random_port(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0"
 
-	ext, err := New(params, embed.FS{}, embed.FS{})
+	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -172,14 +205,14 @@ func TestExtension_error_used_port(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=" + strconv.Itoa(port)
 
-	ext, err := New(params, embed.FS{}, embed.FS{})
+	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
 
 	assert.NoError(t, ext.Start())
 
-	ext2, err := New(params, embed.FS{}, embed.FS{})
+	ext2, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext2)
@@ -189,29 +222,13 @@ func TestExtension_error_used_port(t *testing.T) {
 	assert.NoError(t, ext.Stop())
 }
 
-func TestExtension_error_missing_config(t *testing.T) {
-	t.Parallel()
-
-	var params output.Params
-
-	params.Logger = logrus.StandardLogger()
-	params.ConfigArgument = "port=-1&config=no_such_file"
-
-	ext, err := New(params, embed.FS{}, embed.FS{})
-
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
-
-	assert.Error(t, ext.Start())
-}
-
 func TestExtension_open(t *testing.T) { //nolint:paralleltest
 	var params output.Params
 
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0&open"
 
-	ext, err := New(params, embed.FS{}, embed.FS{})
+	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -235,7 +252,7 @@ func TestExtension_report(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
 
-	ext, err := New(params, embed.FS{}, assets.DirBrief())
+	ext, err := New(params, testConfig(t), embed.FS{}, testDirBrief(t))
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)

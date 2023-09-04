@@ -5,6 +5,7 @@
 package dashboard
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
@@ -15,10 +16,10 @@ import (
 	"go.k6.io/k6/lib/consts"
 )
 
-func Execute(uiFS fs.FS, briefFS fs.FS) {
+func Execute(uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) {
 	opts := new(options)
 
-	if err := buildRootCmd(opts, uiFS, briefFS).Execute(); err != nil {
+	if err := buildRootCmd(opts, uiConfig, uiFS, briefFS).Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -31,7 +32,6 @@ const (
 	flagPort   = "port"
 	flagPeriod = "period"
 	flagOpen   = "open"
-	flagConfig = "config"
 	flagReport = "report"
 	flagTags   = "tags"
 
@@ -39,7 +39,7 @@ const (
 	typePoint  = "Point"
 )
 
-func buildRootCmd(opts *options, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
+func buildRootCmd(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
 	rootCmd := &cobra.Command{ // nolint:exhaustruct
 		Use:   "k6",
 		Short: "a next-generation load generator",
@@ -59,7 +59,7 @@ func buildRootCmd(opts *options, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
 		Long:  "The replay command load the saved JSON results and replay it for the dashboard UI.\nThe compressed file will be automatically decompressed if the file extension is .gz",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := replay(opts, uiFS, briefFS, args[0]); err != nil {
+			if err := replay(opts, uiConfig, uiFS, briefFS, args[0]); err != nil {
 				return err
 			}
 
@@ -87,7 +87,6 @@ func buildRootCmd(opts *options, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
 	flags.IntVar(&opts.Port, flagPort, defaultPort, "TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080")
 	flags.DurationVar(&opts.Period, flagPeriod, defaultPeriod, "Event emitting frequency, example: `1m`")
 	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window automatically")
-	flags.StringVar(&opts.Config, flagConfig, defaultConfig, "UI configuration file location")
 	flags.StringVar(&opts.Report, flagReport, defaultReport, "Report file location (default: '', no report)")
 	flags.StringSliceVar(&opts.Tags, flagTags, defaultTags, "Precomputed metric tags, can be specified more than once")
 

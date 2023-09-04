@@ -88,7 +88,7 @@ func Test_send_earlier_events(t *testing.T) {
 
 	<-started
 
-	time.Sleep(time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 
 	res := rec.Result() // nolint:bodyclose
 

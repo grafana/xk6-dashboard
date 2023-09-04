@@ -8,8 +8,7 @@
     "build": "lerna run build"
   },
   "devDependencies": {
-    "lerna": "^7.1.5",
-    "vite": "^4.4.9"
+    "lerna": "^7.1.5"
   },
   "workspaces": [
     "packages/*"

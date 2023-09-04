@@ -53,6 +53,7 @@ linters-settings:
           - github.com/dop251/goja
           - github.com/grafana/xk6-dashboard/assets
           - github.com/grafana/xk6-dashboard/dashboard
+          - github.com/grafana/xk6-dashboard/customize
       test:
         files:
         - $test

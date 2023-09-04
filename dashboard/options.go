@@ -5,19 +5,16 @@
 package dashboard
 
 import (
-	"encoding/json"
 	"errors"
 	"math"
 	"net"
 	"net/url"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gorilla/schema"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -25,10 +22,7 @@ const (
 	defaultPort   = 5665
 	defaultPeriod = time.Second * 10
 	defaultOpen   = false
-	defaultConfig = ".dashboard.js"
 	defaultReport = ""
-
-	defaultAltConfig = ".dashboard.json"
 )
 
 var defaultTags = []string{"group"}
@@ -38,7 +32,6 @@ type options struct {
 	Host   string
 	Period time.Duration
 	Open   bool
-	Config string
 	Report string
 	Tags   []string `schema:"tag"`
 	TagsS  string   `schema:"tags"`
@@ -50,7 +43,6 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		Host:   defaultHost,
 		Period: defaultPeriod,
 		Open:   defaultOpen,
-		Config: defaultConfig,
 		Report: defaultReport,
 		Tags:   defaultTags,
 		TagsS:  "",
@@ -97,27 +89,6 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 	}
 
 	return opts, err
-}
-
-func exists(filename string) bool {
-	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
-		return false
-	}
-
-	return true
-}
-
-func (opts *options) config(logger logrus.FieldLogger) (json.RawMessage, error) {
-	if opts.Config == defaultConfig {
-		if !exists(opts.Config) {
-			opts.Config = defaultAltConfig
-			if !exists(opts.Config) {
-				opts.Config = ""
-			}
-		}
-	}
-
-	return loadConfig(opts.Config, logger)
 }
 
 func (opts *options) addr() string {

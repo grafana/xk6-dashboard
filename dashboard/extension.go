@@ -5,6 +5,7 @@
 package dashboard
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"time"
@@ -39,13 +40,24 @@ type Extension struct {
 
 	briefFS fs.FS
 
+	uiConfig json.RawMessage
+
 	param *paramData
 }
 
 var _ output.Output = (*Extension)(nil)
 
+var Customize = func(uiConfig json.RawMessage) (json.RawMessage, error) {
+	return uiConfig, nil
+}
+
 // New creates Extension instance using the passwd uiFS as source of web UI.
-func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
+func New(params output.Params, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
+	uiConfig, err := Customize(uiConfig)
+	if err != nil {
+		return nil, err
+	}
+
 	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
 		return nil, err
@@ -57,6 +69,7 @@ func New(params output.Params, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
 	ext := &Extension{
 		uiFS:        uiFS,
 		briefFS:     briefFS,
+		uiConfig:    uiConfig,
 		logger:      params.Logger,
 		options:     opts,
 		name:        params.OutputType,
@@ -86,12 +99,7 @@ func (ext *Extension) SetThresholds(thresholds map[string]metrics.Thresholds) {
 }
 
 func (ext *Extension) Start() error {
-	config, err := ext.options.config(ext.logger)
-	if err != nil {
-		return err
-	}
-
-	brf := newBriefer(ext.briefFS, config, ext.options.Report, ext.logger)
+	brf := newBriefer(ext.briefFS, ext.uiConfig, ext.options.Report, ext.logger)
 
 	ext.addEventListener(brf)
 
@@ -124,7 +132,7 @@ func (ext *Extension) Start() error {
 
 	now := time.Now()
 
-	ext.fireEvent(configEvent, config)
+	ext.fireEvent(configEvent, ext.uiConfig)
 	ext.fireEvent(paramEvent, ext.param)
 
 	ext.updateAndSend(nil, newMeter(ext.period, now, ext.cumulative.tags), startEvent, now)

@@ -46,23 +46,22 @@ type replayer struct {
 	seenMetrics map[string]struct{}
 }
 
-func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
-	logger := logrus.StandardLogger()
-
-	config, err := opts.config(logger)
+func replay(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS, filename string) error {
+	uiConfig, err := Customize(uiConfig)
 	if err != nil {
 		return err
 	}
 
+	logger := logrus.StandardLogger()
 	rep := new(replayer)
 
 	rep.options = opts
-	rep.config = config
+	rep.config = uiConfig
 	rep.logger = logger
 	rep.eventSource = new(eventSource)
 	rep.seenMetrics = make(map[string]struct{})
 
-	brf := newBriefer(briefFS, config, opts.Report, rep.logger)
+	brf := newBriefer(briefFS, uiConfig, opts.Report, rep.logger)
 
 	rep.addEventListener(brf)
 

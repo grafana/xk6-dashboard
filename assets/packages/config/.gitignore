@@ -1,0 +1,8 @@
+# Logs
+logs
+*.log
+*-debug.log*
+
+node_modules
+*.local
+coverage

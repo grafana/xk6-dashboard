@@ -1,12 +1,10 @@
-package dashboard
+package customize
 
 import (
-	_ "embed"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 
@@ -16,16 +14,13 @@ import (
 	"go.k6.io/k6/lib"
 )
 
-//go:embed config.js
-var config []byte
-
 type configLoader struct {
 	runtime       *goja.Runtime
 	compiler      *compiler.Compiler
 	defaultConfig *goja.Object
 }
 
-func newConfigLoader(logger logrus.FieldLogger) (*configLoader, error) {
+func newConfigLoader(defaultConfig json.RawMessage, logger logrus.FieldLogger) (*configLoader, error) {
 	comp := compiler.New(logger)
 
 	comp.Options.CompatibilityMode = lib.CompatibilityModeExtended
@@ -41,28 +36,34 @@ func newConfigLoader(logger logrus.FieldLogger) (*configLoader, error) {
 		return nil, err
 	}
 
-	exports := runtime.NewObject()
-	module := runtime.NewObject()
-
-	if err := module.Set("exports", exports); err != nil {
+	def, err := toObject(runtime, defaultConfig)
+	if err != nil {
 		return nil, err
 	}
 
-	loader := &configLoader{ //nolint:exhaustruct
-		runtime:  runtime,
-		compiler: comp,
+	loader := &configLoader{
+		runtime:       runtime,
+		compiler:      comp,
+		defaultConfig: def,
 	}
 
 	return loader, nil
 }
 
-func (loader *configLoader) load(filename string) (map[string]interface{}, error) {
+func (loader *configLoader) load(filename string) (json.RawMessage, error) {
 	src, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 
-	return loader.run(src, filename)
+	val, err := loader.eval(src, filename)
+	if err != nil {
+		return nil, err
+	}
+
+	obj := val.ToObject(loader.runtime)
+
+	return obj.MarshalJSON()
 }
 
 func isObject(val goja.Value) bool {
@@ -116,89 +117,28 @@ func (loader *configLoader) eval(src []byte, filename string) (*goja.Object, err
 	return def.ToObject(loader.runtime), nil
 }
 
-func (loader *configLoader) run(src []byte, filename string) (map[string]interface{}, error) {
-	val, err := loader.eval(src, filename)
-	if err != nil {
-		return nil, err
-	}
-
-	obj := val.ToObject(loader.runtime)
-
-	bin, err := obj.MarshalJSON()
-	if err != nil {
-		return nil, err
-	}
-
-	ret := map[string]interface{}{}
-
-	err = json.Unmarshal(bin, &ret)
-
-	return ret, err
-}
-
-func (loader *configLoader) loadDefaultConfig() error {
-	conf, err := loader.run(config, "")
-	if err != nil {
-		return err
-	}
-
-	// use JavaScript JSON.parse to create native goja object
-	// there could be a better solution.... (but Object.UnmarshallJSON is missing)
-
-	bin, err := json.Marshal(conf)
-	if err != nil {
-		return err
-	}
-
-	val := loader.runtime.Get("JSON").ToObject(loader.runtime).Get("parse")
+// toObject use JavaScript JSON.parse to create native goja object
+// there could be a better solution.... (but Object.UnmarshallJSON is missing).
+func toObject(runtime *goja.Runtime, bin json.RawMessage) (*goja.Object, error) {
+	val := runtime.Get("JSON").ToObject(runtime).Get("parse")
 
 	call, _ := goja.AssertFunction(val)
 
-	val, err = call(loader.runtime.GlobalObject(), loader.runtime.ToValue(string(bin)))
+	val, err := call(runtime.GlobalObject(), runtime.ToValue(string(bin)))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	loader.defaultConfig = val.ToObject(loader.runtime)
-
-	return nil
+	return val.ToObject(runtime), nil
 }
 
-func loadConfig(filename string, logger logrus.FieldLogger) (json.RawMessage, error) {
-	if filepath.Ext(filename) == ".json" {
-		bin, err := os.ReadFile(filename)
-		if err != nil {
-			return nil, err
-		}
-
-		conf := map[string]interface{}{}
-
-		if err := json.Unmarshal(bin, &conf); err != nil {
-			return nil, err
-		}
-
-		return json.Marshal(conf)
-	}
-
-	loader, err := newConfigLoader(logger)
+func loadConfigJS(filename string, config json.RawMessage, logger logrus.FieldLogger) (json.RawMessage, error) {
+	loader, err := newConfigLoader(config, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := loader.loadDefaultConfig(); err != nil {
-		return nil, err
-	}
-
-	if len(filename) == 0 {
-		return loader.defaultConfig.MarshalJSON()
-	}
-
-	content, err := loader.load(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	return json.Marshal(content)
+	return loader.load(filename)
 }
 
 // configConsole represents a JS configConsole implemented as a logrus.Logger.

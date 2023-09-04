@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -16,7 +15,7 @@ import (
 func Test_newWebServer(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(assets.DirUI(), http.NotFoundHandler(), logrus.StandardLogger())
+	srv := newWebServer(testDirUI(t), http.NotFoundHandler(), logrus.StandardLogger())
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
@@ -50,7 +49,7 @@ func Test_newWebServer(t *testing.T) {
 func Test_webServer_used_addr(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(assets.DirUI(), http.NotFoundHandler(), logrus.StandardLogger())
+	srv := newWebServer(testDirUI(t), http.NotFoundHandler(), logrus.StandardLogger())
 
 	addr := getRandomAddr(t)
 

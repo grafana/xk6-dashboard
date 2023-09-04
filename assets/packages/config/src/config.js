@@ -1,10 +1,10 @@
 //@ts-check
 /**
- * @typedef {import('../config').dashboard.Config} Config
- * @typedef {import('../config').dashboard.Tab} Tab
- * @typedef {import('../config').dashboard.Panel} Panel
- * @typedef {import('../config').dashboard.Chart} Chart
- * @typedef {import('../config').dashboard.Serie} Serie
+ * @typedef {import('./config').dashboard.Config} Config
+ * @typedef {import('./config').dashboard.Tab} Tab
+ * @typedef {import('./config').dashboard.Panel} Panel
+ * @typedef {import('./config').dashboard.Chart} Chart
+ * @typedef {import('./config').dashboard.Serie} Serie
  */
 
 /**
@@ -16,39 +16,39 @@ const overviewPanels = [
     id: "iterations",
     title: "Iteration Rate",
     metric: "iterations.rate",
-    format: "rps",
+    format: "rps"
   },
   {
     id: "vus",
     title: "VUs",
     metric: "vus.value",
-    format: "counter",
+    format: "counter"
   },
   {
     id: "http_reqs",
     title: "HTTP Request Rate",
     metric: "http_reqs.rate",
-    format: "rps",
+    format: "rps"
   },
   {
     id: "http_req_duration",
     title: "HTTP Request Duration",
     metric: "http_req_duration.avg",
-    format: "duration",
+    format: "duration"
   },
   {
     id: "data_received",
     title: "Received Rate",
     metric: "data_received.rate",
-    format: "bps",
+    format: "bps"
   },
   {
     id: "data_sent",
     title: "Sent Rate",
     metric: "data_sent.rate",
-    format: "bps",
-  },
-];
+    format: "bps"
+  }
+]
 
 /**
  * Chart configurations for overview tab.
@@ -63,16 +63,16 @@ const overviewCharts = [
         label: "VUs",
         width: 2,
         scale: "n",
-        format: "counter",
+        format: "counter"
       },
       "http_reqs.rate": {
         label: "HTTP request rate",
         scale: "1/s",
-        format: "rps",
-      },
+        format: "rps"
+      }
     },
     axes: [{}, { scale: "n" }, { scale: "1/s", side: 1, format: "rps" }],
-    scales: [{}, {}, {}],
+    scales: [{}, {}, {}]
   },
   {
     id: "data",
@@ -82,21 +82,17 @@ const overviewCharts = [
         label: "data sent",
         rate: true,
         scale: "sent",
-        format: "bps",
+        format: "bps"
       },
       "data_received.rate": {
         label: "data received",
         rate: true,
         width: 2,
         scale: "received",
-        format: "bps",
-      },
+        format: "bps"
+      }
     },
-    axes: [
-      {},
-      { scale: "sent", format: "bps" },
-      { scale: "received", side: 1, format: "bps" },
-    ],
+    axes: [{}, { scale: "sent", format: "bps" }, { scale: "received", side: 1, format: "bps" }]
   },
   {
     id: "http_req_duration",
@@ -105,12 +101,12 @@ const overviewCharts = [
       "http_req_duration.avg": {
         label: "avg",
         width: 2,
-        format: "duration",
+        format: "duration"
       },
       "http_req_duration.p(90)": { label: "p(90)", format: "duration" },
-      "http_req_duration.p(95)": { label: "p(95)", format: "duration" },
+      "http_req_duration.p(95)": { label: "p(95)", format: "duration" }
     },
-    axes: [{}, { format: "duration" }, { side: 1, format: "duration" }],
+    axes: [{}, { format: "duration" }, { side: 1, format: "duration" }]
   },
   {
     id: "iteration_duration",
@@ -119,14 +115,14 @@ const overviewCharts = [
       "iteration_duration.avg": {
         label: "avg",
         width: 2,
-        format: "duration",
+        format: "duration"
       },
       "iteration_duration.p(90)": { label: "p(90)", format: "duration" },
-      "iteration_duration.p(95)": { label: "p(95)", format: "duration" },
+      "iteration_duration.p(95)": { label: "p(95)", format: "duration" }
     },
-    axes: [{}, { format: "duration" }, { side: 1, format: "duration" }],
-  },
-];
+    axes: [{}, { format: "duration" }, { side: 1, format: "duration" }]
+  }
+]
 
 /**
  * Create optional suffix for cumulative tabs.
@@ -134,7 +130,7 @@ const overviewCharts = [
  * @returns {string} empty on snapshot event otherwise " (cum)" for cumulative tabs.
  */
 function suffix(event) {
-  return event == "snapshot" ? "" : " (cum)";
+  return event == "snapshot" ? "" : " (cum)"
 }
 
 /**
@@ -144,7 +140,7 @@ function suffix(event) {
  * @returns {boolean} should event included in report
  */
 function reportable(event) {
-  return event == "snapshot";
+  return event == "snapshot"
 }
 
 /**
@@ -160,8 +156,8 @@ function tabOverview(event) {
     panels: overviewPanels,
     charts: overviewCharts,
     description:
-      "This section provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.",
-  };
+      "This section provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time."
+  }
 }
 
 /**
@@ -177,11 +173,11 @@ function chartTimings(metric, title) {
     series: {
       [`${metric}.avg`]: { label: "avg", width: 2, format: "duration" },
       [`${metric}.p(90)`]: { label: "p(90)", format: "duration" },
-      [`${metric}.p(95)`]: { label: "p(95)", format: "duration" },
+      [`${metric}.p(95)`]: { label: "p(95)", format: "duration" }
     },
     axes: [{}, { format: "duration" }, { side: 1, format: "duration" }],
-    height: 224,
-  };
+    height: 224
+  }
 }
 
 /**
@@ -200,13 +196,13 @@ function tabTimings(event) {
       chartTimings("http_req_tls_handshaking", "HTTP TLS handshaking"),
       chartTimings("http_req_sending", "HTTP Request Sending"),
       chartTimings("http_req_connecting", "HTTP Request Connecting"),
-      chartTimings("http_req_receiving", "HTTP Request Receiving"),
+      chartTimings("http_req_receiving", "HTTP Request Receiving")
     ],
     panels: [],
     report: reportable(event),
     description:
-      "This section provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.",
-  };
+      "This section provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time."
+  }
 }
 
 /**
@@ -215,7 +211,7 @@ function tabTimings(event) {
  */
 const defaultConfig = {
   title: "k6 dashboard",
-  tabs: [tabOverview("snapshot"), tabTimings("snapshot")],
-};
+  tabs: [tabOverview("snapshot"), tabTimings("snapshot")]
+}
 
-export default defaultConfig;
+export default defaultConfig
