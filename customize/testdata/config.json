@@ -1,0 +1,102 @@
+{
+  "tabs": [
+    {
+      "charts": [
+        {
+          "axes": [
+            {},
+            { "scale": "n" },
+            { "format": "rps", "scale": "1/s", "side": 1 }
+          ],
+          "id": "http_reqs",
+          "scales": [{}, {}, {}],
+          "series": {
+            "http_reqs.rate": {
+              "format": "rps",
+              "label": "HTTP request rate",
+              "scale": "1/s"
+            },
+            "vus.value": {
+              "format": "counter",
+              "label": "VUs",
+              "scale": "n",
+              "width": 2
+            }
+          },
+          "title": "VUs"
+        },
+        {
+          "axes": [
+            {},
+            { "format": "duration" },
+            { "format": "duration", "side": 1 }
+          ],
+          "id": "http_req_duration",
+          "series": {
+            "http_req_duration.avg": {
+              "format": "duration",
+              "label": "avg",
+              "width": 2
+            },
+            "http_req_duration.p(90)": {
+              "format": "duration",
+              "label": "p(90)"
+            },
+            "http_req_duration.p(95)": {
+              "format": "duration",
+              "label": "p(95)"
+            },
+            "http_req_duration.p(99)": {
+              "format": "duration",
+              "label": "p(99)"
+            }
+          },
+          "title": "HTTP Request Duration"
+        }
+      ],
+      "description": "Example of customizing the display of metrics.",
+      "event": "snapshot",
+      "id": "custom",
+      "panels": [
+        {
+          "format": "counter",
+          "id": "vus",
+          "metric": "vus.value",
+          "title": "VUs"
+        },
+        {
+          "format": "rps",
+          "id": "http_reqs",
+          "metric": "http_reqs.rate",
+          "title": "HTTP Request Rate"
+        },
+        {
+          "format": "duration",
+          "id": "http_req_duration.avg",
+          "metric": "http_req_duration.avg",
+          "title": "HTTP Request Duration avg"
+        },
+        {
+          "format": "duration",
+          "id": "http_req_duration.p(90)",
+          "metric": "http_req_duration.p(90)",
+          "title": "HTTP Request Duration p(90)"
+        },
+        {
+          "format": "duration",
+          "id": "http_req_duration.p(95)",
+          "metric": "http_req_duration.p(95)",
+          "title": "HTTP Request Duration p(95)"
+        },
+        {
+          "format": "duration",
+          "id": "http_req_duration.p(99)",
+          "metric": "http_req_duration.p(99)",
+          "title": "HTTP Request Duration p(99)"
+        }
+      ],
+      "title": "Custom"
+    }
+  ],
+  "title": "k6 dashboard"
+}

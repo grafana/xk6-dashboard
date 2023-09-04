@@ -14,7 +14,7 @@ import {format} from './format'
 const sync = uPlot.sync("chart");
 
 function Chart(props) {
-  const model = new MetricsUplot(props.metrics, props.series)
+  const model = new MetricsUplot(props.samples, props.series)
   const ref = useRef(null);
 
   //const { width } = useParentSize(ref);
@@ -80,6 +80,6 @@ const dateFormats = [
     [60,                "{HH}:{mm}",      "\n{YYYY}-{MM}-{DD}",            null,    "\n{MM}-{DD}",            null,    null,           null,        1],
     [1,                 ":{ss}",          "\n{YYYY}-{MM}-{DD} {HH}:{mm}",  null,    "\n{MM}-{DD} {HH}:{mm}",  null,    "\n{HH}:{mm}",  null,        1],
     [0.001,             ":{ss}.{fff}",    "\n{YYYY}-{MM}-{DD} {HH}:{mm}",  null,    "\n{MM}-{DD} {HH}:{mm}",  null,    "\n{HH}:{mm}",  null,        1],
-  ]
+]
 
 export { Chart }

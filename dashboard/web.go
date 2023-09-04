@@ -24,6 +24,9 @@ const (
 	cumulativeEvent = "cumulative"
 	startEvent      = "start"
 	stopEvent       = "stop"
+	configEvent     = "config"
+	metricEvent     = "metric"
+	paramEvent      = "param"
 )
 
 type webServer struct {
@@ -31,14 +34,14 @@ type webServer struct {
 	*http.ServeMux
 }
 
-func newWebServer(uiFS fs.FS, uiConfig []byte, reportHandler http.Handler, logger logrus.FieldLogger) *webServer { //nolint:ireturn
+func newWebServer(uiFS fs.FS, reportHandler http.Handler, logger logrus.FieldLogger) *webServer { //nolint:ireturn
 	srv := &webServer{
 		eventEmitter: newEventEmitter(eventChannel, logger),
 		ServeMux:     http.NewServeMux(),
 	}
 
 	srv.Handle(pathEvents, srv.eventEmitter)
-	srv.HandleFunc(pathUI, uiHandler(pathUI, uiFS, uiConfig))
+	srv.Handle(pathUI, http.StripPrefix(pathUI, http.FileServer(http.FS(uiFS))))
 	srv.Handle(pathReport, reportHandler)
 
 	srv.HandleFunc("/", rootHandler(pathUI))
@@ -74,25 +77,5 @@ func rootHandler(uiPath string) http.HandlerFunc {
 		}
 
 		http.NotFound(w, r)
-	}
-}
-
-func uiHandler(uiPath string, uiFS fs.FS, uiConfig []byte) http.HandlerFunc {
-	handler := http.StripPrefix(uiPath, http.FileServer(http.FS(uiFS)))
-
-	if len(uiConfig) == 0 {
-		return handler.ServeHTTP
-	}
-
-	return func(res http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != uiPath+"config.js" {
-			handler.ServeHTTP(res, req)
-
-			return
-		}
-
-		res.Header().Set("Content-Type", "text/javascript; charset=utf-8")
-		res.WriteHeader(http.StatusOK)
-		res.Write(uiConfig) // nolint:errcheck
 	}
 }

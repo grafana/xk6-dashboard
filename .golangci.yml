@@ -50,8 +50,10 @@ linters-settings:
           - github.com/gorilla/schema
           - github.com/tidwall/gjson
           - github.com/r3labs/sse/v2
+          - github.com/dop251/goja
           - github.com/grafana/xk6-dashboard/assets
           - github.com/grafana/xk6-dashboard/dashboard
+          - github.com/grafana/xk6-dashboard/customize
       test:
         files:
         - $test
@@ -59,5 +61,7 @@ linters-settings:
         - $gostd
         - github.com/stretchr/testify/assert
         - github.com/sirupsen/logrus
+        - github.com/dop251/goja
+        - github.com/tidwall/gjson
         - github.com/grafana/xk6-dashboard/assets
         - github.com/grafana/xk6-dashboard/dashboard

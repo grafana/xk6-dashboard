@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useContext, useRef } from 'react'
-import { MetricsContext } from './metrics'
+import { SamplesContext } from './samples'
 import { MetricsUplot } from './metrics-uplot'
 import './Panel.css'
 import UplotReact from 'uplot-react';
@@ -14,7 +14,7 @@ import { format } from './format';
 
 function Panel(props) {
   const theme = useTheme()
-  const summaries = useContext(MetricsContext)
+  const summaries = useContext(SamplesContext)
 
   const series = {}
   series[props.metric] = { label: "" }

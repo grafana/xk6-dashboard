@@ -12,4 +12,4 @@ import './styles.scss'
 
 import './index.css'
 
-data().then(d => render(<Brief data={d} config={window.config}/>, document.getElementById('root')))
+data().then(d => render(<Brief data={d} config={d.config} />, document.getElementById('root')))

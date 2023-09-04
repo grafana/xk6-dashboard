@@ -9,9 +9,9 @@ import (
 	"math"
 	"net"
 	"net/url"
-	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/schema"
@@ -22,17 +22,19 @@ const (
 	defaultPort   = 5665
 	defaultPeriod = time.Second * 10
 	defaultOpen   = false
-	defaultConfig = ".dashboard.js"
 	defaultReport = ""
 )
+
+var defaultTags = []string{"group"}
 
 type options struct {
 	Port   int
 	Host   string
 	Period time.Duration
 	Open   bool
-	Config string
 	Report string
+	Tags   []string `schema:"tag"`
+	TagsS  string   `schema:"tags"`
 }
 
 func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
@@ -41,8 +43,9 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		Host:   defaultHost,
 		Period: defaultPeriod,
 		Open:   defaultOpen,
-		Config: defaultConfig,
 		Report: defaultReport,
+		Tags:   defaultTags,
+		TagsS:  "",
 	}
 
 	if query == "" {
@@ -81,20 +84,11 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 		opts.Open = true
 	}
 
+	if len(opts.TagsS) != 0 {
+		opts.Tags = append(opts.Tags, strings.Split(opts.TagsS, ",")...)
+	}
+
 	return opts, err
-}
-
-func (opts *options) config() ([]byte, error) {
-	if len(opts.Config) == 0 {
-		return []byte{}, nil
-	}
-
-	data, err := os.ReadFile(opts.Config)
-	if err != nil && os.IsNotExist(err) && opts.Config == defaultConfig {
-		return []byte{}, nil
-	}
-
-	return data, err
 }
 
 func (opts *options) addr() string {

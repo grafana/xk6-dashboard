@@ -1,13 +1,11 @@
 package dashboard
 
 import (
-	"embed"
 	"io"
 	"math"
 	"strings"
 	"testing"
 
-	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -74,13 +72,13 @@ func recursiveJSON(t *testing.T) interface{} {
 func Test_briefer_exportJSON_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
-	brf.cumulative = recursiveJSON(t)
+	brf.data.cumulative = recursiveJSON(t)
 
 	assert.Error(t, brf.exportJSON(io.Discard))
 
-	brf.cumulative = nil
+	brf.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
@@ -89,21 +87,27 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 	assert.Error(t, brf.exportJSON(out.reset(2)))
 	assert.Error(t, brf.exportJSON(out.reset(3)))
 	assert.Error(t, brf.exportJSON(out.reset(4)))
+	assert.Error(t, brf.exportJSON(out.reset(5)))
+	assert.Error(t, brf.exportJSON(out.reset(6)))
+	assert.Error(t, brf.exportJSON(out.reset(7)))
+	assert.Error(t, brf.exportJSON(out.reset(8)))
+	assert.Error(t, brf.exportJSON(out.reset(9)))
+	assert.Error(t, brf.exportJSON(out.reset(10)))
 
-	assert.NoError(t, brf.exportJSON(out.reset(5)))
+	assert.NoError(t, brf.exportJSON(out.reset(11)))
 	assert.Equal(t, emptyData, out.String())
 }
 
 func Test_briefer_exportBase64_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
-	brf.cumulative = recursiveJSON(t)
+	brf.data.cumulative = recursiveJSON(t)
 
 	assert.Error(t, brf.exportBase64(io.Discard))
 
-	brf.cumulative = nil
+	brf.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
@@ -112,12 +116,12 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 	assert.Equal(t, emptyDataBase64, out.String())
 }
 
-func Test_briefer_injectData_error(t *testing.T) {
+func Test_briefer_inject_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
-	file, err := assets.DirBrief().Open("index.html")
+	file, err := testDirBrief(t).Open("index.html")
 
 	assert.NoError(t, err)
 
@@ -128,57 +132,14 @@ func Test_briefer_injectData_error(t *testing.T) {
 	out := newErrorWriter(t)
 
 	assert.Panics(t, func() {
-		brf.injectData(out, []byte{}) //nolint:errcheck
+		brf.inject(out, []byte{}, dataTag, nil) //nolint:errcheck
 	})
 
-	_, err = brf.injectData(out, html)
+	_, err = brf.inject(out, html, dataTag, func(out io.Writer) error {
+		_, err := out.Write([]byte("Hello, World!"))
 
-	assert.Error(t, err)
-
-	brf.cumulative = recursiveJSON(t)
-	_, err = brf.injectData(io.Discard, html)
-
-	assert.Error(t, err)
-
-	brf.cumulative = nil
-
-	_, err = brf.injectData(out.reset(math.MaxInt), html)
-
-	assert.NoError(t, err)
-
-	assert.True(t, strings.HasSuffix(out.String(), emptyDataScript))
-}
-
-func Test_briefer_injectConfig_error(t *testing.T) {
-	t.Parallel()
-
-	brf := newBriefer(embed.FS{}, nil, "", logrus.StandardLogger())
-
-	file, err := assets.DirBrief().Open("index.html")
-
-	assert.NoError(t, err)
-
-	html, err := io.ReadAll(file)
-
-	assert.NoError(t, err)
-
-	out := newErrorWriter(t)
-
-	assert.Panics(t, func() {
-		brf.injectConfig(out, []byte{}) //nolint:errcheck
+		return err
 	})
-
-	_, err = brf.injectConfig(out, html)
-
-	assert.Error(t, err)
-
-	_, err = brf.injectConfig(out.reset(math.MaxInt), html)
-
-	assert.Error(t, err)
-
-	brf.assets = assets.DirBrief()
-
-	_, err = brf.injectConfig(out.reset(2), html)
 
 	assert.Error(t, err)
 }
@@ -186,33 +147,33 @@ func Test_briefer_injectConfig_error(t *testing.T) {
 func Test_briefer_onEvent(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(assets.DirBrief(), nil, "", logrus.StandardLogger())
+	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
 
 	data := make(map[string]interface{})
 
 	brf.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n", brf.buff.String())
+	assert.Equal(t, "{}\n", brf.data.buff.String())
 
 	brf.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n,{}\n", brf.buff.String())
+	assert.Equal(t, "{}\n,{}\n", brf.data.buff.String())
 
 	data["bad"] = recursiveJSON(t)
 
 	brf.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
 
-	assert.Equal(t, "{}\n,{}\n,null\n", brf.buff.String())
+	assert.Equal(t, "{}\n,{}\n,null\n", brf.data.buff.String())
 
 	data["foo"] = "bar"
 
 	brf.onEvent(cumulativeEvent, data)
 
-	assert.Equal(t, data, brf.cumulative)
+	assert.Equal(t, data, brf.data.cumulative)
 }
 
 const (
-	emptyData       = `{"cumulative":null,"snapshot":[]}`
-	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKs5LLCjOyC9RsoqOrQUEAAD//4mab6shAAAA`
+	emptyData       = `{"cumulative":null,"param":null,"config":null,"metrics":{},"snapshot":[]}`
+	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKkgsSsyFcZLz89Iy02G83NSSoszkYiWr6lodpeK8xILijPwSJavo2FpAAAAA///7qm9QSQAAAA==`
 	emptyDataScript = `<script id="data" type="application/json; charset=utf-8; gzip; base64">` + emptyDataBase64
 )

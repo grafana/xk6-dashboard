@@ -21,7 +21,7 @@ export function Digest(props) {
 
   const summary = useContext(SummaryContext)
 
-  const filter = (key) => (!iterable(series) || series.includes(key)) && (summary.values[key].type == type)
+  const filter = (key) => (!iterable(series) || series.includes(key)) && (summary.values[key].meta.type == type)
 
   const component = props.plain ? "div" : Paper
 

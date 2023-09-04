@@ -7,6 +7,7 @@ package dashboard
 import (
 	"bufio"
 	"compress/gzip"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -39,26 +40,33 @@ type replayer struct {
 	timestamp time.Time
 
 	once sync.Once
+
+	config json.RawMessage
+
+	seenMetrics map[string]struct{}
 }
 
-func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
-	config, err := opts.config()
+func replay(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS, filename string) error {
+	uiConfig, err := Customize(uiConfig)
 	if err != nil {
 		return err
 	}
 
+	logger := logrus.StandardLogger()
 	rep := new(replayer)
 
 	rep.options = opts
-	rep.logger = logrus.StandardLogger()
+	rep.config = uiConfig
+	rep.logger = logger
 	rep.eventSource = new(eventSource)
+	rep.seenMetrics = make(map[string]struct{})
 
-	brf := newBriefer(briefFS, config, opts.Report, rep.logger)
+	brf := newBriefer(briefFS, uiConfig, opts.Report, rep.logger)
 
 	rep.addEventListener(brf)
 
 	if opts.Port >= 0 {
-		rep.server = newWebServer(uiFS, config, brf, rep.logger)
+		rep.server = newWebServer(uiFS, brf, rep.logger)
 
 		rep.addEventListener(rep.server)
 
@@ -91,15 +99,23 @@ func replay(opts *options, uiFS fs.FS, briefFS fs.FS, filename string) error {
 func (rep *replayer) start() error {
 	now := time.Now()
 
-	rep.updateAndSend(nil, newMeter(rep.options.Period, now), startEvent, now)
+	rep.fireEvent(configEvent, rep.config)
 
-	return rep.fireStop()
+	param := new(paramData)
+
+	param.Period = time.Duration(rep.options.Period.Milliseconds())
+
+	rep.fireEvent(paramEvent, param)
+
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now, rep.options.Tags), startEvent, now)
+
+	return rep.fireStart()
 }
 
 func (rep *replayer) stop() error {
 	now := time.Now()
 
-	rep.updateAndSend(nil, newMeter(rep.options.Period, now), stopEvent, now)
+	rep.updateAndSend(nil, newMeter(rep.options.Period, now, rep.options.Tags), stopEvent, now)
 
 	return rep.fireStop()
 }
@@ -108,7 +124,7 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	firstTime := samples[0].GetSamples()[0].Time
 
 	rep.once.Do(func() {
-		rep.cumulative = newMeter(0, firstTime)
+		rep.cumulative = newMeter(0, firstTime, rep.options.Tags)
 		rep.timestamp = firstTime
 		rep.buffer = new(output.SampleBuffer)
 	})
@@ -117,7 +133,7 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 		samples := rep.buffer.GetBufferedSamples()
 		now := firstTime
 
-		rep.updateAndSend(samples, newMeter(rep.options.Period, now), snapshotEvent, now)
+		rep.updateAndSend(samples, newMeter(rep.options.Period, now, rep.options.Tags), snapshotEvent, now)
 		rep.updateAndSend(samples, rep.cumulative, cumulativeEvent, now)
 
 		rep.timestamp = now
@@ -126,12 +142,17 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	rep.buffer.AddMetricSamples(samples)
 }
 
-func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, m *meter, event string, now time.Time) {
-	data, err := m.update(containers, now)
+func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, met *meter, event string, now time.Time) {
+	data, err := met.update(containers, now)
 	if err != nil {
 		rep.logger.WithError(err).Warn("Error while processing samples")
 
 		return
+	}
+
+	newbies := met.newbies(rep.seenMetrics)
+	if len(newbies) != 0 {
+		rep.fireEvent(metricEvent, newbies)
 	}
 
 	rep.fireEvent(event, data)
@@ -236,22 +257,41 @@ func (f *feeder) processPoint(data []byte) error {
 		return fmt.Errorf("%w: %s", errUnknownMetric, name)
 	}
 
+	tags := f.tagSetFrom(gjson.GetBytes(data, "data.tags"))
+
 	sample := metrics.Sample{ //nolint:exhaustruct
 		Time:  timestamp,
 		Value: gjson.GetBytes(data, "data.value").Float(),
 		TimeSeries: metrics.TimeSeries{ //nolint:exhaustruct
 			Metric: metric,
+			Tags:   tags,
 		},
 	}
 
 	container := metrics.ConnectedSamples{ //nolint:exhaustruct
 		Samples: []metrics.Sample{sample},
 		Time:    sample.Time,
+		Tags:    tags,
 	}
 
 	f.callback([]metrics.SampleContainer{container})
 
 	return nil
+}
+
+func (f *feeder) tagSetFrom(res gjson.Result) *metrics.TagSet {
+	asMap := res.Map()
+	if len(asMap) == 0 {
+		return nil
+	}
+
+	set := f.registry.Registry.RootTagSet()
+
+	for key, value := range asMap {
+		set = set.With(key, value.String())
+	}
+
+	return set
 }
 
 var errUnknownMetric = errors.New("unknown metric")

@@ -2,25 +2,27 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { Metrics } from './metrics'
-import { Summary } from './summary'
+import { Samples, Summary } from "@xk6-dashboard/model";
 
 export default async function () {
-    var text = document.getElementById("data").innerText
-    var blob = new Blob([Uint8Array.from(atob(text), m => m.codePointAt(0))])
-    var stream = blob.stream().pipeThrough(new DecompressionStream("gzip"))
+  var text = document.getElementById("data").innerText;
+  var blob = new Blob([Uint8Array.from(atob(text), (m) => m.codePointAt(0))]);
+  var stream = blob.stream().pipeThrough(new DecompressionStream("gzip"));
 
-    var data = await new Response(stream).json()
+  var data = await new Response(stream).json();
 
-    var metrics = new Metrics()
+  var samples = new Samples();
 
-    for (var i = 0; i < data.snapshot.length; i++) {
-        metrics.push(data.snapshot[i])
-    }
+  for (var i = 0; i < data.snapshot.length; i++) {
+    samples.push(data.snapshot[i]);
+  }
 
-    var summary = new Summary()
+  samples.annotate(data.metrics);
 
-    summary.update(data.cumulative)
+  var summary = new Summary();
 
-    return { metrics, summary }
+  summary.update(data.cumulative);
+  summary.annotate(data.metrics);
+
+  return { metrics: data.metrics, samples, summary, config: data.config };
 }

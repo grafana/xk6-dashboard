@@ -10,12 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grafana/xk6-dashboard/assets"
 	"github.com/stretchr/testify/assert"
 	"go.k6.io/k6/metrics"
 )
 
-const testSampleCount = 312
+const testSampleCount = 311
 
 func Test_feed(t *testing.T) {
 	t.Parallel()
@@ -45,11 +44,12 @@ func Test_replay(t *testing.T) {
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
-		Config: "",
 		Report: "",
+		Tags:   nil,
+		TagsS:  "",
 	}
 
-	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+	assert.NoError(t, replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.gz"))
 
 	time.Sleep(time.Millisecond)
 
@@ -66,11 +66,12 @@ func Test_replay_random_port(t *testing.T) {
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
-		Config: "",
 		Report: "",
+		Tags:   nil,
+		TagsS:  "",
 	}
 
-	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+	assert.NoError(t, replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.gz"))
 
 	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
 }
@@ -81,28 +82,16 @@ func Test_replay_open(t *testing.T) { //nolint:paralleltest
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   true,
-		Config: "",
 		Report: "",
+		Tags:   nil,
+		TagsS:  "",
 	}
 
 	t.Setenv("PATH", "")
 
-	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+	assert.NoError(t, replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.gz"))
 
 	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
-}
-
-func Test_replay_error_config(t *testing.T) { //nolint:paralleltest
-	opts := &options{
-		Port:   0,
-		Host:   "127.0.0.1",
-		Period: time.Second,
-		Open:   false,
-		Config: "no_such_file",
-		Report: "",
-	}
-
-	assert.Error(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
 }
 
 func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
@@ -111,12 +100,13 @@ func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
-		Config: "",
 		Report: "",
+		Tags:   nil,
+		TagsS:  "",
 	}
 
-	assert.NoError(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
-	assert.Error(t, replay(opts, embed.FS{}, embed.FS{}, "testdata/result.gz"))
+	assert.NoError(t, replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.gz"))
+	assert.Error(t, replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.gz"))
 }
 
 func Test_replay_report(t *testing.T) {
@@ -132,11 +122,12 @@ func Test_replay_report(t *testing.T) {
 		Host:   "",
 		Period: time.Second,
 		Open:   false,
-		Config: "",
 		Report: file.Name(),
+		Tags:   nil,
+		TagsS:  "",
 	}
 
-	assert.NoError(t, replay(opts, embed.FS{}, assets.DirBrief(), "testdata/result.gz"))
+	assert.NoError(t, replay(opts, testConfig(t), embed.FS{}, testDirBrief(t), "testdata/result.gz"))
 
 	st, err := os.Stat(file.Name())
 

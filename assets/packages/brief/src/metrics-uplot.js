@@ -2,8 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
-import { propTime } from './metrics'
-import { format } from './format'
+import { format } from "./format";
 
 const palette = [
   '#7b65fa',
@@ -25,59 +24,35 @@ const palette = [
 ]
 
 function formatter(kind) {
-  return function(self, val, seriesIdx, dataIdx) {
+  return function (self, val, seriesIdx, dataIdx) {
     return dataIdx == null ? "--" : val == null ? "" : format(kind, val);
-  }
+  };
 }
 
 class MetricsUplot {
-  constructor (samples, series) {
-    this.data = MetricsUplot.buildData(samples, series)
-    this.series = MetricsUplot.buildSeries(this.data, series)
+  constructor(samples, series) {
+    this.data = samples.select(Object.keys(series));
+    this.series = MetricsUplot.buildSeries(this.data, series);
   }
 
-  static buildData (samples, series) {
-    const values = samples.values
-
-    let data = []
-    let time = values[propTime]
-
-    if (!Array.isArray(time)) {
-      return data
-    }
-
-    data.push(time)
-
-    for (var key in series) {
-      if (!Array.isArray(values[key])) {
-        data.push(Array(time.length))
-        continue
-      }
-
-      data.push(values[key])
-    }
-
-    return data
-  }
-
-  static buildSeries (data, input) {
-    const series = [{value: formatter('timestamp')}]
-    const keys = Object.keys(input)
+  static buildSeries(data, input) {
+    const series = [{ value: formatter("timestamp") }];
+    const keys = Object.keys(input);
 
     for (var i = 0; i < keys.length; i++) {
-      var pidx = i % palette.length
+      var pidx = i % palette.length;
 
       series.push({
         stroke: palette[pidx],
         fill: `${palette[pidx]}20`,
         value: formatter(input[keys[i]].format),
         ...input[keys[i]],
-        show: data.length > i && Array.isArray(data[i + 1])
-      })
+        show: data.length > i && Array.isArray(data[i + 1]),
+      });
     }
 
-    return series
+    return series;
   }
 }
 
-export { MetricsUplot }
+export { MetricsUplot };

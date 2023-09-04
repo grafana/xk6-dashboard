@@ -6,7 +6,6 @@ package dashboard
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.k6.io/k6/metrics"
@@ -51,25 +50,4 @@ func Test_registry_getOrNew(t *testing.T) {
 	assert.Error(t, err)
 
 	assert.Panics(t, func() { reg.mustGetOrNew("", metrics.Counter, metrics.Data) })
-}
-
-func Test_registry_format(t *testing.T) {
-	t.Parallel()
-
-	reg := newRegistry()
-
-	reg.getOrNew("foo", metrics.Counter, metrics.Data) // nolint:errcheck
-	reg.getOrNew("bar", metrics.Counter, metrics.Data) // nolint:errcheck
-
-	reg.names = append(reg.names, "dummy")
-
-	assert.Equal(t, []string{"foo", "bar", "dummy"}, reg.names)
-
-	data := reg.format(time.Second)
-
-	assert.NotNil(t, data)
-
-	assert.Equal(t, 2, len(data))
-	assert.Contains(t, data, "foo")
-	assert.Contains(t, data, "bar")
 }
