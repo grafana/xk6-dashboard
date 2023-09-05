@@ -58,7 +58,7 @@ export default function () {
 
   group("crocodiles", () => {
     for (var i = 0; i < 5; i++) {
-      http.get(http.url`http://test-api.k6.io/public/crocodiels/${i}`);
+      http.get(http.url`http://test-api.k6.io/public/crocodiles/${i}`);
       sleep(0.5);
     }
   });
