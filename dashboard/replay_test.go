@@ -6,11 +6,13 @@ package dashboard
 
 import (
 	"embed"
-	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 )
 
@@ -25,13 +27,16 @@ func Test_feed(t *testing.T) {
 		all = append(all, samples...)
 	}
 
-	assert.NoError(t, feed("testdata/result.json", callback))
+	fs := fsext.NewOsFs()
+	logger := logrus.StandardLogger()
+
+	assert.NoError(t, feed("testdata/result.json", fs, callback, logger))
 
 	assert.Equal(t, testSampleCount, len(all))
 
 	all = nil
 
-	assert.NoError(t, feed("testdata/result.json.gz", callback))
+	assert.NoError(t, feed("testdata/result.json.gz", fs, callback, logger))
 
 	assert.Equal(t, testSampleCount, len(all))
 }
@@ -49,9 +54,11 @@ func Test_replay(t *testing.T) {
 		TagsS:  "",
 	}
 
+	fs := fsext.NewOsFs()
+
 	assert.NoError(
 		t,
-		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz"),
+		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz", fs),
 	)
 
 	time.Sleep(time.Millisecond)
@@ -74,9 +81,11 @@ func Test_replay_random_port(t *testing.T) {
 		TagsS:  "",
 	}
 
+	fs := fsext.NewOsFs()
+
 	assert.NoError(
 		t,
-		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz"),
+		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz", fs),
 	)
 
 	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
@@ -95,9 +104,11 @@ func Test_replay_open(t *testing.T) { //nolint:paralleltest
 
 	t.Setenv("PATH", "")
 
+	fs := fsext.NewOsFs()
+
 	assert.NoError(
 		t,
-		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz"),
+		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz", fs),
 	)
 
 	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
@@ -114,43 +125,45 @@ func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
 		TagsS:  "",
 	}
 
+	fs := fsext.NewOsFs()
+
 	assert.NoError(
 		t,
-		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz"),
+		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz", fs),
 	)
-	assert.Error(t, replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz"))
+	assert.Error(
+		t,
+		replay(opts, testConfig(t), embed.FS{}, embed.FS{}, "testdata/result.json.gz", fs),
+	)
 }
 
 func Test_replay_report(t *testing.T) {
 	t.Parallel()
 
-	file, err := os.CreateTemp("", "")
-
-	assert.NoError(t, err)
-	assert.NoError(t, file.Close())
+	report := filepath.Join(t.TempDir(), "report.html")
 
 	opts := &options{
 		Port:   0,
 		Host:   "",
 		Period: time.Second,
 		Open:   false,
-		Report: file.Name(),
+		Report: report,
 		Tags:   nil,
 		TagsS:  "",
 	}
 
+	fs := fsext.NewOsFs()
+
 	assert.NoError(
 		t,
-		replay(opts, testConfig(t), embed.FS{}, testDirBrief(t), "testdata/result.json.gz"),
+		replay(opts, testConfig(t), embed.FS{}, testDirBrief(t), "testdata/result.json.gz", fs),
 	)
 
-	st, err := os.Stat(file.Name())
+	st, err := fs.Stat(report)
 
 	assert.NoError(t, err)
 
 	assert.Greater(t, st.Size(), int64(1024))
-
-	assert.NoError(t, os.Remove(file.Name()))
 }
 
 func Test_feeder_processMetric(t *testing.T) {

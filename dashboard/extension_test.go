@@ -8,7 +8,6 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -17,6 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"go.k6.io/k6/lib"
+	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
@@ -61,6 +61,7 @@ func TestNewExtension(t *testing.T) {
 
 	params.ConfigArgument = "port=1&host=localhost"
 	params.OutputType = "dashboard"
+	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
@@ -83,6 +84,7 @@ func testReadSSE(t *testing.T, nlines int) []string {
 
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=0"
+	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
@@ -158,6 +160,7 @@ func TestExtension_no_http(t *testing.T) {
 	params.OutputType = "bar"
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=-1"
+	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, nil, embed.FS{}, embed.FS{})
 
@@ -180,6 +183,7 @@ func TestExtension_random_port(t *testing.T) {
 	params.OutputType = "foo"
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0"
+	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
@@ -190,7 +194,11 @@ func TestExtension_random_port(t *testing.T) {
 
 	assert.Greater(t, ext.options.Port, 0)
 
-	assert.Equal(t, fmt.Sprintf("foo (%s) %s", ext.options.addr(), ext.options.url()), ext.Description())
+	assert.Equal(
+		t,
+		fmt.Sprintf("foo (%s) %s", ext.options.addr(), ext.options.url()),
+		ext.Description(),
+	)
 
 	assert.NoError(t, ext.Stop())
 }
@@ -204,6 +212,7 @@ func TestExtension_error_used_port(t *testing.T) {
 
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=" + strconv.Itoa(port)
+	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
@@ -227,6 +236,7 @@ func TestExtension_open(t *testing.T) { //nolint:paralleltest
 
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0&open"
+	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 
@@ -242,7 +252,9 @@ func TestExtension_open(t *testing.T) { //nolint:paralleltest
 func TestExtension_report(t *testing.T) {
 	t.Parallel()
 
-	file, err := os.CreateTemp("", "")
+	osFS := fsext.NewMemMapFs()
+
+	file, err := osFS.Create("temp")
 
 	assert.NoError(t, err)
 	assert.NoError(t, file.Close())
@@ -251,6 +263,7 @@ func TestExtension_report(t *testing.T) {
 
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
+	params.FS = osFS
 
 	ext, err := New(params, testConfig(t), embed.FS{}, testDirBrief(t))
 
@@ -269,13 +282,13 @@ func TestExtension_report(t *testing.T) {
 
 	assert.NoError(t, ext.Stop())
 
-	st, err := os.Stat(file.Name() + ".gz")
+	st, err := osFS.Stat(file.Name() + ".gz")
 
 	assert.NoError(t, err)
 
 	assert.Greater(t, st.Size(), int64(1024))
 
-	assert.NoError(t, os.Remove(file.Name()+".gz"))
+	assert.NoError(t, osFS.Remove(file.Name()+".gz"))
 }
 
 func Test_newParamData(t *testing.T) {

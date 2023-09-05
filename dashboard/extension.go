@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+// Package dashboard contains dashboard extension code.
 package dashboard
 
 import (
@@ -13,10 +14,12 @@ import (
 	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
 	"go.k6.io/k6/lib"
+	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
 
+// Extension holds the runtime state of the dashboard extension.
 type Extension struct {
 	*eventSource
 
@@ -43,21 +46,19 @@ type Extension struct {
 	uiConfig json.RawMessage
 
 	param *paramData
+
+	osFS fsext.Fs
 }
 
 var _ output.Output = (*Extension)(nil)
 
-var Customize = func(uiConfig json.RawMessage) (json.RawMessage, error) {
-	return uiConfig, nil
-}
-
 // New creates Extension instance using the passwd uiFS as source of web UI.
-func New(params output.Params, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) (*Extension, error) {
-	uiConfig, err := Customize(uiConfig)
-	if err != nil {
-		return nil, err
-	}
-
+func New(
+	params output.Params,
+	uiConfig json.RawMessage,
+	uiFS fs.FS,
+	briefFS fs.FS,
+) (*Extension, error) {
 	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
 		return nil, err
@@ -70,6 +71,7 @@ func New(params output.Params, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.
 		uiFS:        uiFS,
 		briefFS:     briefFS,
 		uiConfig:    uiConfig,
+		osFS:        params.FS,
 		logger:      params.Logger,
 		options:     opts,
 		name:        params.OutputType,
@@ -86,6 +88,7 @@ func New(params output.Params, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.
 	return ext, nil
 }
 
+// Description returns a human-readable description of the output.
 func (ext *Extension) Description() string {
 	if ext.options.Port < 0 {
 		return ext.name
@@ -94,12 +97,14 @@ func (ext *Extension) Description() string {
 	return fmt.Sprintf("%s (%s) %s", ext.name, ext.options.addr(), ext.options.url())
 }
 
+// SetThresholds saves thresholds provided by k6 runtime.
 func (ext *Extension) SetThresholds(thresholds map[string]metrics.Thresholds) {
 	ext.param.withThresholds(thresholds)
 }
 
+// Start starts metrics aggregation and event streaming.
 func (ext *Extension) Start() error {
-	brf := newBriefer(ext.briefFS, ext.uiConfig, ext.options.Report, ext.logger)
+	brf := newBriefer(ext.briefFS, ext.uiConfig, ext.options.Report, ext.osFS, ext.logger)
 
 	ext.addEventListener(brf)
 
@@ -117,7 +122,7 @@ func (ext *Extension) Start() error {
 		}
 
 		if ext.options.Open {
-			browser.OpenURL(ext.options.url()) // nolint:errcheck
+			_ = browser.OpenURL(ext.options.url())
 		}
 	}
 
@@ -147,6 +152,7 @@ func (ext *Extension) Start() error {
 	return nil
 }
 
+// Stop flushes any remaining metrics and stops the extension.
 func (ext *Extension) Stop() error {
 	ext.flusher.Stop()
 
@@ -157,6 +163,7 @@ func (ext *Extension) Stop() error {
 	return ext.fireStop()
 }
 
+// AddMetricSamples adds the given metric samples to the internal buffer.
 func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
 	ext.buffer.AddMetricSamples(samples)
 }
@@ -169,7 +176,12 @@ func (ext *Extension) flush() {
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
-func (ext *Extension) updateAndSend(containers []metrics.SampleContainer, met *meter, event string, now time.Time) {
+func (ext *Extension) updateAndSend(
+	containers []metrics.SampleContainer,
+	met *meter,
+	event string,
+	now time.Time,
+) {
 	data, err := met.update(containers, now)
 	if err != nil {
 		ext.logger.WithError(err).Warn("Error while processing samples")

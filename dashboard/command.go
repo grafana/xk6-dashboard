@@ -13,18 +13,21 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/lib/consts"
 )
 
-func Execute(uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) {
+// Execute executes dashboard command.
+func Execute(gs *state.GlobalState, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) {
 	opts := new(options)
 
-	if err := buildRootCmd(opts, uiConfig, uiFS, briefFS).Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+	if err := buildRootCmd(opts, uiConfig, uiFS, briefFS, gs).Execute(); err != nil {
+		fmt.Fprintln(gs.Stderr, err)
+		gs.OSExit(1)
 	}
 
-	os.Exit(0)
+	gs.OSExit(0)
 }
 
 const (
@@ -39,27 +42,34 @@ const (
 	typePoint  = "Point"
 )
 
-func buildRootCmd(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) *cobra.Command {
-	rootCmd := &cobra.Command{ // nolint:exhaustruct
+func buildRootCmd(
+	opts *options,
+	uiConfig json.RawMessage,
+	uiFS fs.FS,
+	briefFS fs.FS,
+	gs *state.GlobalState,
+) *cobra.Command {
+	rootCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "k6",
 		Short: "a next-generation load generator",
 		Long:  "\n" + consts.Banner(),
 	}
 
-	dashboardCmd := &cobra.Command{ // nolint:exhaustruct
+	dashboardCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "dashboard",
 		Short: "xk6-dashboard commands",
 	}
 
 	rootCmd.AddCommand(dashboardCmd)
 
-	replayCmd := &cobra.Command{ // nolint:exhaustruct
+	replayCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "replay file",
 		Short: "load the saved JSON results and replay it for the dashboard UI",
-		Long:  "The replay command load the saved JSON results and replay it for the dashboard UI.\nThe compressed file will be automatically decompressed if the file extension is .gz",
-		Args:  cobra.ExactArgs(1),
+		Long: `The replay command load the saved JSON results and replay it for the dashboard UI.
+The compressed file will be automatically decompressed if the file extension is .gz`,
+		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := replay(opts, uiConfig, uiFS, briefFS, args[0]); err != nil {
+			if err := replay(opts, uiConfig, uiFS, briefFS, args[0], gs.FS); err != nil {
 				return err
 			}
 
@@ -83,14 +93,43 @@ func buildRootCmd(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS f
 
 	opts = new(options)
 
-	flags.StringVar(&opts.Host, flagHost, defaultHost, "Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)")
-	flags.IntVar(&opts.Port, flagPort, defaultPort, "TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080")
-	flags.DurationVar(&opts.Period, flagPeriod, defaultPeriod, "Event emitting frequency, example: `1m`")
-	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window automatically")
-	flags.StringVar(&opts.Report, flagReport, defaultReport, "Report file location (default: '', no report)")
-	flags.StringSliceVar(&opts.Tags, flagTags, defaultTags, "Precomputed metric tags, can be specified more than once")
+	defineFlags(opts, flags)
 
 	dashboardCmd.AddCommand(replayCmd)
 
 	return rootCmd
+}
+
+func defineFlags(opts *options, flags *pflag.FlagSet) {
+	flags.StringVar(
+		&opts.Host,
+		flagHost,
+		defaultHost,
+		"Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)",
+	)
+	flags.IntVar(
+		&opts.Port,
+		flagPort,
+		defaultPort,
+		"TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080",
+	)
+	flags.DurationVar(
+		&opts.Period,
+		flagPeriod,
+		defaultPeriod,
+		"Event emitting frequency, example: `1m`",
+	)
+	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window automatically")
+	flags.StringVar(
+		&opts.Report,
+		flagReport,
+		defaultReport,
+		"Report file location (default: '', no report)",
+	)
+	flags.StringSliceVar(
+		&opts.Tags,
+		flagTags,
+		defaultTags(),
+		"Precomputed metric tags, can be specified more than once",
+	)
 }

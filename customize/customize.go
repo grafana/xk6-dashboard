@@ -1,12 +1,14 @@
+// Package customize adds custom dashboard configuration handling.
 package customize
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
-	"os"
+	"io"
 	"path/filepath"
 
-	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/cmd/state"
+	"go.k6.io/k6/lib/fsext"
 )
 
 const (
@@ -14,35 +16,43 @@ const (
 	defaultAltConfig = ".dashboard.json"
 )
 
-func findDefaultConfig() string {
-	if exists(defaultConfig) {
+func findDefaultConfig(fs fsext.Fs) string {
+	if exists(fs, defaultConfig) {
 		return defaultConfig
 	}
 
-	if exists(defaultAltConfig) {
+	if exists(fs, defaultAltConfig) {
 		return defaultAltConfig
 	}
 
 	return ""
 }
 
+// Customize allows using custom dashboard configuration.
 func Customize(uiConfig json.RawMessage) (json.RawMessage, error) {
-	filename := os.Getenv("XK6_DASHBOARD_CONFIG")
-	if len(filename) == 0 {
-		if filename = findDefaultConfig(); len(filename) == 0 {
+	state := state.NewGlobalState(context.Background())
+
+	filename, ok := state.Env["XK6_DASHBOARD_CONFIG"]
+	if !ok || len(filename) == 0 {
+		if filename = findDefaultConfig(state.FS); len(filename) == 0 {
 			return uiConfig, nil
 		}
 	}
 
 	if filepath.Ext(filename) == ".json" {
-		return loadConfigJSON(filename)
+		return loadConfigJSON(filename, state)
 	}
 
-	return loadConfigJS(filename, uiConfig, logrus.StandardLogger())
+	return loadConfigJS(filename, uiConfig, state)
 }
 
-func loadConfigJSON(filename string) (json.RawMessage, error) {
-	bin, err := os.ReadFile(filename)
+func loadConfigJSON(filename string, state *state.GlobalState) (json.RawMessage, error) {
+	file, err := state.FS.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	bin, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +66,8 @@ func loadConfigJSON(filename string) (json.RawMessage, error) {
 	return json.Marshal(conf)
 }
 
-func exists(filename string) bool {
-	if _, err := os.Stat(filename); errors.Is(err, os.ErrNotExist) {
+func exists(fs fsext.Fs, filename string) bool {
+	if _, err := fs.Stat(filename); err != nil {
 		return false
 	}
 

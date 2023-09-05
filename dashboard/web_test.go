@@ -30,9 +30,9 @@ func Test_newWebServer(t *testing.T) {
 	base := "http://" + addr
 
 	testLoc := func(loc string) {
-		res, err := http.Get(base + loc) // nolint:bodyclose,noctx
+		res, eerr := http.Get(base + loc) //nolint:bodyclose,noctx
 
-		assert.NoError(t, err)
+		assert.NoError(t, eerr)
 		assert.Equal(t, http.StatusOK, res.StatusCode)
 	}
 
@@ -40,7 +40,7 @@ func Test_newWebServer(t *testing.T) {
 	testLoc("/events")
 	testLoc("/")
 
-	res, err := http.Get(base + "/no_such_path") // nolint:bodyclose,noctx
+	res, err := http.Get(base + "/no_such_path") //nolint:bodyclose,noctx
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, res.StatusCode)
