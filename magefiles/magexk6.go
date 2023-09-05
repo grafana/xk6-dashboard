@@ -125,6 +125,12 @@ func xk6run(args ...string) error {
 	return sh.Run("xk6", append(fix, args...)...)
 }
 
+func lint() error {
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "golangci-lint", "run")
+
+	return err
+}
+
 func generate() error {
 	if err := sh.Run("go", "generate", "./..."); err != nil {
 		return err

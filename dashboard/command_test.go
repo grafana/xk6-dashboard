@@ -53,7 +53,7 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	err = rep.RunE(rep, []string{"testdata/result.gz"})
+	err = rep.RunE(rep, []string{"testdata/result.json.gz"})
 
 	assert.NoError(t, err)
 }

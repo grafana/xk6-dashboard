@@ -7,6 +7,8 @@
 package main
 
 import (
+	"path/filepath"
+
 	"github.com/magefile/mage/sh"
 	"github.com/princjef/mageutil/shellcmd"
 )
@@ -20,7 +22,7 @@ func Tools() error {
 
 // run the golangci-lint linter
 func Lint() error {
-	return sh.Run("golangci-lint", "run")
+	return lint()
 }
 
 // Build build the k6 binary
@@ -73,42 +75,35 @@ func Doc() error {
 	)
 }
 
+// Run run sample script
 func Run() error {
-	return xk6run(`--out dashboard='period=10s&report=test_result_run.html' script.js`)
+	return xk6run(
+		"--out",
+		"dashboard='period=10s&report="+filepath.Join(workdir, "test_result_run.html"),
+		"script.js",
+	)
 }
 
-/*
-type Record mg.Namespace
-
-func Hour() error {
-	return xk6run(`--out dashboard='report=test_result_hour.html' script-hour.js`).Run()
-}
-
+// Record record test result in JSON file
 func Record() error {
-	return xk6run(`--out json=test_result.json script.js`).Run()
+	return xk6run("--out", "json="+filepath.Join(workdir, "test_result.json.gz"), "script.js")
 }
 
-func RecordGZ() error {
-	return xk6run(`--out json=test_result.gz script.js`).Run()
-}
-
-func RecordTest() error {
-	return xk6run(`--out json=dashboard/testdata/result.json scripts/test.js`).Run()
-}
-
-func RecordTestGZ() error {
-	return xk6run(`--out json=dashboard/testdata/result.gz scripts/test.js`).Run()
-}
-
-func xk6dashboard(arg string) shellcmd.Command {
-	return shellcmd.Command("xk6 dashboard  " + arg)
-}
-
+// Replay replay test from recorded JSON file
 func Replay() error {
-	return xk6dashboard(`replay test_result.json`).Run()
+	return sh.Run("xk6", "dashboard", "replay", filepath.Join(workdir, "test_result.json.gz"))
 }
 
-func ReplayGZ() error {
-	return xk6dashboard(`replay test_result.gz`).Run()
+// record test results for testing
+func Testdata() error {
+	out := filepath.Join("dashboard", "testdata", "result.json")
+	gz := out + ".gz"
+
+	return xk6run(
+		"--out",
+		"json="+out,
+		"--out",
+		"json="+gz,
+		filepath.Join("scripts", "test.js"),
+	)
 }
-*/
