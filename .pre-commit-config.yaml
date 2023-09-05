@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2023 Iván Szkiba
+#
+# SPDX-License-Identifier: MIT
+
+default_install_hook_types: [pre-push]
+default_stages: [pre-commit, pre-push]
+
+repos:
+  - repo: https://github.com/golangci/golangci-lint
+    rev: v1.54.1
+    hooks:
+     - id: golangci-lint
+
+  - repo: https://github.com/tekwizely/pre-commit-golang
+    rev: v1.0.0-rc.1
+    hooks:
+      - id: go-mod-tidy
+      - id: go-build-mod
+      - id: go-test-mod
