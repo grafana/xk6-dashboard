@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Test
+name: Quality
 on: [push, pull_request]
 
 jobs:
   lint:
-    name: Lint source code
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
@@ -24,6 +24,7 @@ jobs:
           version: latest
           args: tools lint
   test:
+    name: Test
     needs: [lint]
     strategy:
       matrix:
