@@ -13,8 +13,6 @@ import (
 	"github.com/princjef/mageutil/shellcmd"
 )
 
-var Default = All
-
 // download required build tools
 func Tools() error {
 	return tools()
