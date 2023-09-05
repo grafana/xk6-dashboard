@@ -47,11 +47,11 @@ func Test_sendEvent(t *testing.T) {
 
 	time.Sleep(time.Millisecond)
 
-	res := rec.Result() // nolint:bodyclose
+	res := rec.Result() //nolint:bodyclose
 
 	assert.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
 
-	data, err := io.ReadAll(res.Body) // nolint:bodyclose
+	data, err := io.ReadAll(res.Body)
 
 	assert.NoError(t, err)
 
@@ -90,11 +90,11 @@ func Test_send_earlier_events(t *testing.T) {
 
 	time.Sleep(10 * time.Millisecond)
 
-	res := rec.Result() // nolint:bodyclose
+	res := rec.Result() //nolint:bodyclose
 
 	assert.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
 
-	data, err := io.ReadAll(res.Body) // nolint:bodyclose
+	data, err := io.ReadAll(res.Body)
 
 	assert.NoError(t, err)
 

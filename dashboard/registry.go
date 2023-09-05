@@ -23,7 +23,11 @@ func newRegistry() *registry {
 }
 
 // getOrNew returns existing metric or create new metric registered to this registry.
-func (reg *registry) getOrNew(name string, typ metrics.MetricType, valTyp ...metrics.ValueType) (*metrics.Metric, error) {
+func (reg *registry) getOrNew(
+	name string,
+	typ metrics.MetricType,
+	valTyp ...metrics.ValueType,
+) (*metrics.Metric, error) {
 	if metric := reg.Registry.Get(name); metric != nil {
 		return metric, nil
 	}
@@ -39,7 +43,11 @@ func (reg *registry) getOrNew(name string, typ metrics.MetricType, valTyp ...met
 }
 
 // mustGetOrNew is like getOrNew, but will panic if there is an error.
-func (reg *registry) mustGetOrNew(name string, typ metrics.MetricType, valTyp ...metrics.ValueType) *metrics.Metric {
+func (reg *registry) mustGetOrNew(
+	name string,
+	typ metrics.MetricType,
+	valTyp ...metrics.ValueType,
+) *metrics.Metric {
 	metric, err := reg.getOrNew(name, typ, valTyp...)
 	if err != nil {
 		panic(err)

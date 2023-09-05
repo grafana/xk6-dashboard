@@ -2,21 +2,22 @@
 //
 // SPDX-License-Identifier: MIT
 
+// Package dashboard contains the assembly and registration of the output extension.
 package dashboard
 
 import (
-	"os"
+	"context"
 
-	"github.com/grafana/xk6-dashboard/customize"
 	"github.com/grafana/xk6-dashboard/dashboard"
+	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/output"
 )
 
 func init() {
-	dashboard.Customize = customize.Customize
+	gs := state.NewGlobalState(context.Background())
 
-	if len(os.Args) > 1 && os.Args[1] == "dashboard" {
-		dashboard.Execute(fileConfig(), dirUI(), dirBrief())
+	if len(gs.CmdArgs) > 1 && gs.CmdArgs[1] == "dashboard" {
+		dashboard.Execute(gs, fileConfig(), dirUI(), dirBrief())
 	}
 
 	register()

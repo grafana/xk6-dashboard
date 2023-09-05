@@ -27,9 +27,13 @@ func Test_getopts_defaults(t *testing.T) {
 	assert.Equal(t, defaultPeriod, opts.Period)
 	assert.Equal(t, defaultOpen, opts.Open)
 	assert.Equal(t, defaultReport, opts.Report)
-	assert.Equal(t, defaultTags, opts.Tags)
+	assert.Equal(t, defaultTags(), opts.Tags)
 
-	assert.Equal(t, fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", strconv.Itoa(defaultPort))), opts.url())
+	assert.Equal(
+		t,
+		fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", strconv.Itoa(defaultPort))),
+		opts.url(),
+	)
 }
 
 func Test_getopts_error(t *testing.T) {

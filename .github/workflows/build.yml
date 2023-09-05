@@ -3,13 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 name: Build
-on:
-  pull_request:
-  workflow_dispatch:
-  push:
-    branches:
-      - feature/*
-      - bugfix/*
+on: [pull_request]
 
 jobs:
   build:

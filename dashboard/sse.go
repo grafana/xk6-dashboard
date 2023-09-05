@@ -70,7 +70,10 @@ func (emitter *eventEmitter) onEvent(name string, data interface{}) {
 		retry = []byte(strconv.Itoa(maxSafeInteger))
 	}
 
-	ok := emitter.TryPublish(emitter.channel, &sse.Event{Event: []byte(name), Data: buff, Retry: retry}) // nolint:exhaustruct
+	ok := emitter.TryPublish(
+		emitter.channel,
+		&sse.Event{Event: []byte(name), Data: buff, Retry: retry},
+	) //nolint:exhaustruct
 	if !ok {
 		emitter.logger.Warn("Event dropped")
 	}

@@ -18,7 +18,7 @@ func Test_dir(t *testing.T) {
 
 	assert.NotNil(t, fs)
 	assert.Panics(t, func() {
-		dir("..") //nolint:errcheck
+		dir("..")
 	})
 }
 

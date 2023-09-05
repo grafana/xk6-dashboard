@@ -20,11 +20,11 @@ import (
 func testSample(t *testing.T, name string, typ metrics.MetricType, value float64) metrics.Sample {
 	t.Helper()
 
-	return metrics.Sample{ // nolint:exhaustruct
+	return metrics.Sample{ //nolint:exhaustruct
 		Time:  time.Now(),
 		Value: value,
-		TimeSeries: metrics.TimeSeries{ // nolint:exhaustruct
-			Metric: &metrics.Metric{ // nolint:exhaustruct
+		TimeSeries: metrics.TimeSeries{ //nolint:exhaustruct
+			Metric: &metrics.Metric{ //nolint:exhaustruct
 				Name: name,
 				Type: typ,
 			},
@@ -87,7 +87,7 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	req = req.WithContext(ctx)
 
-	res, err := http.DefaultClient.Do(req) // nolint:bodyclose
+	res, err := http.DefaultClient.Do(req) //nolint:bodyclose
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)

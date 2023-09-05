@@ -1,11 +1,7 @@
 {
   "go.lintTool": "golangci-lint",
-  "go.lintFlags": [
-    "--fast"
-  ],
-  "conventionalCommits.scopes": [
-    "module",
-    "ui",
-    "report"
-  ]
+  "go.lintFlags": ["--fast"],
+  "go.formatTool": "golines",
+  "conventionalCommits.scopes": ["module", "ui", "report"],
+  "go.buildTags": "mage"
 }

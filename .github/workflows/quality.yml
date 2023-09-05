@@ -2,16 +2,29 @@
 #
 # SPDX-License-Identifier: MIT
 
-name: Test
-on:
-  push:
-    branches:
-      - master
-    tags:
-      - "v*"
-  pull_request:
+name: Quality
+on: [push, pull_request]
+
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20.x
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Lint
+        uses: magefile/mage-action@v1
+        with:
+          version: latest
+          args: tools lint
   test:
+    name: Test
+    needs: [lint]
     strategy:
       matrix:
         platform:
@@ -21,19 +34,11 @@ jobs:
     runs-on: ${{matrix.platform}}
     steps:
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: 1.20.x
-
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Lint
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
-        uses: magefile/mage-action@v1
-        with:
-          version: latest
-          args: lint
 
       - name: Test
         uses: magefile/mage-action@v1
@@ -42,9 +47,9 @@ jobs:
           args: test
 
       - name: Upload Coverage
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        if: ${{ matrix.platform == 'ubuntu-latest' && github.ref_name == 'master' }}
         uses: codecov/codecov-action@v2
 
       - name: Generate Go Report Card
-        if: ${{ matrix.platform == 'ubuntu-latest' }}
+        if: ${{ matrix.platform == 'ubuntu-latest' && github.ref_name == 'master' }}
         uses: creekorful/goreportcard-action@v1.0

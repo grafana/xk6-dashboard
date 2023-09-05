@@ -12,17 +12,18 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
-	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/lib/fsext"
 )
 
 type briefer struct {
 	assets fs.FS
 	data   *briefData
 	output string
+	outFS  fsext.Fs
 	logger logrus.FieldLogger
 	mu     sync.RWMutex
 }
@@ -32,11 +33,18 @@ var (
 	_ http.Handler  = (*briefer)(nil)
 )
 
-func newBriefer(assets fs.FS, config json.RawMessage, output string, logger logrus.FieldLogger) *briefer {
-	brf := &briefer{ // nolint:exhaustruct
+func newBriefer(
+	assets fs.FS,
+	config json.RawMessage,
+	output string,
+	outFS fsext.Fs,
+	logger logrus.FieldLogger,
+) *briefer {
+	brf := &briefer{ //nolint:exhaustruct
 		data:   newBriefData(config),
 		assets: assets,
 		output: output,
+		outFS:  outFS,
 		logger: logger,
 	}
 
@@ -52,7 +60,7 @@ func (brf *briefer) onStop() error {
 		return nil
 	}
 
-	file, err := os.Create(brf.output)
+	file, err := brf.outFS.Create(brf.output)
 	if err != nil {
 		return err
 	}
@@ -117,13 +125,15 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 	}
 
 	if err := brf.data.encoder.Encode(data); err != nil {
-		brf.data.encoder.Encode(nil) //nolint:errcheck,errchkjson
+		if eerr := brf.data.encoder.Encode(nil); eerr != nil {
+			brf.logger.Error(err)
+		}
 
 		brf.logger.Error(err)
 	}
 }
 
-func (brf *briefer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+func (brf *briefer) ServeHTTP(res http.ResponseWriter, _ *http.Request) {
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	if err := brf.exportHTML(res); err != nil {
@@ -164,7 +174,7 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 		return err
 	}
 
-	html, err = brf.inject(out, html, dataTag, brf.exportBase64)
+	html, err = brf.inject(out, html, []byte(dataTag), brf.exportBase64)
 	if err != nil {
 		return err
 	}
@@ -176,7 +186,12 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 	return nil
 }
 
-func (brf *briefer) inject(out io.Writer, html []byte, tag []byte, dataFunc func(io.Writer) error) ([]byte, error) {
+func (brf *briefer) inject(
+	out io.Writer,
+	html []byte,
+	tag []byte,
+	dataFunc func(io.Writer) error,
+) ([]byte, error) {
 	idx := bytes.Index(html, tag)
 
 	if idx < 0 {
@@ -270,4 +285,4 @@ func (data *briefData) exportJSON(out io.Writer) error {
 	return err
 }
 
-var dataTag = []byte(`<script id="data" type="application/json; charset=utf-8; gzip; base64">`)
+const dataTag = `<script id="data" type="application/json; charset=utf-8; gzip; base64">`

@@ -45,20 +45,20 @@ export let options = {
 
 export default function () {
   group("main", () => {
-    http.get("http://test-api.k6.io");
+    http.get("https://test-api.k6.io");
   });
 
   sleep(0.2);
 
   group("list", () => {
-    http.get("http://test-api.k6.io/public/crocodiles/");
+    http.get("https://test-api.k6.io/public/crocodiles/");
   });
 
   sleep(0.2);
 
   group("crocodiles", () => {
     for (var i = 0; i < 5; i++) {
-      http.get(http.url`http://test-api.k6.io/public/crocodiels/${i}`);
+      http.get(http.url`https://test-api.k6.io/public/crocodiles/${i}/`);
       sleep(0.5);
     }
   });

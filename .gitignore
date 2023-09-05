@@ -2,24 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-k6
-
-test_result*
-
-coverage.txt
-
-.task
-
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-bin
-node_modules
-*.local
-
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
+/k6
+/build
+/.bin
