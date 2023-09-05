@@ -75,6 +75,10 @@ func tools() error {
 		return err
 	}
 
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("failed to download linter configuration")
+	}
+
 	content, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
@@ -148,11 +152,24 @@ func coverprofile() string {
 }
 
 func test() error {
-	return sh.Run("go", "test", "-count", "1", "-coverprofile="+coverprofile(), "./...")
+	_, err := sh.Exec(
+		nil,
+		os.Stdout,
+		os.Stderr,
+		"go",
+		"test",
+		"-count",
+		"1",
+		"-coverprofile="+coverprofile(),
+		"./...",
+	)
+
+	return err
 }
 
 func cover() error {
-	return sh.Run("go", "tool", "cover", "-html="+coverprofile())
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "go", "tool", "cover", "-html="+coverprofile())
+	return err
 }
 
 func clean() error {

@@ -91,7 +91,14 @@ func Record() error {
 
 // Replay replay test from recorded JSON file
 func Replay() error {
-	return sh.Run("xk6", "dashboard", "replay", filepath.Join(workdir, "test_result.json.gz"))
+	return sh.Run(
+		"xk6",
+		"dashboard",
+		"replay",
+		"--report",
+		filepath.Join(workdir, "test_result_replay.html"),
+		filepath.Join(workdir, "test_result.json.gz"),
+	)
 }
 
 // record test results for testing
