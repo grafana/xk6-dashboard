@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/r3labs/sse/v2"
 	"github.com/sirupsen/logrus"
@@ -19,6 +20,9 @@ type eventEmitter struct {
 	logger  logrus.FieldLogger
 	channel string
 	wait    sync.WaitGroup
+	mu      sync.RWMutex
+	count   int
+	id      atomic.Int64
 }
 
 var _ eventListener = (*eventEmitter)(nil)
@@ -39,11 +43,21 @@ func newEventEmitter(channel string, logger logrus.FieldLogger) *eventEmitter {
 }
 
 func (emitter *eventEmitter) onSubscribe(_ string, _ *sse.Subscriber) {
+	emitter.mu.Lock()
+	defer emitter.mu.Unlock()
+	emitter.count++
 	emitter.wait.Add(1)
 }
 
 func (emitter *eventEmitter) onUnsubscribe(_ string, _ *sse.Subscriber) {
-	emitter.wait.Done()
+	emitter.mu.Lock()
+	defer emitter.mu.Unlock()
+
+	emitter.count--
+
+	if emitter.count >= 0 { // it seem onUnsubscribe sometimes called without onSubscribe...
+		emitter.wait.Done()
+	}
 }
 
 func (emitter *eventEmitter) onStart() error {
@@ -51,6 +65,8 @@ func (emitter *eventEmitter) onStart() error {
 }
 
 func (emitter *eventEmitter) onStop() error {
+	emitter.mu.RLock()
+	defer emitter.mu.RUnlock()
 	emitter.wait.Wait()
 
 	return nil
@@ -70,13 +86,12 @@ func (emitter *eventEmitter) onEvent(name string, data interface{}) {
 		retry = []byte(strconv.Itoa(maxSafeInteger))
 	}
 
-	ok := emitter.TryPublish(
+	id := strconv.FormatInt(emitter.id.Add(1), 10)
+
+	emitter.Publish(
 		emitter.channel,
-		&sse.Event{Event: []byte(name), Data: buff, Retry: retry},
+		&sse.Event{Event: []byte(name), Data: buff, Retry: retry, ID: []byte(id)},
 	) //nolint:exhaustruct
-	if !ok {
-		emitter.logger.Warn("Event dropped")
-	}
 }
 
 func (emitter *eventEmitter) ServeHTTP(res http.ResponseWriter, req *http.Request) {
