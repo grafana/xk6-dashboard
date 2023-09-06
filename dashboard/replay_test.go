@@ -45,7 +45,7 @@ func Test_replay(t *testing.T) {
 	t.Parallel()
 
 	opts := &options{
-		Port:   getRandomPort(t),
+		Port:   0,
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
@@ -116,7 +116,7 @@ func Test_replay_open(t *testing.T) { //nolint:paralleltest
 
 func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
 	opts := &options{
-		Port:   getRandomPort(t),
+		Port:   0,
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
