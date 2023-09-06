@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/princjef/mageutil/bintool"
 )
@@ -105,37 +106,52 @@ func tools() error {
 		return err
 	}
 
-	if err := linter.Ensure(); err != nil {
+	if linter.IsInstalled() {
+		return nil
+	}
+
+	xk6, err := bintool.NewGo("go.k6.io/xk6/cmd/xk6", "latest", bintool.WithFolder(bindir))
+	if err != nil {
 		return err
 	}
 
-	if err := goinstall("go.k6.io/xk6/cmd/xk6@latest"); err != nil {
+	if err := xk6.Ensure(); err != nil {
 		return err
 	}
 
 	if hasAssets() {
-		return sh.Run("yarn", "--silent", "--cwd", "assets", "install")
+		if err := sh.Run("yarn", "--silent", "--cwd", "assets", "install"); err != nil {
+			return err
+		}
 	}
 
-	return nil
+	return linter.Ensure()
 }
 
 func xk6build() error {
+	mg.Deps(tools)
+
 	return sh.Run("xk6", "build", "--with", module+"=.")
 }
 
 func xk6run(args ...string) error {
+	mg.Deps(tools)
+
 	fix := []string{"run", "--quiet", "--no-summary", "--no-usage-report"}
 	return sh.Run("xk6", append(fix, args...)...)
 }
 
 func lint() error {
+	mg.Deps(tools)
+
 	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "golangci-lint", "run")
 
 	return err
 }
 
 func generate() error {
+	mg.Deps(tools)
+
 	if err := sh.Run("go", "generate", "./..."); err != nil {
 		return err
 	}
