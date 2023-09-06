@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
@@ -25,7 +27,7 @@ const (
 	defaultReport = ""
 )
 
-var defaultTags = []string{"group"}
+func defaultTags() []string { return []string{"group"} }
 
 type options struct {
 	Port   int
@@ -37,14 +39,14 @@ type options struct {
 	TagsS  string   `schema:"tags"`
 }
 
-func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
+func getopts(query string) (opts *options, err error) { //nolint:nonamedreturns
 	opts = &options{
 		Port:   defaultPort,
 		Host:   defaultHost,
 		Period: defaultPeriod,
 		Open:   defaultOpen,
 		Report: defaultReport,
-		Tags:   defaultTags,
+		Tags:   defaultTags(),
 		TagsS:  "",
 	}
 
@@ -62,8 +64,8 @@ func getopts(query string) (opts *options, err error) { // nolint:nonamedreturns
 	decoder.IgnoreUnknownKeys(true)
 
 	decoder.RegisterConverter(time.Second, func(s string) reflect.Value {
-		v, err := time.ParseDuration(s)
-		if err != nil {
+		v, eerr := time.ParseDuration(s)
+		if eerr != nil {
 			return reflect.ValueOf(err)
 		}
 

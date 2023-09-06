@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
@@ -31,9 +33,9 @@ func Test_meter_add_error(t *testing.T) {
 	now := time.Now()
 	met := newMeter(time.Second, now, nil)
 
-	sample := metrics.Sample{ // nolint:exhaustruct
-		TimeSeries: metrics.TimeSeries{ // nolint:exhaustruct
-			Metric: &metrics.Metric{ // nolint:exhaustruct
+	sample := metrics.Sample{ //nolint:exhaustruct
+		TimeSeries: metrics.TimeSeries{ //nolint:exhaustruct
+			Metric: &metrics.Metric{ //nolint:exhaustruct
 				Type: metrics.MetricType(-1),
 			},
 		},
@@ -55,7 +57,7 @@ func Test_meter_add(t *testing.T) {
 	metric := met.registry.Get("foo")
 
 	assert.NotNil(t, metric)
-	assert.Equal(t, 1.0, metric.Sink.(*metrics.CounterSink).Value) // nolint:forcetypeassert
+	assert.Equal(t, 1.0, metric.Sink.(*metrics.CounterSink).Value) //nolint:forcetypeassert
 }
 
 func Test_meter_update_error(t *testing.T) {
@@ -127,8 +129,8 @@ func Test_meter_format(t *testing.T) {
 	now := time.Now()
 	met := newMeter(0, now, nil)
 
-	met.registry.getOrNew("foo", metrics.Counter, metrics.Data) // nolint:errcheck
-	met.registry.getOrNew("bar", metrics.Counter, metrics.Data) // nolint:errcheck
+	_, _ = met.registry.getOrNew("foo", metrics.Counter, metrics.Data)
+	_, _ = met.registry.getOrNew("bar", metrics.Counter, metrics.Data)
 
 	data := met.format(time.Second)
 

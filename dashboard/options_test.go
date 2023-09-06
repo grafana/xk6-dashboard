@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
@@ -27,9 +29,13 @@ func Test_getopts_defaults(t *testing.T) {
 	assert.Equal(t, defaultPeriod, opts.Period)
 	assert.Equal(t, defaultOpen, opts.Open)
 	assert.Equal(t, defaultReport, opts.Report)
-	assert.Equal(t, defaultTags, opts.Tags)
+	assert.Equal(t, defaultTags(), opts.Tags)
 
-	assert.Equal(t, fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", strconv.Itoa(defaultPort))), opts.url())
+	assert.Equal(
+		t,
+		fmt.Sprintf("http://%s", net.JoinHostPort("127.0.0.1", strconv.Itoa(defaultPort))),
+		opts.url(),
+	)
 }
 
 func Test_getopts_error(t *testing.T) {

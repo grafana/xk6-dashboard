@@ -1,26 +1,34 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 package customize
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
+	"go.k6.io/k6/cmd/state"
 )
 
 func Test_loadConfigJSON(t *testing.T) {
 	t.Parallel()
 
-	conf, err := loadConfigJSON("testdata/config.json")
+	state := state.NewGlobalState(context.Background())
+
+	conf, err := loadConfigJSON("testdata/config.json", state)
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	_, err = loadConfigJSON("testdata/config-bad.json")
+	_, err = loadConfigJSON("testdata/config-bad.json", state)
 
 	assert.Error(t, err)
 
-	_, err = loadConfigJSON("testdata/config-not-exists.json")
+	_, err = loadConfigJSON("testdata/config-not-exists.json", state)
 
 	assert.Error(t, err)
 }

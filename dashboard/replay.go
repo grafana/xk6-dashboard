@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
@@ -12,7 +14,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -20,6 +21,7 @@ import (
 	"github.com/pkg/browser"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
@@ -46,12 +48,14 @@ type replayer struct {
 	seenMetrics map[string]struct{}
 }
 
-func replay(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS, filename string) error {
-	uiConfig, err := Customize(uiConfig)
-	if err != nil {
-		return err
-	}
-
+func replay(
+	opts *options,
+	uiConfig json.RawMessage,
+	uiFS fs.FS,
+	briefFS fs.FS,
+	filename string,
+	osFS fsext.Fs,
+) error {
 	logger := logrus.StandardLogger()
 	rep := new(replayer)
 
@@ -61,7 +65,7 @@ func replay(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS, 
 	rep.eventSource = new(eventSource)
 	rep.seenMetrics = make(map[string]struct{})
 
-	brf := newBriefer(briefFS, uiConfig, opts.Report, rep.logger)
+	brf := newBriefer(briefFS, rep.config, opts.Report, osFS, rep.logger)
 
 	rep.addEventListener(brf)
 
@@ -80,7 +84,7 @@ func replay(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS, 
 		}
 
 		if rep.options.Open {
-			browser.OpenURL(rep.options.url()) // nolint:errcheck
+			_ = browser.OpenURL(rep.options.url())
 		}
 	}
 
@@ -88,8 +92,7 @@ func replay(opts *options, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS, 
 		return err
 	}
 
-	err = feed(filename, rep.addMetricSamples)
-	if err != nil {
+	if err := feed(filename, osFS, rep.addMetricSamples, logger); err != nil {
 		return err
 	}
 
@@ -130,10 +133,15 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	})
 
 	if firstTime.Sub(rep.timestamp) > rep.options.Period {
-		samples := rep.buffer.GetBufferedSamples()
+		samples = rep.buffer.GetBufferedSamples()
 		now := firstTime
 
-		rep.updateAndSend(samples, newMeter(rep.options.Period, now, rep.options.Tags), snapshotEvent, now)
+		rep.updateAndSend(
+			samples,
+			newMeter(rep.options.Period, now, rep.options.Tags),
+			snapshotEvent,
+			now,
+		)
 		rep.updateAndSend(samples, rep.cumulative, cumulativeEvent, now)
 
 		rep.timestamp = now
@@ -142,7 +150,12 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	rep.buffer.AddMetricSamples(samples)
 }
 
-func (rep *replayer) updateAndSend(containers []metrics.SampleContainer, met *meter, event string, now time.Time) {
+func (rep *replayer) updateAndSend(
+	containers []metrics.SampleContainer,
+	met *meter,
+	event string,
+	now time.Time,
+) {
 	data, err := met.update(containers, now)
 	if err != nil {
 		rep.logger.WithError(err).Warn("Error while processing samples")
@@ -166,13 +179,24 @@ type feeder struct {
 	callback addMetricSamplesFunc
 }
 
-func feed(filename string, callback addMetricSamplesFunc) error {
-	file, err := os.Open(filename)
+func feed(
+	filename string,
+	fs fsext.Fs,
+	callback addMetricSamplesFunc,
+	logger logrus.FieldLogger,
+) error {
+	file, err := fs.Open(filename)
 	if err != nil {
 		return err
 	}
 
-	defer file.Close()
+	closer := func(what io.Closer) {
+		if closeErr := what.Close(); closeErr != nil {
+			logger.Error(err)
+		}
+	}
+
+	defer closer(file)
 
 	var input io.Reader = file
 
@@ -182,7 +206,7 @@ func feed(filename string, callback addMetricSamplesFunc) error {
 			return err
 		}
 
-		defer gzReader.Close()
+		defer closer(gzReader)
 
 		input = gzReader
 	}

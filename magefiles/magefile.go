@@ -1,124 +1,61 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
 	"path/filepath"
-	"strings"
 
 	"github.com/magefile/mage/sh"
-	"github.com/princjef/mageutil/bintool"
 	"github.com/princjef/mageutil/shellcmd"
 )
 
-var Default = All
+// download required build tools
+func Tools() error {
+	return tools()
+}
 
-var linter = bintool.Must(bintool.New(
-	"golangci-lint{{.BinExt}}",
-	"1.51.1",
-	"https://github.com/golangci/golangci-lint/releases/download/v{{.Version}}/golangci-lint-{{.Version}}-{{.GOOS}}-{{.GOARCH}}{{.ArchiveExt}}",
-))
-
+// run the golangci-lint linter
 func Lint() error {
-	if err := linter.Ensure(); err != nil {
-		return err
-	}
-
-	return linter.Command(`run`).Run()
+	return lint()
 }
 
-func Test() error {
-	return shellcmd.Command(`go test -count 1 -coverprofile=coverage.txt ./...`).Run()
-}
-
+// Build build the k6 binary
 func Build() error {
-	return shellcmd.Command(`xk6 build --with github.com/grafana/xk6-dashboard=.`).Run()
+	return xk6build()
 }
 
-func It() error {
-	all, err := filepath.Glob("scripts/*.js")
-	if err != nil {
+// Generate generate go sources and assets
+func Generate() error {
+	if err := generate(); err != nil {
 		return err
 	}
 
-	for _, script := range all {
-		err := xk6run("--out dashboard='period=100ms' " + script).Run()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return License()
 }
 
-func Coverage() error {
-	return shellcmd.Command(`go tool cover -html=coverage.txt`).Run()
+// run tests
+func Test() error {
+	return test()
 }
 
-func glob(patterns ...string) (string, error) {
-	buff := new(strings.Builder)
-
-	for _, p := range patterns {
-		m, err := filepath.Glob(p)
-		if err != nil {
-			return "", err
-		}
-
-		_, err = buff.WriteString(strings.Join(m, " ") + " ")
-		if err != nil {
-			return "", err
-		}
-	}
-
-	return buff.String(), nil
+// show HTML coverage report
+func Cover() error {
+	Test()
+	return cover()
 }
 
-func License() error {
-	all, err := glob(
-		"*.go",
-		"*/*.go",
-		".*.yml",
-		".gitignore",
-		"*/.gitignore",
-		"*.ts",
-		"*/*ts",
-		".github/workflows/*",
-		//
-		"assets/packages/ui/*.yml",
-		"assets/packages/ui/*.js",
-		"assets/packages/ui/.gitignore",
-		"assets/packages/ui/src/*",
-		//
-		"assets/packages/brief/*.yml",
-		"assets/packages/brief/*.js",
-		"assets/packages/brief/.gitignore",
-		"assets/packages/brief/src/*",
-	)
-	if err != nil {
-		return err
-	}
-
-	return shellcmd.Command(
-		`reuse annotate --copyright "Iván Szkiba" --merge-copyrights --license MIT --skip-unrecognised ` + all,
-	).Run()
-}
-
+// remove temporary build files
 func Clean() error {
-	sh.Rm("magefiles/bin")
-	sh.Rm("coverage.txt")
-	sh.Rm("bin")
-	sh.Rm("assets/packages/ui/node_modules")
-	sh.Rm("assets/packages/brief/node_modules")
-	sh.Rm("k6")
-
-	return nil
+	return clean()
 }
 
+// lint, test, build
 func All() error {
 	if err := Lint(); err != nil {
 		return err
@@ -128,79 +65,68 @@ func All() error {
 		return err
 	}
 
-	if err := Build(); err != nil {
-		return err
-	}
-
-	return It()
+	return Build()
 }
 
-func yarn(arg string) shellcmd.Command {
-	return shellcmd.Command("yarn --silent --cwd assets " + arg)
-}
-
-func Prepare() error {
-	return yarn("install").Run()
-}
-
-func Assets() error {
-	return yarn("build").Run()
-}
-
-func Exif() error {
+// generate documentation
+func Doc() error {
 	return shellcmd.RunAll(
 		`exiftool -all= -overwrite_original -ext png screenshot`,
-		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" screenshot`,
+		`exiftool -ext png -overwrite_original -XMP:Subject="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" screenshot`,
 		`exiftool -all= -overwrite_original -ext png .github`,
-		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" .github`,
-		`exiftool -ext pdf -overwrite_original -Subject+="k6 dashboard report" -Title="k6 dashboard report" -Description="Example report of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" screenshot`,
+		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" .github`,
+		`exiftool -all= -overwrite_original -ext pdf screenshot`,
+		`exiftool -ext pdf -overwrite_original -Subject="k6 dashboard report" -Title="k6 dashboard report" -Description="Example report of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" screenshot`,
 	)
 }
 
-func xk6run(arg string) shellcmd.Command {
-	return shellcmd.Command("xk6 run --quiet --no-summary --no-usage-report " + arg)
-}
-
+// Run run sample script
 func Run() error {
-	return xk6run(`--out dashboard='period=10s&report=test_result_run.html' script.js`).Run()
+	return xk6run(
+		"--out",
+		"dashboard='period=10s&report="+filepath.Join(workdir, "test_result_run.html"),
+		"script.js",
+	)
 }
 
-func Report() error {
-	return xk6run(`--out dashboard='period=100ms&report=test_result_report.html' scripts/test.js`).Run()
-}
-
-func ReportGZ() error {
-	return xk6run(`--out dashboard='period=100ms&report=test_result_report.html.gz' scripts/test.js`).Run()
-}
-
-func Hour() error {
-	return xk6run(`--out dashboard='report=test_result_hour.html' script-hour.js`).Run()
-}
-
+// Record record test result in JSON file
 func Record() error {
-	return xk6run(`--out json=test_result.json script.js`).Run()
+	return xk6run("--out", "json="+filepath.Join(workdir, "test_result.json.gz"), "script.js")
 }
 
-func RecordGZ() error {
-	return xk6run(`--out json=test_result.gz script.js`).Run()
-}
-
-func RecordTest() error {
-	return xk6run(`--out json=dashboard/testdata/result.json scripts/test.js`).Run()
-}
-
-func RecordTestGZ() error {
-	return xk6run(`--out json=dashboard/testdata/result.gz scripts/test.js`).Run()
-}
-
-func xk6dashboard(arg string) shellcmd.Command {
-	return shellcmd.Command("xk6 dashboard  " + arg)
-}
-
+// Replay replay test from recorded JSON file
 func Replay() error {
-	return xk6dashboard(`replay test_result.json`).Run()
+	return sh.Run(
+		"xk6",
+		"dashboard",
+		"replay",
+		"--report",
+		filepath.Join(workdir, "test_result_replay.html"),
+		filepath.Join(workdir, "test_result.json.gz"),
+	)
 }
 
-func ReplayGZ() error {
-	return xk6dashboard(`replay test_result.gz`).Run()
+// record test results for testing
+func Testdata() error {
+	out := filepath.Join("dashboard", "testdata", "result.json")
+	gz := out + ".gz"
+
+	return xk6run(
+		"--out",
+		"json="+out,
+		"--out",
+		"json="+gz,
+		filepath.Join("scripts", "test.js"),
+	)
+}
+
+// update license headers
+func License() error {
+	return sh.Run(
+		"reuse", "annotate",
+		"--copyright", "Raintank, Inc. dba Grafana Labs",
+		"--merge-copyrights",
+		"--license", "AGPL-3.0-only",
+		"--skip-unrecognised", "--recursive", ".",
+	)
 }

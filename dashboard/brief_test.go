@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 package dashboard
 
 import (
@@ -8,6 +12,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"go.k6.io/k6/lib/fsext"
 )
 
 type errorWriter struct {
@@ -72,7 +77,9 @@ func recursiveJSON(t *testing.T) interface{} {
 func Test_briefer_exportJSON_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
+	osFS := fsext.NewMemMapFs()
+
+	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
 
 	brf.data.cumulative = recursiveJSON(t)
 
@@ -101,7 +108,9 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 func Test_briefer_exportBase64_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
+	osFS := fsext.NewMemMapFs()
+
+	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
 
 	brf.data.cumulative = recursiveJSON(t)
 
@@ -119,7 +128,9 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 func Test_briefer_inject_error(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
+	osFS := fsext.NewMemMapFs()
+
+	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
 
 	file, err := testDirBrief(t).Open("index.html")
 
@@ -132,11 +143,11 @@ func Test_briefer_inject_error(t *testing.T) {
 	out := newErrorWriter(t)
 
 	assert.Panics(t, func() {
-		brf.inject(out, []byte{}, dataTag, nil) //nolint:errcheck
+		_, _ = brf.inject(out, []byte{}, []byte(dataTag), nil)
 	})
 
-	_, err = brf.inject(out, html, dataTag, func(out io.Writer) error {
-		_, err := out.Write([]byte("Hello, World!"))
+	_, err = brf.inject(out, html, []byte(dataTag), func(out io.Writer) error {
+		_, err = out.Write([]byte("Hello, World!"))
 
 		return err
 	})
@@ -147,7 +158,9 @@ func Test_briefer_inject_error(t *testing.T) {
 func Test_briefer_onEvent(t *testing.T) {
 	t.Parallel()
 
-	brf := newBriefer(testDirBrief(t), nil, "", logrus.StandardLogger())
+	osFS := fsext.NewMemMapFs()
+
+	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
 
 	data := make(map[string]interface{})
 

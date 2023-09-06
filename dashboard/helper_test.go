@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
@@ -7,9 +9,7 @@ package dashboard
 import (
 	"bufio"
 	"context"
-	"net"
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
@@ -20,11 +20,11 @@ import (
 func testSample(t *testing.T, name string, typ metrics.MetricType, value float64) metrics.Sample {
 	t.Helper()
 
-	return metrics.Sample{ // nolint:exhaustruct
+	return metrics.Sample{ //nolint:exhaustruct
 		Time:  time.Now(),
 		Value: value,
-		TimeSeries: metrics.TimeSeries{ // nolint:exhaustruct
-			Metric: &metrics.Metric{ // nolint:exhaustruct
+		TimeSeries: metrics.TimeSeries{ //nolint:exhaustruct
+			Metric: &metrics.Metric{ //nolint:exhaustruct
 				Name: name,
 				Type: typ,
 			},
@@ -50,26 +50,6 @@ func (ts *testSamples) toArray() []metrics.SampleContainer {
 	return []metrics.SampleContainer{ts}
 }
 
-func getRandomPort(t *testing.T) int {
-	t.Helper()
-
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-
-	assert.NoError(t, err)
-
-	port := listener.Addr().(*net.TCPAddr).Port //nolint:forcetypeassert
-
-	assert.NoError(t, listener.Close())
-
-	return port
-}
-
-func getRandomAddr(t *testing.T) string {
-	t.Helper()
-
-	return net.JoinHostPort("127.0.0.1", strconv.Itoa(getRandomPort(t)))
-}
-
 func readSSE(t *testing.T, nlines int, loc string) []string {
 	t.Helper()
 
@@ -87,7 +67,7 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	req = req.WithContext(ctx)
 
-	res, err := http.DefaultClient.Do(req) // nolint:bodyclose
+	res, err := http.DefaultClient.Do(req) //nolint:bodyclose
 
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
@@ -108,6 +88,10 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 	}
 
 	assert.Equal(t, nlines, len(lines))
+
+	cancel()
+
+	time.Sleep(10 * time.Millisecond) // allow unsubscribe to run
 
 	return lines
 }

@@ -1,15 +1,19 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
 
 import (
+	"context"
 	"embed"
 	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.k6.io/k6/cmd/state"
 )
 
 func Test_buildRootCmd(t *testing.T) {
@@ -17,7 +21,9 @@ func Test_buildRootCmd(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{})
+	gs := state.NewGlobalState(context.Background())
+
+	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{}, gs)
 
 	assert.NotNil(t, cmd)
 
@@ -41,7 +47,9 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{})
+	gs := state.NewGlobalState(context.Background())
+
+	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{}, gs)
 
 	assert.NotNil(t, cmd)
 
@@ -53,7 +61,7 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	assert.NoError(t, err)
 
-	err = rep.RunE(rep, []string{"testdata/result.gz"})
+	err = rep.RunE(rep, []string{"testdata/result.json.gz"})
 
 	assert.NoError(t, err)
 }
@@ -63,7 +71,9 @@ func Test_buildRootCmd_reply_error(t *testing.T) {
 
 	opts := new(options)
 
-	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{})
+	gs := state.NewGlobalState(context.Background())
+
+	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{}, gs)
 
 	assert.NotNil(t, cmd)
 

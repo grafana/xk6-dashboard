@@ -1,15 +1,20 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 package customize
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
+	"io"
 	"reflect"
 	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/js/compiler"
 	"go.k6.io/k6/lib"
 )
@@ -18,15 +23,19 @@ type configLoader struct {
 	runtime       *goja.Runtime
 	compiler      *compiler.Compiler
 	defaultConfig *goja.Object
+	state         *state.GlobalState
 }
 
-func newConfigLoader(defaultConfig json.RawMessage, logger logrus.FieldLogger) (*configLoader, error) {
-	comp := compiler.New(logger)
+func newConfigLoader(
+	defaultConfig json.RawMessage,
+	state *state.GlobalState,
+) (*configLoader, error) {
+	comp := compiler.New(state.Logger)
 
 	comp.Options.CompatibilityMode = lib.CompatibilityModeExtended
 	comp.Options.Strict = true
 
-	con := newConfigConsole(logger)
+	con := newConfigConsole(state.Logger)
 
 	runtime := goja.New()
 
@@ -45,13 +54,19 @@ func newConfigLoader(defaultConfig json.RawMessage, logger logrus.FieldLogger) (
 		runtime:       runtime,
 		compiler:      comp,
 		defaultConfig: def,
+		state:         state,
 	}
 
 	return loader, nil
 }
 
 func (loader *configLoader) load(filename string) (json.RawMessage, error) {
-	src, err := os.ReadFile(filename)
+	file, err := loader.state.FS.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	src, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +94,7 @@ func (loader *configLoader) eval(src []byte, filename string) (*goja.Object, err
 	exports := loader.runtime.NewObject()
 	module := loader.runtime.NewObject()
 
-	if err := module.Set("exports", exports); err != nil {
+	if err = module.Set("exports", exports); err != nil {
 		return nil, err
 	}
 
@@ -132,8 +147,12 @@ func toObject(runtime *goja.Runtime, bin json.RawMessage) (*goja.Object, error) 
 	return val.ToObject(runtime), nil
 }
 
-func loadConfigJS(filename string, config json.RawMessage, logger logrus.FieldLogger) (json.RawMessage, error) {
-	loader, err := newConfigLoader(config, logger)
+func loadConfigJS(
+	filename string,
+	config json.RawMessage,
+	state *state.GlobalState,
+) (json.RawMessage, error) {
+	loader, err := newConfigLoader(config, state)
 	if err != nil {
 		return nil, err
 	}
@@ -164,7 +183,7 @@ func (c configConsole) log(level logrus.Level, args ...goja.Value) {
 
 	msg := strs.String()
 
-	switch level { //nolint:exhaustive
+	switch level {
 	case logrus.DebugLevel:
 		c.logger.Debug(msg)
 

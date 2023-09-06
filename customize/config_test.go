@@ -1,6 +1,11 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 package customize
 
 import (
+	"context"
 	_ "embed"
 	"testing"
 
@@ -9,6 +14,8 @@ import (
 	logtest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
+	"go.k6.io/k6/cmd/state"
+	"go.k6.io/k6/cmd/tests"
 )
 
 //go:embed testdata/config/config.json
@@ -17,13 +24,15 @@ var testconfig []byte
 func TestConfigInReadme(t *testing.T) {
 	t.Parallel()
 
-	conf, err := loadConfigJS("../.dashboard.js", testconfig, logrus.StandardLogger())
+	state := state.NewGlobalState(context.Background())
+
+	conf, err := loadConfigJS("../.dashboard.js", testconfig, state)
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	loader, err := newConfigLoader(testconfig, logrus.StandardLogger())
+	loader, err := newConfigLoader(testconfig, state)
 
 	assert.NoError(t, err)
 
@@ -70,27 +79,38 @@ func TestConfigConsoleLevels(t *testing.T) {
 func TestConfigConsoleJSON(t *testing.T) {
 	t.Parallel()
 
-	assertMessageAndLevel(t, `let obj = {foo:"bar"}; console.log(obj)`, `{"foo":"bar"}`, logrus.InfoLevel)
+	assertMessageAndLevel(
+		t,
+		`let obj = {foo:"bar"}; console.log(obj)`,
+		`{"foo":"bar"}`,
+		logrus.InfoLevel,
+	)
 }
 
 func Test_loadConfigJS_error(t *testing.T) {
 	t.Parallel()
 
-	conf, err := loadConfigJSON("testdata/config.json")
+	state := state.NewGlobalState(context.Background())
+
+	conf, err := loadConfigJSON("testdata/config.json", state)
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	_, err = loadConfigJS("testdata/config-bad.json", testconfig, logrus.StandardLogger())
+	_, err = loadConfigJS("testdata/config-bad.json", testconfig, state)
 
 	assert.Error(t, err)
 
-	_, err = loadConfigJS("testdata/config-not-exists.json", testconfig, logrus.StandardLogger())
+	_, err = loadConfigJS("testdata/config-not-exists.json", testconfig, state)
 
 	assert.Error(t, err)
 
-	conf, err = loadConfigJS("testdata/config-custom.js", []byte("42='foo'"), logrus.StandardLogger())
+	conf, err = loadConfigJS(
+		"testdata/config-custom.js",
+		[]byte("42='foo'"),
+		state,
+	)
 
 	assert.Nil(t, conf)
 	assert.Error(t, err)
@@ -99,7 +119,9 @@ func Test_loadConfigJS_error(t *testing.T) {
 func Test_configLoader_eval_error(t *testing.T) {
 	t.Parallel()
 
-	loader, err := newConfigLoader(testconfig, logrus.StandardLogger())
+	state := tests.NewGlobalTestState(t).GlobalState
+
+	loader, err := newConfigLoader(testconfig, state)
 
 	assert.NoError(t, err)
 

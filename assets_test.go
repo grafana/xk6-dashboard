@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 package dashboard
@@ -18,7 +20,7 @@ func Test_dir(t *testing.T) {
 
 	assert.NotNil(t, fs)
 	assert.Panics(t, func() {
-		dir("..") //nolint:errcheck
+		dir("..")
 	})
 }
 

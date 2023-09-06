@@ -1,5 +1,14 @@
 # SPDX-FileCopyrightText: 2023 Iván Szkiba
+# SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 #
+# SPDX-License-Identifier: AGPL-3.0-only
 # SPDX-License-Identifier: MIT
 
 node_modules/
+package-lock.json
+
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
