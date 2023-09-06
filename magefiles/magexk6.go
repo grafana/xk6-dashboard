@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/magefile/mage/mg"
@@ -168,14 +169,27 @@ func coverprofile() string {
 }
 
 func test() error {
+	maxproc := "4"
+
+	if runtime.GOOS == "windows" {
+		maxproc = "1"
+	}
+
+	env := map[string]string{
+		"GOMAXPROCS": maxproc,
+	}
+
 	_, err := sh.Exec(
-		nil,
+		env,
 		os.Stdout,
 		os.Stderr,
 		"go",
 		"test",
 		"-count",
 		"1",
+		"-p",
+		maxproc,
+		"-race",
 		"-coverprofile="+coverprofile(),
 		"./...",
 	)
