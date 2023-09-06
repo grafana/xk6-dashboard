@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 //go:build mage
@@ -30,7 +32,11 @@ func Build() error {
 
 // Generate generate go sources and assets
 func Generate() error {
-	return generate()
+	if err := generate(); err != nil {
+		return err
+	}
+
+	return License()
 }
 
 // run tests
@@ -66,10 +72,11 @@ func All() error {
 func Doc() error {
 	return shellcmd.RunAll(
 		`exiftool -all= -overwrite_original -ext png screenshot`,
-		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" screenshot`,
+		`exiftool -ext png -overwrite_original -XMP:Subject="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" screenshot`,
 		`exiftool -all= -overwrite_original -ext png .github`,
-		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" .github`,
-		`exiftool -ext pdf -overwrite_original -Subject+="k6 dashboard report" -Title="k6 dashboard report" -Description="Example report of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Ivan SZKIBA" screenshot`,
+		`exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" .github`,
+		`exiftool -all= -overwrite_original -ext pdf screenshot`,
+		`exiftool -ext pdf -overwrite_original -Subject="k6 dashboard report" -Title="k6 dashboard report" -Description="Example report of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" screenshot`,
 	)
 }
 
@@ -110,5 +117,16 @@ func Testdata() error {
 		"--out",
 		"json="+gz,
 		filepath.Join("scripts", "test.js"),
+	)
+}
+
+// update license headers
+func License() error {
+	return sh.Run(
+		"reuse", "annotate",
+		"--copyright", "Raintank, Inc. dba Grafana Labs",
+		"--merge-copyrights",
+		"--license", "AGPL-3.0-only",
+		"--skip-unrecognised", "--recursive", ".",
 	)
 }
