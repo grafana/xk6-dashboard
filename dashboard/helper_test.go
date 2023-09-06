@@ -7,9 +7,7 @@ package dashboard
 import (
 	"bufio"
 	"context"
-	"net"
 	"net/http"
-	"strconv"
 	"testing"
 	"time"
 
@@ -50,26 +48,6 @@ func (ts *testSamples) toArray() []metrics.SampleContainer {
 	return []metrics.SampleContainer{ts}
 }
 
-func getRandomPort(t *testing.T) int {
-	t.Helper()
-
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
-
-	assert.NoError(t, err)
-
-	port := listener.Addr().(*net.TCPAddr).Port //nolint:forcetypeassert
-
-	assert.NoError(t, listener.Close())
-
-	return port
-}
-
-func getRandomAddr(t *testing.T) string {
-	t.Helper()
-
-	return net.JoinHostPort("127.0.0.1", strconv.Itoa(getRandomPort(t)))
-}
-
 func readSSE(t *testing.T, nlines int, loc string) []string {
 	t.Helper()
 
@@ -108,6 +86,10 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 	}
 
 	assert.Equal(t, nlines, len(lines))
+
+	cancel()
+
+	time.Sleep(10 * time.Millisecond) // allow unsubscribe to run
 
 	return lines
 }

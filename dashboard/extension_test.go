@@ -91,13 +91,17 @@ func testReadSSE(t *testing.T, nlines int) []string {
 	assert.NoError(t, err)
 	assert.NoError(t, ext.Start())
 
-	time.Sleep(time.Millisecond)
+	done := make(chan struct{})
 
 	go func() {
 		sample := testSample(t, "foo", metrics.Counter, 1)
 
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
+
+		done <- struct{}{}
 	}()
+
+	<-done
 
 	lines := readSSE(t, nlines, "http://"+ext.options.addr()+"/events")
 
@@ -206,12 +210,10 @@ func TestExtension_random_port(t *testing.T) {
 func TestExtension_error_used_port(t *testing.T) {
 	t.Parallel()
 
-	port := getRandomPort(t)
-
 	var params output.Params
 
 	params.Logger = logrus.StandardLogger()
-	params.ConfigArgument = "port=" + strconv.Itoa(port)
+	params.ConfigArgument = "port=0"
 	params.FS = fsext.NewMemMapFs()
 
 	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
@@ -220,6 +222,8 @@ func TestExtension_error_used_port(t *testing.T) {
 	assert.NotNil(t, ext)
 
 	assert.NoError(t, ext.Start())
+
+	params.ConfigArgument = "port=" + strconv.Itoa(ext.options.Port)
 
 	ext2, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
 

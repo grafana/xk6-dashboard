@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -31,21 +30,18 @@ func Test_sendEvent(t *testing.T) {
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Connection", "keep-alive")
 
-	started := make(chan struct{})
-
-	go func() {
-		started <- struct{}{}
-
-		src.ServeHTTP(rec, req)
-	}()
-
-	<-started
-
-	time.Sleep(time.Millisecond)
-
 	src.onEvent("foo", map[string]interface{}{"answer": 42})
 
-	time.Sleep(time.Millisecond)
+	done := make(chan struct{})
+
+	go func() {
+		src.ServeHTTP(rec, req)
+		done <- struct{}{}
+	}()
+
+	cancel()
+
+	<-done
 
 	res := rec.Result() //nolint:bodyclose
 
@@ -78,17 +74,16 @@ func Test_send_earlier_events(t *testing.T) {
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Connection", "keep-alive")
 
-	started := make(chan struct{})
+	done := make(chan struct{})
 
 	go func() {
-		started <- struct{}{}
-
 		src.ServeHTTP(rec, req)
+		done <- struct{}{}
 	}()
 
-	<-started
+	cancel()
 
-	time.Sleep(10 * time.Millisecond)
+	<-done
 
 	res := rec.Result() //nolint:bodyclose
 
@@ -99,6 +94,4 @@ func Test_send_earlier_events(t *testing.T) {
 	assert.NoError(t, err)
 
 	assert.Equal(t, "id: 0\ndata: {\"answer\":42}\nevent: foo\n\n", string(data))
-
-	cancel()
 }

@@ -21,13 +21,11 @@ func Test_newWebServer(t *testing.T) {
 	assert.NotNil(t, srv.ServeMux)
 	assert.NotNil(t, srv.eventEmitter)
 
-	addr := getRandomAddr(t)
-
-	_, err := srv.listenAndServe(addr)
+	addr, err := srv.listenAndServe("127.0.0.1:0")
 
 	assert.NoError(t, err)
 
-	base := "http://" + addr
+	base := "http://" + addr.String()
 
 	testLoc := func(loc string) {
 		res, eerr := http.Get(base + loc) //nolint:bodyclose,noctx
@@ -51,12 +49,11 @@ func Test_webServer_used_addr(t *testing.T) {
 
 	srv := newWebServer(testDirUI(t), http.NotFoundHandler(), logrus.StandardLogger())
 
-	addr := getRandomAddr(t)
+	addr, err := srv.listenAndServe("127.0.0.1:0")
 
-	_, err := srv.listenAndServe(addr)
 	assert.NoError(t, err)
 
-	_, err = srv.listenAndServe(addr)
+	_, err = srv.listenAndServe(addr.String())
 
 	assert.Error(t, err)
 }
