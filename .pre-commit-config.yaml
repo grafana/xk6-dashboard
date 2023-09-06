@@ -1,11 +1,18 @@
 # SPDX-FileCopyrightText: 2023 Iván Szkiba
+# SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 #
+# SPDX-License-Identifier: AGPL-3.0-only
 # SPDX-License-Identifier: MIT
 
 default_install_hook_types: [pre-push]
 default_stages: [pre-push]
 
 repos:
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v2.1.0
+    hooks:
+    - id: reuse
+
   - repo: https://github.com/golangci/golangci-lint
     rev: v1.54.1
     hooks:

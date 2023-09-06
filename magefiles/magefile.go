@@ -1,5 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Iván Szkiba
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
+// SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
 //go:build mage
@@ -30,7 +32,11 @@ func Build() error {
 
 // Generate generate go sources and assets
 func Generate() error {
-	return generate()
+	if err := generate(); err != nil {
+		return err
+	}
+
+	return License()
 }
 
 // run tests
@@ -110,5 +116,16 @@ func Testdata() error {
 		"--out",
 		"json="+gz,
 		filepath.Join("scripts", "test.js"),
+	)
+}
+
+// update license headers
+func License() error {
+	return sh.Run(
+		"reuse", "annotate",
+		"--copyright", "Raintank, Inc. dba Grafana Labs",
+		"--merge-copyrights",
+		"--license", "AGPL-3.0-only",
+		"--skip-unrecognised", "--recursive", ".",
 	)
 }
