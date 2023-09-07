@@ -1,4 +1,4 @@
-# Contributing to k6
+# Contributing to xk6-dashboard
 
 Thank you for your interest in contributing to xk6-dashboard!
 
