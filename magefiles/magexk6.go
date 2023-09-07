@@ -74,6 +74,26 @@ func hasAssets() bool {
 	return exists(filepath.Join("assets", "package.json"))
 }
 
+func findPip() (string, bool) {
+	if _, err := exec.LookPath("pipx"); err == nil {
+		return "pipx", true
+	}
+
+	if _, err := exec.LookPath("pip"); err == nil {
+		return "pip", true
+	}
+
+	return "", false
+}
+
+func hasReuse() bool {
+	if _, err := exec.LookPath("reuse"); err != nil {
+		return false
+	}
+
+	return true
+}
+
 // tools downloads k6 golangci-lint configuration, golangci-lint and xk6 binary.
 func tools() error {
 	resp, err := http.Get("https://raw.githubusercontent.com/grafana/k6/master/.golangci.yml")
@@ -130,6 +150,12 @@ func tools() error {
 		}
 	}
 
+	if pip, ok := findPip(); ok && !hasReuse() {
+		if err := sh.Run(pip, "install", "reuse"); err != nil {
+			return err
+		}
+	}
+
 	return linter.Ensure()
 }
 
@@ -150,8 +176,17 @@ func lint() error {
 	mg.Deps(tools)
 
 	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "golangci-lint", "run")
+	if err != nil {
+		return err
+	}
 
-	return err
+	if hasReuse() {
+		_, err := sh.Exec(nil, os.Stdout, os.Stderr, "reuse", "lint", "-q")
+
+		return err
+	}
+
+	return nil
 }
 
 func generate() error {
@@ -165,7 +200,7 @@ func generate() error {
 		return sh.Run("yarn", "--silent", "--cwd", "assets", "build")
 	}
 
-	return nil
+	return license()
 }
 
 func coverprofile() string {
@@ -202,6 +237,7 @@ func test() error {
 }
 
 func cover() error {
+	mg.Deps(test)
 	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "go", "tool", "cover", "-html="+coverprofile())
 	return err
 }
@@ -223,3 +259,25 @@ func clean() error {
 
 	return nil
 }
+
+func license() error {
+	mg.Deps(tools)
+
+	if !hasReuse() {
+		fmt.Println("reuse tool missing, you should update license information manually")
+		return nil
+	}
+
+	return sh.Run(
+		"reuse", "annotate",
+		"--copyright", optCopyright,
+		"--merge-copyrights",
+		"--license", optLicense,
+		"--skip-unrecognised", "--recursive", ".",
+	)
+}
+
+var (
+	optCopyright = "Raintank, Inc. dba Grafana Labs"
+	optLicense   = "AGPL-3.0-only"
+)

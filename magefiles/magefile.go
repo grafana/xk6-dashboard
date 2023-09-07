@@ -32,11 +32,7 @@ func Build() error {
 
 // Generate generate go sources and assets
 func Generate() error {
-	if err := generate(); err != nil {
-		return err
-	}
-
-	return License()
+	return generate()
 }
 
 // run tests
@@ -46,7 +42,6 @@ func Test() error {
 
 // show HTML coverage report
 func Cover() error {
-	Test()
 	return cover()
 }
 
@@ -122,11 +117,5 @@ func Testdata() error {
 
 // update license headers
 func License() error {
-	return sh.Run(
-		"reuse", "annotate",
-		"--copyright", "Raintank, Inc. dba Grafana Labs",
-		"--merge-copyrights",
-		"--license", "AGPL-3.0-only",
-		"--skip-unrecognised", "--recursive", ".",
-	)
+	return license()
 }
