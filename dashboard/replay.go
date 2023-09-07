@@ -133,16 +133,16 @@ func (rep *replayer) addMetricSamples(samples []metrics.SampleContainer) {
 	})
 
 	if firstTime.Sub(rep.timestamp) > rep.options.Period {
-		samples = rep.buffer.GetBufferedSamples()
+		flushed := rep.buffer.GetBufferedSamples()
 		now := firstTime
 
 		rep.updateAndSend(
-			samples,
+			flushed,
 			newMeter(rep.options.Period, now, rep.options.Tags),
 			snapshotEvent,
 			now,
 		)
-		rep.updateAndSend(samples, rep.cumulative, cumulativeEvent, now)
+		rep.updateAndSend(flushed, rep.cumulative, cumulativeEvent, now)
 
 		rep.timestamp = now
 	}
