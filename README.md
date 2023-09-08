@@ -147,6 +147,7 @@ port      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no
 period    | Event emitting frequency (default: `10s`), example: `1m`
 open      | Set to `true` (or empty) to open the browser window automatically
 report    | File name to save the report (default: "", empty, the report will not be saved)
+record    | File name to save the dashboard events (default: "", empty, the events will not be saved)
 tag       | Precomputed metric tag name(s) (default: "group"), can be specified more than once
 
 ## Docker
@@ -316,7 +317,8 @@ Usage:
   k6 dashboard [command]
 
 Available Commands:
-  replay      load the saved JSON results and replay it for the dashboard UI
+  aggregate   convert saved json output to recorded dashboard events
+  replay      load the recorded dashboard events and replay it for the UI
 
 Flags:
   -h, --help   help for dashboard
@@ -324,13 +326,14 @@ Flags:
 Use "k6 dashboard [command] --help" for more information about a command.
 ```
 
-At the moment, the `dashboard` command has only one subcommand, `replay`, which can be used to play back test run results previously saved in JSON format from k6.
+At the moment, the `dashboard` command has two subcommand, `replay` (which can be used to play back dashboard events previously saved with `record` parameter) and `aggregate` (which can be used to convert test run results previously saved in JSON format from k6 to dashboard events format NDJSON).
+
 
 ```sh
 $ ./k6 dashboard replay --help
 
-The replay command will load the saved JSON results and replay it in the dashboard UI.
-The compressed file will automatically be decompressed if the file extension is .gz
+The replay command load the recorded dashboard events (NDJSON format) and replay it for the dashboard UI.
+The compressed file will be automatically decompressed if the file extension is .gz
 
 Usage:
   k6 dashboard replay file [flags]
@@ -338,21 +341,40 @@ Usage:
 Flags:
       --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
       --open            Open browser window automatically
-      --period 1m       Event emitting frequency, example: 1m (default 10s)
       --port int        TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080 (default 5665)
       --report string   Report file location (default: '', no report)
-      --tags strings    Precomputed metric tags (default [group]) can be specified more than once
   -h, --help            help for replay
 ```
 
-The `replay` command expects a JSON (or gzip-compressed JSON) file as an argument. Flags with the same name and meaning as the extension parameters can be used in the `replay` command.
+```
+$ ./k6 dashboard aggregate --help
+
+The aggregate command converts the file saved by json output to dashboard format events file.
+The files will be automatically compressed/decompressed if the file extension is .gz
+
+Usage:
+  k6 dashboard aggregate input-file output-file [flags]
+
+Flags:
+      --period 1m      Event emitting frequency, example: 1m (default 10s)
+      --tags strings   Precomputed metric tags, can be specified more than once (default [group])
+  -h, --help           help for aggregate
+```
 
 
-To visualize the result of a previous test run:
+To visualize the result of a previous test run (using events file):
 
 ```
+./k6 run --out dashboard=record=test_result.ndjson script.js
+./k6 dashboard replay test_result.ndjson
+```
+
+To visualize the result of a previous test run (using json output):
+
+```sh
 ./k6 run --out json=test_result.json script.js
-./k6 dashboard replay test_result.json
+./k6 dashboard aggregate test_result.json test_result.ndjson
+./k6 dashboard replay test_result.ndjson
 ```
 
 ### Docker

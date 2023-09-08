@@ -2,10 +2,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package customize
+package dashboard
 
 import (
-	"context"
 	_ "embed"
 	"testing"
 
@@ -14,29 +13,75 @@ import (
 	logtest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
-	"go.k6.io/k6/cmd/state"
-	"go.k6.io/k6/cmd/tests"
 )
 
-//go:embed testdata/config/config.json
-var testconfig []byte
-
-func TestConfigInReadme(t *testing.T) {
+func Test_loadConfigJSON(t *testing.T) {
 	t.Parallel()
 
-	state := state.NewGlobalState(context.Background())
+	th := helper(t).osFs()
 
-	conf, err := loadConfigJS("../.dashboard.js", testconfig, state)
+	conf, err := loadConfigJSON("testdata/customize/config.json", th.proc)
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	loader, err := newConfigLoader(testconfig, state)
+	_, err = loadConfigJSON("testdata/customize/config-bad.json", th.proc)
+
+	assert.Error(t, err)
+
+	_, err = loadConfigJSON("testdata/customize/config-not-exists.json", th.proc)
+
+	assert.Error(t, err)
+}
+
+func Test_customize(t *testing.T) {
+	t.Parallel()
+
+	th := helper(t)
+
+	conf, err := customize(testconfig, th.proc)
 
 	assert.NoError(t, err)
 
-	_, err = loader.load("testdata/config-custom.js")
+	assert.False(t, gjson.GetBytes(conf, `tabs.#(id="custom")`).Exists())
+}
+
+func Test_customize_env_found(t *testing.T) { //nolint:paralleltest
+	t.Setenv("XK6_DASHBOARD_CONFIG", "testdata/customize/config-custom.js")
+
+	th := helper(t).osFs()
+
+	conf, err := customize(testconfig, th.proc)
+
+	assert.NoError(t, err)
+
+	assert.True(t, gjson.GetBytes(conf, `tabs.#(id="custom")`).Exists())
+
+	t.Setenv("XK6_DASHBOARD_CONFIG", "testdata/customize/config.json")
+
+	assert.NoError(t, err)
+}
+
+//go:embed testdata/customize/config/config.json
+var testconfig []byte
+
+func TestConfigInReadme(t *testing.T) {
+	t.Parallel()
+
+	th := helper(t).osFs()
+
+	conf, err := loadConfigJS("../.dashboard.js", testconfig, th.proc)
+
+	assert.NoError(t, err)
+
+	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
+
+	loader, err := newConfigLoader(testconfig, th.proc)
+
+	assert.NoError(t, err)
+
+	_, err = loader.load("testdata/customize/config-custom.js")
 
 	assert.NoError(t, err)
 }
@@ -90,26 +135,26 @@ func TestConfigConsoleJSON(t *testing.T) {
 func Test_loadConfigJS_error(t *testing.T) {
 	t.Parallel()
 
-	state := state.NewGlobalState(context.Background())
+	th := helper(t).osFs()
 
-	conf, err := loadConfigJSON("testdata/config.json", state)
+	conf, err := loadConfigJSON("testdata/customize/config.json", th.proc)
 
 	assert.NoError(t, err)
 
 	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
-	_, err = loadConfigJS("testdata/config-bad.json", testconfig, state)
+	_, err = loadConfigJS("testdata/customize/config-bad.json", testconfig, th.proc)
 
 	assert.Error(t, err)
 
-	_, err = loadConfigJS("testdata/config-not-exists.json", testconfig, state)
+	_, err = loadConfigJS("testdata/customize/config-not-exists.json", testconfig, th.proc)
 
 	assert.Error(t, err)
 
 	conf, err = loadConfigJS(
-		"testdata/config-custom.js",
+		"testdata/customize/config-custom.js",
 		[]byte("42='foo'"),
-		state,
+		th.proc,
 	)
 
 	assert.Nil(t, conf)
@@ -119,9 +164,9 @@ func Test_loadConfigJS_error(t *testing.T) {
 func Test_configLoader_eval_error(t *testing.T) {
 	t.Parallel()
 
-	state := tests.NewGlobalTestState(t).GlobalState
+	th := helper(t).osFs()
 
-	loader, err := newConfigLoader(testconfig, state)
+	loader, err := newConfigLoader(testconfig, th.proc)
 
 	assert.NoError(t, err)
 

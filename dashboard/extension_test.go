@@ -7,9 +7,7 @@
 package dashboard
 
 import (
-	"embed"
 	"fmt"
-	"io/fs"
 	"strconv"
 	"strings"
 	"testing"
@@ -23,39 +21,6 @@ import (
 	"go.k6.io/k6/output"
 )
 
-//go:embed testdata/ui testdata/brief testdata/config/config.json
-var testdata embed.FS
-
-func testConfig(t *testing.T) []byte {
-	t.Helper()
-
-	content, err := testdata.ReadFile("testdata/config/config.json")
-
-	assert.NoError(t, err)
-
-	return content
-}
-
-func testDirBrief(t *testing.T) fs.FS {
-	t.Helper()
-
-	subfs, err := fs.Sub(testdata, "testdata/brief")
-
-	assert.NoError(t, err)
-
-	return subfs
-}
-
-func testDirUI(t *testing.T) fs.FS {
-	t.Helper()
-
-	subfs, err := fs.Sub(testdata, "testdata/ui")
-
-	assert.NoError(t, err)
-
-	return subfs
-}
-
 func TestNewExtension(t *testing.T) {
 	t.Parallel()
 
@@ -65,7 +30,7 @@ func TestNewExtension(t *testing.T) {
 	params.OutputType = "dashboard"
 	params.FS = fsext.NewMemMapFs()
 
-	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -74,7 +39,7 @@ func TestNewExtension(t *testing.T) {
 
 	params.ConfigArgument = "period=2"
 
-	_, err = New(params, testConfig(t), embed.FS{}, embed.FS{})
+	_, err = New(params)
 
 	assert.Error(t, err)
 }
@@ -88,7 +53,7 @@ func testReadSSE(t *testing.T, nlines int) []string {
 	params.ConfigArgument = "period=10ms&port=0"
 	params.FS = fsext.NewMemMapFs()
 
-	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NoError(t, ext.Start())
@@ -105,7 +70,11 @@ func testReadSSE(t *testing.T, nlines int) []string {
 
 	<-done
 
-	lines := readSSE(t, nlines, "http://"+ext.options.addr()+"/events")
+	dashboard, ok := ext.(*extension)
+
+	assert.True(t, ok)
+
+	lines := readSSE(t, nlines, "http://"+dashboard.options.addr()+"/events")
 
 	assert.NotNil(t, lines)
 
@@ -168,14 +137,18 @@ func TestExtension_no_http(t *testing.T) {
 	params.ConfigArgument = "port=-1"
 	params.FS = fsext.NewMemMapFs()
 
-	ext, err := New(params, nil, embed.FS{}, embed.FS{})
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
 
 	assert.NoError(t, ext.Start())
 
-	assert.Equal(t, -1, ext.options.Port)
+	dashboard, ok := ext.(*extension)
+
+	assert.True(t, ok)
+
+	assert.Equal(t, -1, dashboard.options.Port)
 	assert.Equal(t, "bar", ext.Description())
 
 	assert.NoError(t, ext.Stop())
@@ -191,18 +164,22 @@ func TestExtension_random_port(t *testing.T) {
 	params.ConfigArgument = "port=0"
 	params.FS = fsext.NewMemMapFs()
 
-	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
 
 	assert.NoError(t, ext.Start())
 
-	assert.Greater(t, ext.options.Port, 0)
+	dashboard, ok := ext.(*extension)
+
+	assert.True(t, ok)
+
+	assert.Greater(t, dashboard.options.Port, 0)
 
 	assert.Equal(
 		t,
-		fmt.Sprintf("foo (%s) %s", ext.options.addr(), ext.options.url()),
+		fmt.Sprintf("foo (%s) %s", dashboard.options.addr(), dashboard.options.url()),
 		ext.Description(),
 	)
 
@@ -218,16 +195,20 @@ func TestExtension_error_used_port(t *testing.T) {
 	params.ConfigArgument = "port=0"
 	params.FS = fsext.NewMemMapFs()
 
-	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
 
 	assert.NoError(t, ext.Start())
 
-	params.ConfigArgument = "port=" + strconv.Itoa(ext.options.Port)
+	dashboard, ok := ext.(*extension)
 
-	ext2, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
+	assert.True(t, ok)
+
+	params.ConfigArgument = "port=" + strconv.Itoa(dashboard.options.Port)
+
+	ext2, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext2)
@@ -244,7 +225,7 @@ func TestExtension_open(t *testing.T) { //nolint:paralleltest
 	params.ConfigArgument = "port=0&open"
 	params.FS = fsext.NewMemMapFs()
 
-	ext, err := New(params, testConfig(t), embed.FS{}, embed.FS{})
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -271,7 +252,7 @@ func TestExtension_report(t *testing.T) {
 	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
 	params.FS = osFS
 
-	ext, err := New(params, testConfig(t), embed.FS{}, testDirBrief(t))
+	ext, err := New(params)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
@@ -362,7 +343,7 @@ func Test_paramData_With(t *testing.T) {
 	assert.Equal(t, []string{"c > 1", "d > 0"}, param.Thresholds["bar"])
 	assert.Len(t, param.Thresholds, 2)
 
-	ext := new(Extension)
+	ext := new(extension)
 
 	ext.param = new(paramData)
 

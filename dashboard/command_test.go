@@ -8,7 +8,6 @@ package dashboard
 
 import (
 	"context"
-	"embed"
 	"strconv"
 	"testing"
 
@@ -21,7 +20,7 @@ func Test_buildRootCmd(t *testing.T) {
 
 	gs := state.NewGlobalState(context.Background())
 
-	cmd := buildRootCmd(testConfig(t), embed.FS{}, embed.FS{}, gs)
+	cmd := NewCommand(gs)
 
 	assert.NotNil(t, cmd)
 
@@ -45,7 +44,7 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	gs := state.NewGlobalState(context.Background())
 
-	cmd := buildRootCmd(testConfig(t), embed.FS{}, embed.FS{}, gs)
+	cmd := NewCommand(gs)
 
 	assert.NotNil(t, cmd)
 
@@ -67,7 +66,7 @@ func Test_buildRootCmd_reply_error(t *testing.T) {
 
 	gs := state.NewGlobalState(context.Background())
 
-	cmd := buildRootCmd(testConfig(t), embed.FS{}, embed.FS{}, gs)
+	cmd := NewCommand(gs)
 
 	assert.NotNil(t, cmd)
 

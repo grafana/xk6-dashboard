@@ -18,7 +18,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
 	"github.com/tidwall/gjson"
-	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
@@ -52,23 +51,18 @@ func closer(what io.Closer, logger logrus.FieldLogger) {
 	}
 }
 
-func aggregate(
-	input, output string,
-	opts *options,
-	osFS fsext.Fs,
-	logger logrus.FieldLogger,
-) error {
+func aggregate(input, output string, opts *options, proc *process) error {
 	agg := new(aggregator)
 
 	agg.registry = newRegistry()
 	agg.options = opts
-	agg.logger = logger
+	agg.logger = proc.logger
 	agg.seenMetrics = make(map[string]struct{})
 
 	var inputFile, outputFile afero.File
 	var err error
 
-	if inputFile, err = osFS.Open(input); err != nil {
+	if inputFile, err = proc.fs.Open(input); err != nil {
 		return err
 	}
 
@@ -79,12 +73,12 @@ func aggregate(
 			return err
 		}
 
-		defer closer(agg.input, logger)
+		defer closer(agg.input, proc.logger)
 	}
 
-	defer closer(inputFile, logger)
+	defer closer(inputFile, proc.logger)
 
-	if outputFile, err = osFS.Create(output); err != nil {
+	if outputFile, err = proc.fs.Create(output); err != nil {
 		return err
 	}
 
@@ -93,10 +87,10 @@ func aggregate(
 	if strings.HasSuffix(output, gzSuffix) {
 		agg.writer = gzip.NewWriter(outputFile)
 
-		defer closer(agg.writer, logger)
+		defer closer(agg.writer, proc.logger)
 	}
 
-	defer closer(outputFile, logger)
+	defer closer(outputFile, proc.logger)
 
 	agg.encoder = json.NewEncoder(agg.writer)
 

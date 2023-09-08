@@ -119,6 +119,10 @@ func Testdata() error {
 		"--out",
 		"json="+gz,
 		filepath.Join("scripts", "test.js"),
+		"--out",
+		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(out, ".json", ".ndjson"),
+		"--out",
+		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(gz, ".json", ".ndjson"),
 	)
 }
 

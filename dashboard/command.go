@@ -7,9 +7,6 @@
 package dashboard
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/fs"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,16 +15,6 @@ import (
 	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/lib/consts"
 )
-
-// Execute executes dashboard command.
-func Execute(gs *state.GlobalState, uiConfig json.RawMessage, uiFS fs.FS, briefFS fs.FS) {
-	if err := buildRootCmd(uiConfig, uiFS, briefFS, gs).Execute(); err != nil {
-		fmt.Fprintln(gs.Stderr, err)
-		gs.OSExit(1)
-	}
-
-	gs.OSExit(0)
-}
 
 const (
 	flagHost   = "host"
@@ -38,12 +25,11 @@ const (
 	flagTags   = "tags"
 )
 
-func buildRootCmd(
-	uiConfig json.RawMessage,
-	uiFS fs.FS,
-	briefFS fs.FS,
-	gs *state.GlobalState,
-) *cobra.Command {
+// NewCommand build dashboard command.
+func NewCommand(gs *state.GlobalState) *cobra.Command {
+	proc := new(process).fromGlobalState(gs)
+	assets := newCustomizedAssets(proc)
+
 	rootCmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "k6",
 		Short: "a next-generation load generator",
@@ -57,28 +43,23 @@ func buildRootCmd(
 
 	rootCmd.AddCommand(dashboardCmd)
 
-	dashboardCmd.AddCommand(newReplayCommand(uiConfig, uiFS, briefFS, gs))
-	dashboardCmd.AddCommand(newAggregateCommand(gs))
+	dashboardCmd.AddCommand(newReplayCommand(assets, proc))
+	dashboardCmd.AddCommand(newAggregateCommand(proc))
 
 	return rootCmd
 }
 
-func newReplayCommand(
-	uiConfig json.RawMessage,
-	uiFS fs.FS,
-	briefFS fs.FS,
-	gs *state.GlobalState,
-) *cobra.Command {
+func newReplayCommand(assets *assets, proc *process) *cobra.Command {
 	opts := new(options)
 
 	cmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "replay file",
-		Short: "load the recorded dashboard output and replay it for the UI",
-		Long: `The replay command load the recorded dashboard output (NDJSON format) and replay it for the dashboard UI.
+		Short: "load the recorded dashboard events and replay it for the UI",
+		Long: `The replay command load the recorded dashboard events (NDJSON format) and replay it for the dashboard UI.
 The compressed file will be automatically decompressed if the file extension is .gz`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			err := replay(args[0], opts, uiConfig, uiFS, briefFS, gs.FS, gs.Logger)
+			err := replay(args[0], opts, assets, proc)
 			if err != nil {
 				return err
 			}
@@ -124,16 +105,16 @@ The compressed file will be automatically decompressed if the file extension is 
 	return cmd
 }
 
-func newAggregateCommand(gs *state.GlobalState) *cobra.Command {
+func newAggregateCommand(proc *process) *cobra.Command {
 	opts := new(options)
 	cmd := &cobra.Command{ //nolint:exhaustruct
 		Use:   "aggregate input-file output-file",
-		Short: "convert saved json output to recorded dashboard output",
-		Long: `The aggregate command converts the file saved by json output to dashboard format NDJSON file.
+		Short: "convert saved json output to recorded dashboard events",
+		Long: `The aggregate command converts the file saved by json output to dashboard format events file.
 The files will be automatically compressed/decompressed if the file extension is .gz`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return aggregate(args[0], args[1], opts, gs.FS, gs.Logger)
+			return aggregate(args[0], args[1], opts, proc)
 		},
 	}
 

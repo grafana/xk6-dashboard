@@ -10,13 +10,10 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"io"
-	"io/fs"
 	"strings"
 
 	"github.com/pkg/browser"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/afero"
-	"go.k6.io/k6/lib/fsext"
 )
 
 type replayer struct {
@@ -24,40 +21,24 @@ type replayer struct {
 
 	reader io.ReadCloser
 
-	logger logrus.FieldLogger
-
 	options *options
 
-	config json.RawMessage
-
-	briefFS fs.FS
-	uiFS    fs.FS
-	osFS    fsext.Fs
+	assets *assets
+	proc   *process
 }
 
-func replay(
-	input string,
-	opts *options,
-	uiConfig json.RawMessage,
-	uiFS fs.FS,
-	briefFS fs.FS,
-	osFS fsext.Fs,
-	logger logrus.FieldLogger,
-) error {
+func replay(input string, opts *options, assets *assets, proc *process) error {
 	rep := &replayer{
 		options:     opts,
-		uiFS:        uiFS,
-		briefFS:     briefFS,
-		osFS:        osFS,
-		logger:      logger,
-		config:      uiConfig,
+		assets:      assets,
+		proc:        proc,
 		eventSource: new(eventSource),
 	}
 
 	var inputFile afero.File
 	var err error
 
-	if inputFile, err = osFS.Open(input); err != nil {
+	if inputFile, err = proc.fs.Open(input); err != nil {
 		return err
 	}
 
@@ -68,21 +49,21 @@ func replay(
 			return err
 		}
 
-		defer closer(rep.reader, logger)
+		defer closer(rep.reader, proc.logger)
 	}
 
-	defer closer(inputFile, logger)
+	defer closer(inputFile, proc.logger)
 
 	return rep.run()
 }
 
 func (rep *replayer) run() error {
-	brf := newBriefer(rep.briefFS, rep.config, rep.options.Report, rep.osFS, rep.logger)
+	rptr := newReporter(rep.options.Report, rep.assets, rep.proc)
 
-	rep.addEventListener(brf)
+	rep.addEventListener(rptr)
 
 	if rep.options.Port >= 0 {
-		server := newWebServer(rep.uiFS, brf, rep.logger)
+		server := newWebServer(rep.assets.ui, rptr, rep.proc.logger)
 
 		rep.addEventListener(server)
 
@@ -100,7 +81,11 @@ func (rep *replayer) run() error {
 		}
 	}
 
-	rep.fireEvent(configEvent, rep.config)
+	if err := rep.fireStart(); err != nil {
+		return err
+	}
+
+	rep.fireEvent(configEvent, rep.assets.config)
 
 	decoder := json.NewDecoder(rep.reader)
 
@@ -118,7 +103,7 @@ func (rep *replayer) run() error {
 		rep.fireEvent(input.Name, input.Data)
 	}
 
-	return nil
+	return rep.fireStop()
 }
 
 type replayerEnvelope struct {

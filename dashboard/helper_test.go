@@ -9,13 +9,64 @@ package dashboard
 import (
 	"bufio"
 	"context"
+	"embed"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"go.k6.io/k6/cmd/state"
+	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 )
+
+//go:embed testdata
+var testdata embed.FS
+
+type testHelper struct {
+	proc   *process
+	assets *assets
+}
+
+func newTestAssets(t *testing.T) *assets {
+	t.Helper()
+
+	const prefix = "testdata/assets/packages/"
+
+	config, err := testdata.ReadFile(prefix + "config/dist/config.json")
+	if err != nil {
+		panic(err)
+	}
+
+	return &assets{
+		ui:     assetDir(prefix+"ui/dist", testdata),
+		report: assetDir(prefix+"report/dist", testdata),
+		config: config,
+	}
+}
+
+func helper(t *testing.T) *testHelper {
+	t.Helper()
+
+	gs := state.NewGlobalState(context.Background())
+
+	proc := &process{
+		logger: gs.Logger,
+		fs:     fsext.NewMemMapFs(),
+		env:    gs.Env,
+	}
+
+	return &testHelper{
+		proc:   proc,
+		assets: newTestAssets(t),
+	}
+}
+
+func (th *testHelper) osFs() *testHelper {
+	th.proc.fs = fsext.NewOsFs()
+
+	return th
+}
 
 func testSample(t *testing.T, name string, typ metrics.MetricType, value float64) metrics.Sample {
 	t.Helper()

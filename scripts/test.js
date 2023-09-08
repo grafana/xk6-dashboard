@@ -10,7 +10,7 @@ export let options = {
     contacts: {
       executor: "constant-vus",
       vus: 2,
-      duration: '2s',
+      duration: "20s",
     },
   },
 };

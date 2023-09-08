@@ -10,15 +10,11 @@ import (
 	"io"
 	"strings"
 	"sync"
-
-	"github.com/sirupsen/logrus"
-	"go.k6.io/k6/lib/fsext"
 )
 
 type recorder struct {
 	output  string
-	outFS   fsext.Fs
-	logger  logrus.FieldLogger
+	proc    *process
 	mu      sync.RWMutex
 	encoder *json.Encoder
 	writer  io.WriteCloser
@@ -26,22 +22,17 @@ type recorder struct {
 
 var _ eventListener = (*recorder)(nil)
 
-func newRecorder(
-	output string,
-	outFS fsext.Fs,
-	logger logrus.FieldLogger,
-) *recorder {
+func newRecorder(output string, proc *process) *recorder {
 	rec := &recorder{
 		output: output,
-		outFS:  outFS,
-		logger: logger,
+		proc:   proc,
 	}
 
 	return rec
 }
 
 func (rec *recorder) onStart() error {
-	file, err := rec.outFS.Create(rec.output)
+	file, err := rec.proc.fs.Create(rec.output)
 	if err != nil {
 		return err
 	}
@@ -72,7 +63,7 @@ func (rec *recorder) onEvent(name string, data interface{}) {
 	event := &recorderEnvelope{Name: name, Data: data}
 
 	if err := rec.encoder.Encode(event); err != nil {
-		rec.logger.Warn(err)
+		rec.proc.logger.Warn(err)
 	}
 }
 

@@ -8,34 +8,30 @@
 package dashboard
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/fs"
 	"sync/atomic"
 	"time"
 
 	"github.com/pkg/browser"
-	"github.com/sirupsen/logrus"
 	"go.k6.io/k6/lib"
-	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
 	"go.k6.io/k6/output"
 )
 
-// Extension holds the runtime state of the dashboard extension.
-type Extension struct {
+// extension holds the runtime state of the dashboard extension.
+type extension struct {
 	*eventSource
+
+	assets  *assets
+	proc    *process
+	options *options
 
 	buffer *output.SampleBuffer
 
 	flusher *output.PeriodicFlusher
 	noFlush atomic.Bool
-	logger  logrus.FieldLogger
 
-	uiFS   fs.FS
 	server *webServer
-
-	options *options
 
 	cumulative *meter
 
@@ -45,24 +41,19 @@ type Extension struct {
 
 	name string
 
-	briefFS fs.FS
-
-	uiConfig json.RawMessage
-
 	param *paramData
-
-	osFS fsext.Fs
 }
 
-var _ output.Output = (*Extension)(nil)
+var _ output.Output = (*extension)(nil)
 
-// New creates Extension instance using the passwd uiFS as source of web UI.
-func New(
-	params output.Params,
-	uiConfig json.RawMessage,
-	uiFS fs.FS,
-	briefFS fs.FS,
-) (*Extension, error) {
+// New creates new dashboard extension instance.
+func New(params output.Params) (output.Output, error) {
+	assets := newCustomizedAssets(new(process).fromParams(params))
+
+	return newWithAssets(params, assets)
+}
+
+func newWithAssets(params output.Params, assets *assets) (*extension, error) {
 	opts, err := getopts(params.ConfigArgument)
 	if err != nil {
 		return nil, err
@@ -71,12 +62,9 @@ func New(
 	offset, _ := lib.GetEndOffset(params.ExecutionPlan)
 	period := opts.period(offset)
 
-	ext := &Extension{
-		uiFS:        uiFS,
-		briefFS:     briefFS,
-		uiConfig:    uiConfig,
-		osFS:        params.FS,
-		logger:      params.Logger,
+	ext := &extension{
+		assets:      assets,
+		proc:        &process{logger: params.Logger, fs: params.FS},
 		options:     opts,
 		name:        params.OutputType,
 		buffer:      nil,
@@ -93,7 +81,7 @@ func New(
 }
 
 // Description returns a human-readable description of the output.
-func (ext *Extension) Description() string {
+func (ext *extension) Description() string {
 	if ext.options.Port < 0 {
 		return ext.name
 	}
@@ -102,22 +90,22 @@ func (ext *Extension) Description() string {
 }
 
 // SetThresholds saves thresholds provided by k6 runtime.
-func (ext *Extension) SetThresholds(thresholds map[string]metrics.Thresholds) {
+func (ext *extension) SetThresholds(thresholds map[string]metrics.Thresholds) {
 	ext.param.withThresholds(thresholds)
 }
 
 // Start starts metrics aggregation and event streaming.
-func (ext *Extension) Start() error {
+func (ext *extension) Start() error {
 	if len(ext.options.Record) != 0 {
-		ext.addEventListener(newRecorder(ext.options.Record, ext.osFS, ext.logger))
+		ext.addEventListener(newRecorder(ext.options.Record, ext.proc))
 	}
 
-	brf := newBriefer(ext.briefFS, ext.uiConfig, ext.options.Report, ext.osFS, ext.logger)
+	brf := newReporter(ext.options.Report, ext.assets, ext.proc)
 
 	ext.addEventListener(brf)
 
 	if ext.options.Port >= 0 {
-		ext.server = newWebServer(ext.uiFS, brf, ext.logger)
+		ext.server = newWebServer(ext.assets.ui, brf, ext.proc.logger)
 		ext.addEventListener(ext.server)
 
 		addr, err := ext.server.listenAndServe(ext.options.addr())
@@ -145,7 +133,7 @@ func (ext *Extension) Start() error {
 
 	now := time.Now()
 
-	ext.fireEvent(configEvent, ext.uiConfig)
+	ext.fireEvent(configEvent, ext.assets.config)
 	ext.fireEvent(paramEvent, ext.param)
 
 	ext.updateAndSend(nil, newMeter(ext.period, now, ext.cumulative.tags), startEvent, now)
@@ -161,7 +149,7 @@ func (ext *Extension) Start() error {
 }
 
 // Stop flushes any remaining metrics and stops the extension.
-func (ext *Extension) Stop() error {
+func (ext *extension) Stop() error {
 	ext.noFlush.Store(true)
 
 	ext.flusher.Stop()
@@ -174,11 +162,11 @@ func (ext *Extension) Stop() error {
 }
 
 // AddMetricSamples adds the given metric samples to the internal buffer.
-func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
+func (ext *extension) AddMetricSamples(samples []metrics.SampleContainer) {
 	ext.buffer.AddMetricSamples(samples)
 }
 
-func (ext *Extension) flush() {
+func (ext *extension) flush() {
 	if ext.noFlush.Load() { // skip the last fraction period (called when flusher stops)
 		return
 	}
@@ -190,7 +178,7 @@ func (ext *Extension) flush() {
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
-func (ext *Extension) updateAndSend(
+func (ext *extension) updateAndSend(
 	containers []metrics.SampleContainer,
 	met *meter,
 	event string,
@@ -198,7 +186,7 @@ func (ext *Extension) updateAndSend(
 ) {
 	data, err := met.update(containers, now)
 	if err != nil {
-		ext.logger.WithError(err).Warn("Error while processing samples")
+		ext.proc.logger.WithError(err).Warn("Error while processing samples")
 
 		return
 	}

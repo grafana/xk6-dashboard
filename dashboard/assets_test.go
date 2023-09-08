@@ -13,55 +13,49 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_dir(t *testing.T) {
+func Test_assetDir(t *testing.T) {
 	t.Parallel()
 
-	fs := dir("hu")
+	fs := assetDir("hu", testdata)
 
 	assert.NotNil(t, fs)
 	assert.Panics(t, func() {
-		dir("..")
+		assetDir("..", testdata)
 	})
 }
 
-func Test_dirUI(t *testing.T) {
+func Test_newAssets(t *testing.T) {
 	t.Parallel()
 
-	fs := dirUI()
+	assertAssets(t, newTestAssets(t))
 
-	assert.NotNil(t, fs)
+	assertAssets(t, newAssets())
+}
 
-	file, err := fs.Open("index.html")
+func assertAssets(t *testing.T, assets *assets) {
+	t.Helper()
+
+	assert.NotNil(t, assets.ui)
+
+	file, err := assets.ui.Open("index.html")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, file)
 
 	assert.NoError(t, file.Close())
-}
 
-func Test_dirBrief(t *testing.T) {
-	t.Parallel()
+	assert.NotNil(t, assets.report)
 
-	fs := dirBrief()
-
-	assert.NotNil(t, fs)
-
-	file, err := fs.Open("index.html")
+	file, err = assets.report.Open("index.html")
 
 	assert.NoError(t, err)
 	assert.NotNil(t, file)
 
 	assert.NoError(t, file.Close())
-}
 
-func Test_fileConfig(t *testing.T) {
-	t.Parallel()
-
-	binary := fileConfig()
-
-	assert.NotNil(t, binary)
+	assert.NotNil(t, assets.config)
 
 	conf := map[string]interface{}{}
 
-	assert.NoError(t, json.Unmarshal(binary, &conf))
+	assert.NoError(t, json.Unmarshal(assets.config, &conf))
 }

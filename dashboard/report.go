@@ -12,62 +12,51 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"io/fs"
 	"net/http"
 	"path/filepath"
 	"sync"
-
-	"github.com/sirupsen/logrus"
-	"go.k6.io/k6/lib/fsext"
 )
 
-type briefer struct {
-	assets fs.FS
-	data   *briefData
+type reporter struct {
+	assets *assets
+	proc   *process
+
+	data   *reportData
 	output string
-	outFS  fsext.Fs
-	logger logrus.FieldLogger
 	mu     sync.RWMutex
 }
 
 var (
-	_ eventListener = (*briefer)(nil)
-	_ http.Handler  = (*briefer)(nil)
+	_ eventListener = (*reporter)(nil)
+	_ http.Handler  = (*reporter)(nil)
 )
 
-func newBriefer(
-	assets fs.FS,
-	config json.RawMessage,
-	output string,
-	outFS fsext.Fs,
-	logger logrus.FieldLogger,
-) *briefer {
-	brf := &briefer{ //nolint:exhaustruct
-		data:   newBriefData(config),
+func newReporter(output string, assets *assets, proc *process) *reporter {
+	rep := &reporter{ //nolint:exhaustruct
+		data:   newReportData(assets.config),
 		assets: assets,
+		proc:   proc,
 		output: output,
-		outFS:  outFS,
-		logger: logger,
 	}
 
-	return brf
+	return rep
 }
 
-func (brf *briefer) onStart() error {
+func (rep *reporter) onStart() error {
 	return nil
 }
 
-func (brf *briefer) onStop() error {
-	if len(brf.output) == 0 {
+func (rep *reporter) onStop() error {
+	if len(rep.output) == 0 {
 		return nil
 	}
 
-	file, err := brf.outFS.Create(brf.output)
+	file, err := rep.proc.fs.Create(rep.output)
 	if err != nil {
 		return err
 	}
 
-	compress := filepath.Ext(brf.output) == ".gz"
+	compress := filepath.Ext(rep.output) == ".gz"
 
 	var out io.WriteCloser = file
 
@@ -75,7 +64,7 @@ func (brf *briefer) onStop() error {
 		out = gzip.NewWriter(file)
 	}
 
-	if err := brf.exportHTML(out); err != nil {
+	if err := rep.exportHTML(out); err != nil {
 		return err
 	}
 
@@ -88,18 +77,18 @@ func (brf *briefer) onStop() error {
 	return file.Close()
 }
 
-func (brf *briefer) onEvent(name string, data interface{}) {
-	brf.mu.Lock()
-	defer brf.mu.Unlock()
+func (rep *reporter) onEvent(name string, data interface{}) {
+	rep.mu.Lock()
+	defer rep.mu.Unlock()
 
 	if name == cumulativeEvent {
-		brf.data.cumulative = data
+		rep.data.cumulative = data
 
 		return
 	}
 
 	if name == paramEvent {
-		brf.data.param = data
+		rep.data.param = data
 
 		return
 	}
@@ -107,7 +96,7 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 	if name == metricEvent {
 		if metrics, ok := data.(map[string]metricData); ok {
 			for key, value := range metrics {
-				brf.data.metrics[key] = value
+				rep.data.metrics[key] = value
 			}
 		}
 
@@ -118,43 +107,43 @@ func (brf *briefer) onEvent(name string, data interface{}) {
 		return
 	}
 
-	if brf.data.buff.Len() != 0 {
-		if _, err := brf.data.buff.WriteRune(','); err != nil {
-			brf.logger.Error(err)
+	if rep.data.buff.Len() != 0 {
+		if _, err := rep.data.buff.WriteRune(','); err != nil {
+			rep.proc.logger.Error(err)
 
 			return
 		}
 	}
 
-	if err := brf.data.encoder.Encode(data); err != nil {
-		if eerr := brf.data.encoder.Encode(nil); eerr != nil {
-			brf.logger.Error(err)
+	if err := rep.data.encoder.Encode(data); err != nil {
+		if eerr := rep.data.encoder.Encode(nil); eerr != nil {
+			rep.proc.logger.Error(err)
 		}
 
-		brf.logger.Error(err)
+		rep.proc.logger.Error(err)
 	}
 }
 
-func (brf *briefer) ServeHTTP(res http.ResponseWriter, _ *http.Request) {
+func (rep *reporter) ServeHTTP(res http.ResponseWriter, _ *http.Request) {
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	if err := brf.exportHTML(res); err != nil {
+	if err := rep.exportHTML(res); err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 	}
 }
 
-func (brf *briefer) exportJSON(out io.Writer) error {
-	brf.mu.RLock()
-	defer brf.mu.RUnlock()
+func (rep *reporter) exportJSON(out io.Writer) error {
+	rep.mu.RLock()
+	defer rep.mu.RUnlock()
 
-	return brf.data.exportJSON(out)
+	return rep.data.exportJSON(out)
 }
 
-func (brf *briefer) exportBase64(out io.Writer) error {
+func (rep *reporter) exportBase64(out io.Writer) error {
 	outB64 := base64.NewEncoder(base64.StdEncoding, out)
 	outGZ := gzip.NewWriter(outB64)
 
-	if err := brf.exportJSON(outGZ); err != nil {
+	if err := rep.exportJSON(outGZ); err != nil {
 		return err
 	}
 
@@ -165,8 +154,8 @@ func (brf *briefer) exportBase64(out io.Writer) error {
 	return outB64.Close()
 }
 
-func (brf *briefer) exportHTML(out io.Writer) error {
-	file, err := brf.assets.Open("index.html")
+func (rep *reporter) exportHTML(out io.Writer) error {
+	file, err := rep.assets.report.Open("index.html")
 	if err != nil {
 		return err
 	}
@@ -176,7 +165,7 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 		return err
 	}
 
-	html, err = brf.inject(out, html, []byte(dataTag), brf.exportBase64)
+	html, err = rep.inject(out, html, []byte(dataTag), rep.exportBase64)
 	if err != nil {
 		return err
 	}
@@ -188,7 +177,7 @@ func (brf *briefer) exportHTML(out io.Writer) error {
 	return nil
 }
 
-func (brf *briefer) inject(
+func (rep *reporter) inject(
 	out io.Writer,
 	html []byte,
 	tag []byte,
@@ -213,7 +202,7 @@ func (brf *briefer) inject(
 	return html[idx:], nil
 }
 
-type briefData struct {
+type reportData struct {
 	config     json.RawMessage
 	param      interface{}
 	buff       bytes.Buffer
@@ -222,8 +211,8 @@ type briefData struct {
 	metrics    map[string]metricData
 }
 
-func newBriefData(config []byte) *briefData {
-	data := new(briefData)
+func newReportData(config []byte) *reportData {
+	data := new(reportData)
 
 	data.config = config
 	data.metrics = make(map[string]metricData)
@@ -257,7 +246,7 @@ func encodeJSONprop(out io.Writer, prefix string, name string, value interface{}
 	return err
 }
 
-func (data *briefData) exportJSON(out io.Writer) error {
+func (data *reportData) exportJSON(out io.Writer) error {
 	if err := encodeJSONprop(out, "{", "cumulative", data.cumulative); err != nil {
 		return err
 	}
