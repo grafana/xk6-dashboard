@@ -25,6 +25,7 @@ const (
 	defaultPeriod = time.Second * 10
 	defaultOpen   = false
 	defaultReport = ""
+	defaultRecord = ""
 )
 
 func defaultTags() []string { return []string{"group"} }
@@ -35,6 +36,7 @@ type options struct {
 	Period time.Duration
 	Open   bool
 	Report string
+	Record string
 	Tags   []string `schema:"tag"`
 	TagsS  string   `schema:"tags"`
 }
@@ -46,6 +48,7 @@ func getopts(query string) (opts *options, err error) { //nolint:nonamedreturns
 		Period: defaultPeriod,
 		Open:   defaultOpen,
 		Report: defaultReport,
+		Record: defaultRecord,
 		Tags:   defaultTags(),
 		TagsS:  "",
 	}

@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"sync/atomic"
 	"time"
 
 	"github.com/pkg/browser"
@@ -28,6 +29,7 @@ type Extension struct {
 	buffer *output.SampleBuffer
 
 	flusher *output.PeriodicFlusher
+	noFlush atomic.Bool
 	logger  logrus.FieldLogger
 
 	uiFS   fs.FS
@@ -106,6 +108,10 @@ func (ext *Extension) SetThresholds(thresholds map[string]metrics.Thresholds) {
 
 // Start starts metrics aggregation and event streaming.
 func (ext *Extension) Start() error {
+	if len(ext.options.Record) != 0 {
+		ext.addEventListener(newRecorder(ext.options.Record, ext.osFS, ext.logger))
+	}
+
 	brf := newBriefer(ext.briefFS, ext.uiConfig, ext.options.Report, ext.osFS, ext.logger)
 
 	ext.addEventListener(brf)
@@ -156,6 +162,8 @@ func (ext *Extension) Start() error {
 
 // Stop flushes any remaining metrics and stops the extension.
 func (ext *Extension) Stop() error {
+	ext.noFlush.Store(true)
+
 	ext.flusher.Stop()
 
 	now := time.Now()
@@ -171,6 +179,10 @@ func (ext *Extension) AddMetricSamples(samples []metrics.SampleContainer) {
 }
 
 func (ext *Extension) flush() {
+	if ext.noFlush.Load() { // skip the last fraction period (called when flusher stops)
+		return
+	}
+
 	samples := ext.buffer.GetBufferedSamples()
 	now := time.Now()
 

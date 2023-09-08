@@ -19,11 +19,9 @@ import (
 func Test_buildRootCmd(t *testing.T) {
 	t.Parallel()
 
-	opts := new(options)
-
 	gs := state.NewGlobalState(context.Background())
 
-	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{}, gs)
+	cmd := buildRootCmd(testConfig(t), embed.FS{}, embed.FS{}, gs)
 
 	assert.NotNil(t, cmd)
 
@@ -45,11 +43,9 @@ func Test_buildRootCmd(t *testing.T) {
 func Test_buildRootCmd_reply(t *testing.T) {
 	t.Parallel()
 
-	opts := new(options)
-
 	gs := state.NewGlobalState(context.Background())
 
-	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{}, gs)
+	cmd := buildRootCmd(testConfig(t), embed.FS{}, embed.FS{}, gs)
 
 	assert.NotNil(t, cmd)
 
@@ -69,11 +65,9 @@ func Test_buildRootCmd_reply(t *testing.T) {
 func Test_buildRootCmd_reply_error(t *testing.T) {
 	t.Parallel()
 
-	opts := new(options)
-
 	gs := state.NewGlobalState(context.Background())
 
-	cmd := buildRootCmd(opts, testConfig(t), embed.FS{}, embed.FS{}, gs)
+	cmd := buildRootCmd(testConfig(t), embed.FS{}, embed.FS{}, gs)
 
 	assert.NotNil(t, cmd)
 
