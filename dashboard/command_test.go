@@ -8,6 +8,7 @@ package dashboard
 
 import (
 	"context"
+	"path/filepath"
 	"strconv"
 	"testing"
 
@@ -81,4 +82,24 @@ func Test_buildRootCmd_reply_error(t *testing.T) {
 	err = rep.RunE(rep, []string{"no such file"})
 
 	assert.Error(t, err)
+}
+
+func Test_buildRootCmd_report(t *testing.T) {
+	t.Parallel()
+
+	gs := state.NewGlobalState(context.Background())
+
+	cmd := NewCommand(gs)
+
+	assert.NotNil(t, cmd)
+
+	rep, _, err := cmd.Find([]string{"dashboard", "report"})
+
+	assert.NoError(t, err)
+
+	out := filepath.Join(t.TempDir(), "report.html")
+
+	err = rep.RunE(rep, []string{"testdata/result.ndjson.gz", out})
+
+	assert.NoError(t, err)
 }

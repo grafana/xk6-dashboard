@@ -319,6 +319,7 @@ Usage:
 Available Commands:
   aggregate   convert saved json output to recorded dashboard events
   replay      load the recorded dashboard events and replay it for the UI
+  report      create report from a recorded event file  
 
 Flags:
   -h, --help   help for dashboard
@@ -326,7 +327,7 @@ Flags:
 Use "k6 dashboard [command] --help" for more information about a command.
 ```
 
-At the moment, the `dashboard` command has two subcommand, `replay` (which can be used to play back dashboard events previously saved with `record` parameter) and `aggregate` (which can be used to convert test run results previously saved in JSON format from k6 to dashboard events format NDJSON).
+At the moment, the `dashboard` command has three subcommand, `replay` (which can be used to play back dashboard events previously saved with `record` parameter), `aggregate` (which can be used to convert test run results previously saved in JSON format from k6 to dashboard events format NDJSON) and `report` (which can be used to generate report from dashboard events previously saved with `record` parameter).
 
 
 ```sh
@@ -361,6 +362,19 @@ Flags:
   -h, --help           help for aggregate
 ```
 
+```
+$ ./k6 dashboard report --help
+
+The report command loads recorded dashboard events (NDJSON format) and creates a report.
+The compressed events file will be automatically decompressed if the file extension is .gz
+
+Usage:
+  k6 dashboard report events-file report-file [flags]
+
+Flags:
+      --open   Open browser window with generated report
+  -h, --help   help for report
+```
 
 To visualize the result of a previous test run (using events file):
 
@@ -375,6 +389,13 @@ To visualize the result of a previous test run (using json output):
 ./k6 run --out json=test_result.json script.js
 ./k6 dashboard aggregate test_result.json test_result.ndjson
 ./k6 dashboard replay test_result.ndjson
+```
+
+To generate report from previous test run (using events file):
+
+```
+./k6 run --out dashboard=record=test_result.ndjson script.js
+./k6 dashboard report test_result.ndjson test_result_report.html
 ```
 
 ### Docker

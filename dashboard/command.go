@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/lib/consts"
@@ -45,6 +46,7 @@ func NewCommand(gs *state.GlobalState) *cobra.Command {
 
 	dashboardCmd.AddCommand(newReplayCommand(assets, proc))
 	dashboardCmd.AddCommand(newAggregateCommand(proc))
+	dashboardCmd.AddCommand(newReportCommand(assets, proc))
 
 	return rootCmd
 }
@@ -134,6 +136,40 @@ The files will be automatically compressed/decompressed if the file extension is
 		defaultTags(),
 		"Precomputed metric tags, can be specified more than once",
 	)
+
+	return cmd
+}
+
+func newReportCommand(assets *assets, proc *process) *cobra.Command {
+	opts := new(options)
+
+	cmd := &cobra.Command{ //nolint:exhaustruct
+		Use:   "report events-file report-file",
+		Short: "create report from a recorded event file",
+		Long: `The report command loads recorded dashboard events (NDJSON format) and creates a report.
+The compressed events file will be automatically decompressed if the file extension is .gz`,
+		Args: cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			opts.Port = -1
+			opts.Report = args[1]
+
+			if err := replay(args[0], opts, assets, proc); err != nil {
+				return err
+			}
+
+			if opts.Open {
+				_ = browser.OpenFile(args[1])
+			}
+
+			return nil
+		},
+	}
+
+	cmd.Flags().SortFlags = false
+
+	flags := cmd.PersistentFlags()
+
+	flags.BoolVar(&opts.Open, flagOpen, defaultOpen, "Open browser window with generated report")
 
 	return cmd
 }
