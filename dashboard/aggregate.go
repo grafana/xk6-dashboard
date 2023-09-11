@@ -68,6 +68,8 @@ func aggregate(input, output string, opts *options, proc *process) error {
 
 	agg.input = inputFile
 
+	defer closer(inputFile, proc.logger)
+
 	if strings.HasSuffix(input, gzSuffix) {
 		if agg.input, err = gzip.NewReader(inputFile); err != nil {
 			return err
@@ -76,21 +78,19 @@ func aggregate(input, output string, opts *options, proc *process) error {
 		defer closer(agg.input, proc.logger)
 	}
 
-	defer closer(inputFile, proc.logger)
-
 	if outputFile, err = proc.fs.Create(output); err != nil {
 		return err
 	}
 
 	agg.writer = outputFile
 
+	defer closer(outputFile, proc.logger)
+
 	if strings.HasSuffix(output, gzSuffix) {
 		agg.writer = gzip.NewWriter(outputFile)
 
 		defer closer(agg.writer, proc.logger)
 	}
-
-	defer closer(outputFile, proc.logger)
 
 	agg.encoder = json.NewEncoder(agg.writer)
 
