@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
-import "./Brief.css";
+import "./Report.css";
 import { iterable } from "./util";
 import SummarySection from "./Summary";
 
@@ -66,9 +66,9 @@ function UsageSection(props) {
   );
 }
 
-export function Brief(props) {
+export function Report(props) {
   return (
-    <section className="container brief">
+    <section className="container report">
       <h1>k6 report</h1>
       <div>{reportSections(props.data.samples, props.config.tabs)}</div>
       <SummarySection

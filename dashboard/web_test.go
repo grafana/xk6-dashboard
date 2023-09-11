@@ -10,14 +10,15 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_newWebServer(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(testDirUI(t), http.NotFoundHandler(), logrus.StandardLogger())
+	th := helper(t)
+
+	srv := newWebServer(th.assets.ui, http.NotFoundHandler(), th.proc.logger)
 
 	assert.NotNil(t, srv)
 	assert.NotNil(t, srv.ServeMux)
@@ -49,7 +50,9 @@ func Test_newWebServer(t *testing.T) {
 func Test_webServer_used_addr(t *testing.T) {
 	t.Parallel()
 
-	srv := newWebServer(testDirUI(t), http.NotFoundHandler(), logrus.StandardLogger())
+	th := helper(t)
+
+	srv := newWebServer(th.assets.ui, http.NotFoundHandler(), th.proc.logger)
 
 	addr, err := srv.listenAndServe("127.0.0.1:0")
 

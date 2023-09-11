@@ -10,6 +10,7 @@ package main
 
 import (
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/sh"
 	"github.com/princjef/mageutil/shellcmd"
@@ -75,29 +76,35 @@ func Doc() error {
 	)
 }
 
-// Run run sample script
-func Run() error {
-	return xk6run(
-		"--out",
-		"dashboard='period=10s&report="+filepath.Join(workdir, "test_result_run.html"),
-		"script.js",
-	)
+func slug(script string) string {
+	return strings.ReplaceAll(script, "/", "-")
 }
 
-// Record record test result in JSON file
-func Record() error {
-	return xk6run("--out", "json="+filepath.Join(workdir, "test_result.json.gz"), "script.js")
+func out(script string) string {
+	report := filepath.Join(workdir, slug(script)+"-report.html")
+	record := filepath.Join(workdir, slug(script)+"-record.ndjson.gz")
+
+	return "dashboard=report=" + report + "&record=" + record
+}
+
+func jsonout(script string) string {
+	return "json=" + filepath.Join(workdir, slug(script)+"-result.json.gz")
+}
+
+// Run run sample script
+func Run(script string) error {
+	return xk6run("--out", out(script), "--out", jsonout(script), "script.js")
 }
 
 // Replay replay test from recorded JSON file
-func Replay() error {
+func Replay(script string) error {
+	record := filepath.Join(workdir, slug(script)+"-record.ndjson.gz")
+
 	return sh.Run(
 		"xk6",
 		"dashboard",
 		"replay",
-		"--report",
-		filepath.Join(workdir, "test_result_replay.html"),
-		filepath.Join(workdir, "test_result.json.gz"),
+		record,
 	)
 }
 
@@ -112,6 +119,10 @@ func Testdata() error {
 		"--out",
 		"json="+gz,
 		filepath.Join("scripts", "test.js"),
+		"--out",
+		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(out, ".json", ".ndjson"),
+		"--out",
+		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(gz, ".json", ".ndjson"),
 	)
 }
 

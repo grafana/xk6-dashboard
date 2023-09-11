@@ -2,40 +2,99 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-package customize
+package dashboard
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/dop251/goja"
 	"github.com/sirupsen/logrus"
-	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/js/compiler"
 	"go.k6.io/k6/lib"
+	"go.k6.io/k6/lib/fsext"
 )
+
+const (
+	defaultConfig    = ".dashboard.js"
+	defaultAltConfig = ".dashboard.json"
+)
+
+func findDefaultConfig(fs fsext.Fs) string {
+	if exists(fs, defaultConfig) {
+		return defaultConfig
+	}
+
+	if exists(fs, defaultAltConfig) {
+		return defaultAltConfig
+	}
+
+	return ""
+}
+
+// customize allows using custom dashboard configuration.
+func customize(uiConfig json.RawMessage, proc *process) (json.RawMessage, error) {
+	filename, ok := proc.env["XK6_DASHBOARD_CONFIG"]
+	if !ok || len(filename) == 0 {
+		if filename = findDefaultConfig(proc.fs); len(filename) == 0 {
+			return uiConfig, nil
+		}
+	}
+
+	if filepath.Ext(filename) == ".json" {
+		return loadConfigJSON(filename, proc)
+	}
+
+	return loadConfigJS(filename, uiConfig, proc)
+}
+
+func loadConfigJSON(filename string, proc *process) (json.RawMessage, error) {
+	file, err := proc.fs.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	bin, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	conf := map[string]interface{}{}
+
+	if err := json.Unmarshal(bin, &conf); err != nil {
+		return nil, err
+	}
+
+	return json.Marshal(conf)
+}
+
+func exists(fs fsext.Fs, filename string) bool {
+	if _, err := fs.Stat(filename); err != nil {
+		return false
+	}
+
+	return true
+}
 
 type configLoader struct {
 	runtime       *goja.Runtime
 	compiler      *compiler.Compiler
 	defaultConfig *goja.Object
-	state         *state.GlobalState
+	proc          *process
 }
 
-func newConfigLoader(
-	defaultConfig json.RawMessage,
-	state *state.GlobalState,
-) (*configLoader, error) {
-	comp := compiler.New(state.Logger)
+func newConfigLoader(defaultConfig json.RawMessage, proc *process) (*configLoader, error) {
+	comp := compiler.New(proc.logger)
 
 	comp.Options.CompatibilityMode = lib.CompatibilityModeExtended
 	comp.Options.Strict = true
 
-	con := newConfigConsole(state.Logger)
+	con := newConfigConsole(proc.logger)
 
 	runtime := goja.New()
 
@@ -54,14 +113,14 @@ func newConfigLoader(
 		runtime:       runtime,
 		compiler:      comp,
 		defaultConfig: def,
-		state:         state,
+		proc:          proc,
 	}
 
 	return loader, nil
 }
 
 func (loader *configLoader) load(filename string) (json.RawMessage, error) {
-	file, err := loader.state.FS.Open(filename)
+	file, err := loader.proc.fs.Open(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -150,9 +209,9 @@ func toObject(runtime *goja.Runtime, bin json.RawMessage) (*goja.Object, error) 
 func loadConfigJS(
 	filename string,
 	config json.RawMessage,
-	state *state.GlobalState,
+	proc *process,
 ) (json.RawMessage, error) {
-	loader, err := newConfigLoader(config, state)
+	loader, err := newConfigLoader(config, proc)
 	if err != nil {
 		return nil, err
 	}

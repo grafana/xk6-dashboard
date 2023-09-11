@@ -15,20 +15,27 @@ import (
 	"go.k6.io/k6/output"
 )
 
+const name = "dashboard"
+
 func init() {
 	gs := state.NewGlobalState(context.Background())
 
-	if len(gs.CmdArgs) > 1 && gs.CmdArgs[1] == "dashboard" {
-		dashboard.Execute(gs, fileConfig(), dirUI(), dirBrief())
+	if len(gs.CmdArgs) > 1 && gs.CmdArgs[1] == name {
+		execute(gs)
 	}
 
 	register()
 }
 
 func register() {
-	output.RegisterExtension("dashboard", ctor)
+	output.RegisterExtension(name, dashboard.New)
 }
 
-func ctor(params output.Params) (output.Output, error) { //nolint:ireturn
-	return dashboard.New(params, fileConfig(), dirUI(), dirBrief())
+func execute(gs *state.GlobalState) {
+	if err := dashboard.NewCommand(gs).Execute(); err != nil {
+		gs.Logger.Error(err)
+		gs.OSExit(1)
+	}
+
+	gs.OSExit(0)
 }

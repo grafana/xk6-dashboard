@@ -8,7 +8,7 @@ import { readFileSync } from "fs";
 import { gunzipSync, gzipSync } from "zlib";
 
 import config from "../config/dist/config.json";
-import custom from "../../../.dashboard.js";
+import custom from "../../../../.dashboard.js";
 
 let testdata = "";
 

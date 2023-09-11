@@ -71,7 +71,7 @@ func hasAssets() bool {
 		return false
 	}
 
-	return exists(filepath.Join("assets", "package.json"))
+	return exists(filepath.Join(assetsdir, "package.json"))
 }
 
 func findPip() (string, bool) {
@@ -144,12 +144,6 @@ func tools() error {
 		return err
 	}
 
-	if hasAssets() {
-		if err := sh.Run("yarn", "--silent", "--cwd", "assets", "install"); err != nil {
-			return err
-		}
-	}
-
 	if pip, ok := findPip(); ok && !hasReuse() {
 		if err := sh.Run(pip, "install", "reuse"); err != nil {
 			return err
@@ -197,7 +191,16 @@ func generate() error {
 	}
 
 	if hasAssets() {
-		return sh.Run("yarn", "--silent", "--cwd", "assets", "build")
+		if err := sh.Run("yarn", "--silent", "--cwd", assetsdir, "install"); err != nil {
+			return err
+		}
+
+		if err := sh.Run("yarn", "--silent", "--cwd", assetsdir, "build"); err != nil {
+			return err
+		}
+
+		// workaround begin: reuse tool has trouble with node_modules and can't ignore it
+		sh.Rm(filepath.Join(assetsdir, "node_modules"))
 	}
 
 	return license()
@@ -246,10 +249,10 @@ func clean() error {
 	sh.Rm("build")
 	sh.Rm(".bin")
 	sh.Rm("k6")
-	sh.Rm("assets/node_modules")
+	sh.Rm(filepath.Join(assetsdir, "node_modules"))
 
 	if hasAssets() {
-		dirs, err := filepath.Glob("assets/packages/*/node_modules")
+		dirs, err := filepath.Glob(filepath.Join(assetsdir, "packages/*/node_modules"))
 		if err == nil {
 			for _, file := range dirs {
 				sh.Rm(file)
@@ -280,4 +283,5 @@ func license() error {
 var (
 	optCopyright = "Raintank, Inc. dba Grafana Labs"
 	optLicense   = "AGPL-3.0-only"
+	assetsdir    = filepath.Join("dashboard", "assets")
 )

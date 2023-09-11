@@ -10,9 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"go.k6.io/k6/lib/fsext"
 )
 
 type errorWriter struct {
@@ -77,62 +75,66 @@ func recursiveJSON(t *testing.T) interface{} {
 func Test_briefer_exportJSON_error(t *testing.T) {
 	t.Parallel()
 
-	osFS := fsext.NewMemMapFs()
+	th := helper(t)
 
-	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
+	th.assets.config = nil
 
-	brf.data.cumulative = recursiveJSON(t)
+	rep := newReporter("", th.assets, th.proc)
 
-	assert.Error(t, brf.exportJSON(io.Discard))
+	rep.data.cumulative = recursiveJSON(t)
 
-	brf.data.cumulative = nil
+	assert.Error(t, rep.exportJSON(io.Discard))
+
+	rep.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
-	assert.Error(t, brf.exportJSON(out))
-	assert.Error(t, brf.exportJSON(out.reset(1)))
-	assert.Error(t, brf.exportJSON(out.reset(2)))
-	assert.Error(t, brf.exportJSON(out.reset(3)))
-	assert.Error(t, brf.exportJSON(out.reset(4)))
-	assert.Error(t, brf.exportJSON(out.reset(5)))
-	assert.Error(t, brf.exportJSON(out.reset(6)))
-	assert.Error(t, brf.exportJSON(out.reset(7)))
-	assert.Error(t, brf.exportJSON(out.reset(8)))
-	assert.Error(t, brf.exportJSON(out.reset(9)))
-	assert.Error(t, brf.exportJSON(out.reset(10)))
+	assert.Error(t, rep.exportJSON(out))
+	assert.Error(t, rep.exportJSON(out.reset(1)))
+	assert.Error(t, rep.exportJSON(out.reset(2)))
+	assert.Error(t, rep.exportJSON(out.reset(3)))
+	assert.Error(t, rep.exportJSON(out.reset(4)))
+	assert.Error(t, rep.exportJSON(out.reset(5)))
+	assert.Error(t, rep.exportJSON(out.reset(6)))
+	assert.Error(t, rep.exportJSON(out.reset(7)))
+	assert.Error(t, rep.exportJSON(out.reset(8)))
+	assert.Error(t, rep.exportJSON(out.reset(9)))
+	assert.Error(t, rep.exportJSON(out.reset(10)))
 
-	assert.NoError(t, brf.exportJSON(out.reset(11)))
+	assert.NoError(t, rep.exportJSON(out.reset(11)))
 	assert.Equal(t, emptyData, out.String())
 }
 
 func Test_briefer_exportBase64_error(t *testing.T) {
 	t.Parallel()
 
-	osFS := fsext.NewMemMapFs()
+	th := helper(t)
 
-	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
+	th.assets.config = nil
 
-	brf.data.cumulative = recursiveJSON(t)
+	rep := newReporter("", th.assets, th.proc)
 
-	assert.Error(t, brf.exportBase64(io.Discard))
+	rep.data.cumulative = recursiveJSON(t)
 
-	brf.data.cumulative = nil
+	assert.Error(t, rep.exportBase64(io.Discard))
+
+	rep.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
-	assert.Error(t, brf.exportBase64(out))
-	assert.NoError(t, brf.exportBase64(out.reset(math.MaxInt)))
+	assert.Error(t, rep.exportBase64(out))
+	assert.NoError(t, rep.exportBase64(out.reset(math.MaxInt)))
 	assert.Equal(t, emptyDataBase64, out.String())
 }
 
 func Test_briefer_inject_error(t *testing.T) {
 	t.Parallel()
 
-	osFS := fsext.NewMemMapFs()
+	th := helper(t)
 
-	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
+	rep := newReporter("", th.assets, th.proc)
 
-	file, err := testDirBrief(t).Open("index.html")
+	file, err := th.assets.report.Open("index.html")
 
 	assert.NoError(t, err)
 
@@ -143,10 +145,10 @@ func Test_briefer_inject_error(t *testing.T) {
 	out := newErrorWriter(t)
 
 	assert.Panics(t, func() {
-		_, _ = brf.inject(out, []byte{}, []byte(dataTag), nil)
+		_, _ = rep.inject(out, []byte{}, []byte(dataTag), nil)
 	})
 
-	_, err = brf.inject(out, html, []byte(dataTag), func(out io.Writer) error {
+	_, err = rep.inject(out, html, []byte(dataTag), func(out io.Writer) error {
 		_, err = out.Write([]byte("Hello, World!"))
 
 		return err
@@ -158,31 +160,31 @@ func Test_briefer_inject_error(t *testing.T) {
 func Test_briefer_onEvent(t *testing.T) {
 	t.Parallel()
 
-	osFS := fsext.NewMemMapFs()
+	th := helper(t)
 
-	brf := newBriefer(testDirBrief(t), nil, "", osFS, logrus.StandardLogger())
+	rep := newReporter("", th.assets, th.proc)
 
 	data := make(map[string]interface{})
 
-	brf.onEvent(snapshotEvent, data)
+	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n", brf.data.buff.String())
+	assert.Equal(t, "{}\n", rep.data.buff.String())
 
-	brf.onEvent(snapshotEvent, data)
+	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n,{}\n", brf.data.buff.String())
+	assert.Equal(t, "{}\n,{}\n", rep.data.buff.String())
 
 	data["bad"] = recursiveJSON(t)
 
-	brf.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
+	rep.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
 
-	assert.Equal(t, "{}\n,{}\n,null\n", brf.data.buff.String())
+	assert.Equal(t, "{}\n,{}\n,null\n", rep.data.buff.String())
 
 	data["foo"] = "bar"
 
-	brf.onEvent(cumulativeEvent, data)
+	rep.onEvent(cumulativeEvent, data)
 
-	assert.Equal(t, data, brf.data.cumulative)
+	assert.Equal(t, data, rep.data.cumulative)
 }
 
 const (

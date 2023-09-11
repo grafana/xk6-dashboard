@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: MIT
 
 import { render } from 'preact'
-import { Brief } from './Brief.jsx'
+import { Report } from './Report.jsx'
 import data from './data'
 
 import 'uplot/dist/uPlot.min.css';
@@ -14,4 +14,4 @@ import './styles.scss'
 
 import './index.css'
 
-data().then(d => render(<Brief data={d} config={d.config} />, document.getElementById('root')))
+data().then(d => render(<Report data={d} config={d.config} />, document.getElementById('root')))

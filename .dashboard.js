@@ -22,78 +22,86 @@ export default function (config) {
    * @returns the first element whose id property matches or is undefined if there are no results
    */
   function getById(id) {
-    return this.filter((/** @type {{ id: string; }} */ element) => element.id == id).at(0)
+    return this.filter(
+      (/** @type {{ id: string; }} */ element) => element.id == id
+    ).at(0);
   }
 
   // add getById method to all array
-  Array.prototype["getById"] = getById
+  Array.prototype["getById"] = getById;
 
   /**
    * helper for adding p(99) to existing chart
-   * @param {Chart} chart 
+   * @param {Chart} chart
    */
-  function addP99 (chart) {
-    chart.series = Object.assign({}, chart.series)
-    chart.series['http_req_duration.p(99)'] = { label: 'p(99)', format: 'duration' }
+  function addP99(chart) {
+    chart.series = Object.assign({}, chart.series);
+    chart.series["http_req_duration.p(99)"] = {
+      label: "p(99)",
+      format: "duration",
+    };
   }
 
   /**
    * define request duration panel
-   * @param {string} suffix 
+   * @param {string} suffix
    * @returns {Panel} panel
    */
-  function durationPanel (suffix) {
+  function durationPanel(suffix) {
     return {
       id: `http_req_duration_${suffix}`,
       title: `HTTP Request Duration ${suffix}`,
       metric: `http_req_duration_trend_${suffix}`,
-      format: 'duration'
-    }
+      format: "duration",
+    };
   }
-  
+
   /**
    * reference to overview tab from default config
    * @type {Tab}
    */
-  const overview = config.tabs.getById('overview_snapshot')
+  const overview = config.tabs.getById("overview_snapshot");
 
   /**
    * define custom panels
    * @type {Panel[]}
    */
   const customPanels = [
-    overview.panels.getById('vus'),
-    overview.panels.getById('http_reqs'),
-    durationPanel('avg'),
-    durationPanel('p(90)'),
-    durationPanel('p(95)'),
-    durationPanel('p(99)')
-  ]
+    overview.panels.getById("vus"),
+    overview.panels.getById("http_reqs"),
+    durationPanel("avg"),
+    durationPanel("p(90)"),
+    durationPanel("p(95)"),
+    durationPanel("p(99)"),
+  ];
 
   /**
    * copy of the http_req_duration chart form default config
    * @type {Chart}
    */
-  const durationChart = Object.assign({}, overview.charts.getById('http_req_duration'))
+  const durationChart = Object.assign(
+    {},
+    overview.charts.getById("http_req_duration")
+  );
 
   // and add p(99)
-  addP99(durationChart)
+  addP99(durationChart);
 
   /**
    * custom tab definition
    * @type {Tab}
    */
   const customTab = {
-    id: 'custom',
-    title: 'Custom',
+    id: "custom",
+    title: "Custom",
     event: overview.event,
     panels: customPanels,
-    charts: [overview.charts.getById('http_reqs'), durationChart],
-    description: 'Example of customizing the display of metrics.'
-  }
+    charts: [overview.charts.getById("http_reqs"), durationChart],
+    description: "Example of customizing the display of metrics.",
+  };
 
   // add custom tab to configuration
-  config.tabs.push(customTab)
+  config.tabs.push(customTab);
 
-  return config
+  return config;
 }
