@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+
+SPDX-License-Identifier: AGPL-3.0-only
+-->
+
 xk6-dashboard `<version>` is here 🎉! This release includes:
 
 - (_optional_) `<highlight of breaking changes>`
