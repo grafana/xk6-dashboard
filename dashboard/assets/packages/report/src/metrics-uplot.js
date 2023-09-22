@@ -4,26 +4,26 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
-import { format } from "./format";
+import { format } from "@xk6-dashboard/view";
 
 const palette = [
-  '#7b65fa',
-  '#65d1fa',
-  '#af8b47',
-  '#fa7765',
-  '#4792af',
-  '#af5347',
-  '#4f5aaf',
-  '#9e65fa', //
-  '#d95f02',
-  '#1b9e77',
-  '#7570b3',
-  '#e7298a',
-  '#66a61e',
-  '#e6ab02',
-  '#a6761d',
-  '#666666'
-]
+  "#7b65fa",
+  "#65d1fa",
+  "#af8b47",
+  "#fa7765",
+  "#4792af",
+  "#af5347",
+  "#4f5aaf",
+  "#9e65fa", //
+  "#d95f02",
+  "#1b9e77",
+  "#7570b3",
+  "#e7298a",
+  "#66a61e",
+  "#e6ab02",
+  "#a6761d",
+  "#666666",
+];
 
 function formatter(kind) {
   return function (self, val, seriesIdx, dataIdx) {

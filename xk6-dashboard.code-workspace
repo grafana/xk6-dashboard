@@ -9,16 +9,20 @@
 			"path": "."
 		},
 		{
-			"name": "📦 @xk6-dashboard/brief",
-			"path": "assets/packages/brief"
+			"name": "📦 @xk6-dashboard/report",
+			"path": "dashboard/assets/packages/report"
+		},
+		{
+			"name": "📦 @xk6-dashboard/config",
+			"path": "dashboard/assets/packages/config"
 		},
 		{
 			"name": "📦 @xk6-dashboard/model",
-			"path": "assets/packages/model"
+			"path": "dashboard/assets/packages/model"
 		},
 		{
 			"name": "📦 @xk6-dashboard/ui",
-			"path": "assets/packages/ui"
+			"path": "dashboard/assets/packages/ui"
 		}
 	],
 	"settings": {
@@ -31,6 +35,7 @@
 		"go.lintFlags": [
 		  "--fast"
 		],
-		"standard.autoFixOnSave": true
+		"standard.autoFixOnSave": true,
+		"eslint.workingDirectories": []
 	}
 }

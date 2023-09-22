@@ -1,0 +1,34 @@
+{
+  "name": "@xk6-dashboard/view",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsup --no-splitting --entry.index src/index.ts --entry.config src/Config.ts --dts-resolve --format esm",
+    "dev": "tsup --no-splitting --entry.index src/index.ts --entry.config src/Config.ts --watch --dts-resolve --format esm",
+    "lint": "eslint --ext .js,.ts ."
+  },
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./config": "./dist/config.js"
+  },
+  "dependencies": {
+    "@types/numeral": "^2.0.2",
+    "@xk6-dashboard/model": "0.0.1",
+    "numeral": "^2.0.6",
+    "pretty-bytes": "^6.1.1",
+    "pretty-ms": "^8.0.0",
+    "uplot": "^1.6.25"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
+    "eslint": "^8.49.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.3",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,0 +1,10 @@
+.stat .u-title {
+  font-size: 1.5rem;
+  font-weight: 500 !important;
+  white-space: nowrap;
+}
+
+.stat .MuiCardContent-root {
+  padding: 5px;
+  padding-bottom: 5px !important;
+}

@@ -9,28 +9,31 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@cutting/use-get-parent-size": "^1.26.2",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.13.0",
+    "@xk6-dashboard/config": "0.0.1",
     "@xk6-dashboard/model": "0.0.1",
-    "byte-size": "^8.1.1",
-    "humanize-duration": "^3.28.0",
-    "numeral": "^2.0.6",
-    "pretty-bytes": "^6.1.0",
-    "pretty-ms": "^8.0.0",
+    "@xk6-dashboard/view": "0.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hooks-sse": "^2.1.0",
-    "round-to": "^6.0.0",
     "uplot": "^1.6.24",
-    "uplot-react": "^1.1.4",
+    "uplot-react": "1.1.4",
     "vite-plugin-svgr": "^3.2.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@vitejs/plugin-react-swc": "^3.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-react": "^7.33.2",
+    "prettier": "3.0.2",
     "vite": "^4.1.0"
   }
 }

@@ -12,7 +12,4 @@ import testcontext from "./.testcontext";
 
 export default defineConfig({
   plugins: [preact(), viteSingleFile(), handlebars({ context: testcontext })],
-  build: {
-    // outDir: '../../brief'
-  },
 });

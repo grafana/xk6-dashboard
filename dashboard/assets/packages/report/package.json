@@ -9,14 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@xk6-dashboard/config": "0.0.1",
     "@xk6-dashboard/model": "0.0.1",
+    "@xk6-dashboard/view": "0.0.1",
     "bootstrap": "^5.3.1",
-    "byte-size": "^8.1.1",
-    "humanize-duration": "^3.28.0",
-    "numeral": "^2.0.6",
     "preact": "^10.16.0",
-    "pretty-bytes": "^6.1.0",
-    "pretty-ms": "^8.0.0",
+    "react": "npm:@preact/compat",
+    "react-dom": "npm:@preact/compat",
     "round-to": "^6.0.0",
     "uplot": "^1.6.24",
     "uplot-react": "^1.1.4"
