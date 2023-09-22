@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import React, { useRef, useState, useLayoutEffect } from "react"
 import { PropTypes } from "prop-types"
 import { Grid, Card, CardContent, Typography, useTheme } from "@mui/material"

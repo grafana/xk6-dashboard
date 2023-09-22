@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import React, { useContext } from "react"
 
 import { Button, IconButton, AppBar, Typography, Toolbar, useTheme } from "@mui/material"

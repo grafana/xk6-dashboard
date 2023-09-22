@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 export { UnitType } from "./UnitType.ts"
 
 export { Metric, Metrics, MetricType, ValueType, Query } from "./Metrics.ts"

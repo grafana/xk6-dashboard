@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import grpcFn, { options as grpcO } from "./demo-grpc.js";
 import wsFn, { options as wsO } from "./demo-ws.js";
 import browserFn, { options as browserO } from "./demo-browser.js";

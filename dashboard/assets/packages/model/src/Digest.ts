@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import { Metrics, Aggregate } from "./Metrics.ts"
 import { Samples } from "./Samples.ts"
 import { Summary } from "./Summary.ts"

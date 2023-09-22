@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import React from "react"
 import { Tabs, Tab as TabNav, Box } from "@mui/material"
 import { PropTypes } from "prop-types"

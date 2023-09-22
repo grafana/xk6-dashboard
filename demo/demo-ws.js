@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import { WebSocket } from "k6/experimental/websockets";
 import { check, sleep } from "k6";
 import smurfs from "./smurfs.js";
