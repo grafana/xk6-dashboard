@@ -210,7 +210,7 @@ Two kind of events will be emitted:
 
 The embedded user interface can be customized using a single JavaScript configuration file specified in the `XK6_DASHBOARD_CONFIG` environment variable (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module. The module's default export is a JavaScript function which returns a configuration object. The default configuration is passed as argument to the exported function.
 
-The default configuration is loaded from the [assets/packages/config/dist/config.json](assets/packages/config/dist/config.json) file, which can give you ideas for creating your own configuration.
+The default configuration is loaded from the [dashboard/assets/packages/config/dist/config.json](assets/packages/config/dist/config.json) file, which can give you ideas for creating your own configuration.
 
 > **Warning**
 > The format of the custom configuration has changed!
