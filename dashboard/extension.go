@@ -167,14 +167,13 @@ func (ext *extension) AddMetricSamples(samples []metrics.SampleContainer) {
 }
 
 func (ext *extension) flush() {
-	if ext.noFlush.Load() { // skip the last fraction period (called when flusher stops)
-		return
-	}
-
 	samples := ext.buffer.GetBufferedSamples()
 	now := time.Now()
 
-	ext.updateAndSend(samples, newMeter(ext.period, now, ext.options.Tags), snapshotEvent, now)
+	if !ext.noFlush.Load() { // skip the last fraction period for sanpshot (called when flusher stops)
+		ext.updateAndSend(samples, newMeter(ext.period, now, ext.options.Tags), snapshotEvent, now)
+	}
+
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 }
 
