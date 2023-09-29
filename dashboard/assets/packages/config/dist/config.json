@@ -8,65 +8,64 @@
             {
               "series": [
                 {
-                  "query": "iterations.rate"
+                  "query": "iterations[?!tags && rate]"
                 }
               ],
               "title": "Iteration Rate",
-              "id": "tab-0.section-0.panel-0",
-              "kind": "stat"
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-0"
             },
             {
               "series": [
                 {
-                  "query": "vus.value"
+                  "query": "vus[?!tags && value]"
                 }
               ],
               "title": "VUs",
-              "id": "tab-0.section-0.panel-1",
-              "kind": "stat"
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-1"
             },
             {
               "series": [
                 {
-                  "query": "http_reqs.rate"
+                  "query": "http_reqs[?!tags && rate]"
                 }
               ],
               "title": "HTTP Request Rate",
-              "id": "tab-0.section-0.panel-2",
-              "kind": "stat"
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-2"
             },
             {
               "series": [
                 {
-                  "query": "http_req_duration.avg"
+                  "query": "http_req_duration[?!tags && avg]"
                 }
               ],
               "title": "HTTP Request Duration",
-              "id": "tab-0.section-0.panel-3",
-              "kind": "stat"
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-3"
             },
             {
               "series": [
                 {
-                  "query": "data_received.rate"
+                  "query": "data_received[?!tags && rate]"
                 }
               ],
               "title": "Received Rate",
-              "id": "tab-0.section-0.panel-4",
-              "kind": "stat"
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-4"
             },
             {
               "series": [
                 {
-                  "query": "data_sent.rate"
+                  "query": "data_sent[?!tags && rate]"
                 }
               ],
               "title": "Sent Rate",
-              "id": "tab-0.section-0.panel-5",
-              "kind": "stat"
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-5"
             }
           ],
-          "columns": 6,
           "id": "tab-0.section-0"
         },
         {
@@ -74,12 +73,10 @@
             {
               "series": [
                 {
-                  "query": "vus.value",
-                  "legend": "VUs"
+                  "query": "vus[?!tags && value]"
                 },
                 {
-                  "query": "http_reqs.rate",
-                  "legend": "HTTP Request Rate"
+                  "query": "http_reqs[?!tags && rate ]"
                 }
               ],
               "title": "VUs",
@@ -89,12 +86,10 @@
             {
               "series": [
                 {
-                  "query": "data_received.rate",
-                  "legend": "data received"
+                  "query": "data_received[?!tags && rate]"
                 },
                 {
-                  "query": "data_sent.rate",
-                  "legend": "data sent"
+                  "query": "data_sent[?!tags && rate]"
                 }
               ],
               "title": "Transfer Rate",
@@ -104,51 +99,24 @@
             {
               "series": [
                 {
-                  "query": "http_req_duration.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_duration.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_duration.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_duration.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_duration[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "HTTP Request Duration",
-              "kind": "chart",
-              "id": "tab-0.section-1.panel-2"
+              "id": "tab-0.section-1.panel-2",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "iteration_duration.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "iteration_duration.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "iteration_duration.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "iteration_duration.p(99)",
-                  "legend": "p(99)"
+                  "query": "iteration_duration[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Iteration Duration",
-              "kind": "chart",
-              "id": "tab-0.section-1.panel-3"
+              "id": "tab-0.section-1.panel-3",
+              "kind": "chart"
             }
           ],
-          "columns": 2,
           "id": "tab-0.section-1"
         }
       ],
@@ -163,143 +131,64 @@
             {
               "series": [
                 {
-                  "query": "http_req_duration.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_duration.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_duration.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_duration.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_duration[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Duration",
-              "kind": "chart",
-              "id": "tab-1.section-0.panel-0"
+              "id": "tab-1.section-0.panel-0",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "http_req_waiting.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_waiting.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_waiting.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_waiting.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_waiting[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Waiting",
-              "kind": "chart",
-              "id": "tab-1.section-0.panel-1"
+              "id": "tab-1.section-0.panel-1",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "http_req_tls_handshaking.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_tls_handshaking.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_tls_handshaking.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_tls_handshaking.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_tls_handshaking[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "TLS handshaking",
-              "kind": "chart",
-              "id": "tab-1.section-0.panel-2"
+              "id": "tab-1.section-0.panel-2",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "http_req_sending.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_sending.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_sending.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_sending.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_sending[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Sending",
-              "kind": "chart",
-              "id": "tab-1.section-0.panel-3"
+              "id": "tab-1.section-0.panel-3",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "http_req_connecting.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_connecting.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_connecting.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_connecting.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_connecting[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Connecting",
-              "kind": "chart",
-              "id": "tab-1.section-0.panel-4"
+              "id": "tab-1.section-0.panel-4",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "http_req_receiving.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "http_req_receiving.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "http_req_receiving.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "http_req_receiving.p(99)",
-                  "legend": "p(99)"
+                  "query": "http_req_receiving[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Receiving",
-              "kind": "chart",
-              "id": "tab-1.section-0.panel-5"
+              "id": "tab-1.section-0.panel-5",
+              "kind": "chart"
             }
           ],
-          "columns": 2,
           "title": "HTTP",
           "summary": "These metrics are generated only when the test makes HTTP requests.",
           "id": "tab-1.section-0"
@@ -309,166 +198,74 @@
             {
               "series": [
                 {
-                  "query": "browser_http_req_duration.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_http_req_duration.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_http_req_duration.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_http_req_duration.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_http_req_duration[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Duration",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-0"
+              "id": "tab-1.section-1.panel-0",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "browser_web_vital_lcp.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_web_vital_lcp.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_web_vital_lcp.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_web_vital_lcp.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_web_vital_lcp[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Largest Contentful Paint",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-1"
+              "id": "tab-1.section-1.panel-1",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "browser_web_vital_fid.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_web_vital_fid.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_web_vital_fid.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_web_vital_fid.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_web_vital_fid[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "First Input Delay",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-2"
+              "id": "tab-1.section-1.panel-2",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "browser_web_vital_cls.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_web_vital_cls.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_web_vital_cls.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_web_vital_cls.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_web_vital_cls[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Cumulative Layout Shift",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-3"
+              "id": "tab-1.section-1.panel-3",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "browser_web_vital_ttfb.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_web_vital_ttfb.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_web_vital_ttfb.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_web_vital_ttfb.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_web_vital_ttfb[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Time to First Byte",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-4"
+              "id": "tab-1.section-1.panel-4",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "browser_web_vital_fcp.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_web_vital_fcp.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_web_vital_fcp.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_web_vital_fcp.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_web_vital_fcp[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "First Contentful Paint",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-5"
+              "id": "tab-1.section-1.panel-5",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "browser_web_vital_inp.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "browser_web_vital_inp.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "browser_web_vital_inp.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "browser_web_vital_inp.p(99)",
-                  "legend": "p(99)"
+                  "query": "browser_web_vital_inp[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Interaction to Next Paint",
-              "kind": "chart",
-              "id": "tab-1.section-1.panel-6"
+              "id": "tab-1.section-1.panel-6",
+              "kind": "chart"
             }
           ],
-          "columns": 2,
           "title": "Browser",
           "summary": "The k6 browser module emits its own metrics based on the Core Web Vitals and Other Web Vitals.",
           "id": "tab-1.section-1"
@@ -478,74 +275,34 @@
             {
               "series": [
                 {
-                  "query": "ws_connecting.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "ws_connecting.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "ws_connecting.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "ws_connecting.p(99)",
-                  "legend": "p(99)"
+                  "query": "ws_connecting[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Connect Duration",
-              "kind": "chart",
-              "id": "tab-1.section-2.panel-0"
+              "id": "tab-1.section-2.panel-0",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "ws_session_duration.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "ws_session_duration.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "ws_session_duration.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "ws_session_duration.p(99)",
-                  "legend": "p(99)"
+                  "query": "ws_session_duration[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Session Duration",
-              "kind": "chart",
-              "id": "tab-1.section-2.panel-1"
+              "id": "tab-1.section-2.panel-1",
+              "kind": "chart"
             },
             {
               "series": [
                 {
-                  "query": "ws_ping.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "ws_ping.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "ws_ping.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "ws_ping.p(99)",
-                  "legend": "p(99)"
+                  "query": "ws_ping[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Pong Duration",
-              "kind": "chart",
-              "id": "tab-1.section-2.panel-2"
+              "id": "tab-1.section-2.panel-2",
+              "kind": "chart"
             }
           ],
-          "columns": 2,
           "title": "WebSocket",
           "summary": "k6 emits the following metrics when interacting with a WebSocket service through the experimental or legacy websockets API.",
           "id": "tab-1.section-2"
@@ -555,28 +312,14 @@
             {
               "series": [
                 {
-                  "query": "grpc_req_duration.avg",
-                  "legend": "avg"
-                },
-                {
-                  "query": "grpc_req_duration.p(90)",
-                  "legend": "p(90)"
-                },
-                {
-                  "query": "grpc_req_duration.p(95)",
-                  "legend": "p(95)"
-                },
-                {
-                  "query": "grpc_req_duration.p(99)",
-                  "legend": "p(99)"
+                  "query": "grpc_req_duration[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Duration",
-              "kind": "chart",
-              "id": "tab-1.section-3.panel-0"
+              "id": "tab-1.section-3.panel-0",
+              "kind": "chart"
             }
           ],
-          "columns": 1,
           "title": "gRPC",
           "summary": "k6 emits the following metrics when it interacts with a service through the gRPC API.",
           "id": "tab-1.section-3"
@@ -585,6 +328,65 @@
       "title": "Timings",
       "summary": "This chapter provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.",
       "id": "tab-1"
+    },
+    {
+      "sections": [
+        {
+          "panels": [
+            {
+              "series": [
+                {
+                  "query": "[?!tags && trend]"
+                }
+              ],
+              "title": "Trends",
+              "kind": "summary",
+              "id": "tab-2.section-0.panel-0"
+            }
+          ],
+          "title": "",
+          "id": "tab-2.section-0"
+        },
+        {
+          "panels": [
+            {
+              "series": [
+                {
+                  "query": "[?!tags && counter]"
+                }
+              ],
+              "title": "Counters",
+              "kind": "summary",
+              "id": "tab-2.section-1.panel-0"
+            },
+            {
+              "series": [
+                {
+                  "query": "[?!tags && rate]"
+                }
+              ],
+              "title": "Rates",
+              "kind": "summary",
+              "id": "tab-2.section-1.panel-1"
+            },
+            {
+              "series": [
+                {
+                  "query": "[?!tags && gauge]"
+                }
+              ],
+              "title": "Gauges",
+              "kind": "summary",
+              "id": "tab-2.section-1.panel-2"
+            }
+          ],
+          "title": "",
+          "id": "tab-2.section-1"
+        }
+      ],
+      "title": "Summary",
+      "summary": "This chapter provides a summary of the test run metrics. The tables contains the aggregated values of the metrics for the entire test run.",
+      "id": "tab-2"
     }
   ]
 }

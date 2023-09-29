@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { Metrics, Aggregate } from "./Metrics.ts"
+import { Metrics, Aggregate, AggregateType } from "./Metrics.ts"
 import { Samples } from "./Samples.ts"
 import { Summary } from "./Summary.ts"
 
@@ -66,6 +66,17 @@ export class Digest implements EventListenerObject {
   }
 
   onEvent(type: EventType, data: Record<string, Aggregate>): void {
+    // rename p(XX) to pXX
+    for (const name in data) {
+      for (const prop in data[name]) {
+        if (prop.indexOf("(") >= 0) {
+          const pname = prop.replaceAll("(", "").replaceAll(")", "") as AggregateType
+          data[name][pname] = data[name][prop as AggregateType]
+          delete data[name][prop as AggregateType]
+        }
+      }
+    }
+
     switch (type) {
       case EventType.config:
         this.onConfig(data)
@@ -107,7 +118,7 @@ export class Digest implements EventListenerObject {
 
   private onStop(data: Record<string, Aggregate>): void {
     if (data["time"] && data["time"].value) {
-      this.start = new Date(data["time"].value)
+      this.stop = new Date(data["time"].value)
     }
   }
 

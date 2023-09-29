@@ -4,15 +4,15 @@
 
 import React, { useEffect, useState } from "react"
 
-import { Model, Config } from "@xk6-dashboard/model"
+import { Digest, Config } from "@xk6-dashboard/model"
 import defaultConfig from "@xk6-dashboard/config"
 
-const ModelContext = React.createContext(() => new Model({ config: defaultConfig }))
+const ModelContext = React.createContext(() => new Digest({ config: defaultConfig }))
 ModelContext.displayName = "Model"
 
 function ModelProvider({ endpoint = "/events", children }) {
   const [source, setSource] = useState(null)
-  const [model, setModel] = useState(new Model({ config: new Config(defaultConfig) }))
+  const [model, setModel] = useState(new Digest({ config: new Config(defaultConfig) }))
 
   useEffect(() => {
     if (source == null) {
@@ -20,7 +20,7 @@ function ModelProvider({ endpoint = "/events", children }) {
 
       const listener = (e) => {
         model.handleEvent(e)
-        setModel(new Model(model))
+        setModel(new Digest(model))
       }
 
       model.eventNames().forEach((name) => {

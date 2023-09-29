@@ -2,8 +2,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
+import jmesspath from "jmespath"
+
 import { UnitType } from "./UnitType.ts"
-import { Metrics, Metric, Aggregate, AggregateType } from "./Metrics.ts"
+import { Metrics, Metric, Aggregate, AggregateType, MetricType, Query } from "./Metrics.ts"
 
 const propTime = "time"
 
@@ -14,14 +16,21 @@ export type SampleVectorInit = {
   values?: number[]
   metric?: Metric
   unit?: UnitType
+  tags?: Record<string, string>
+  group?: string
+  name: string
 }
 
-export class SampleVector extends Array<number | undefined> {
+export class SampleVector {
   capacity: number
   aggregate: AggregateType
   metric?: Metric
   unit: UnitType
   empty: boolean
+  name: string
+  tags?: Record<string, string>
+  group?: string
+  values: Array<number | undefined>
   constructor(
     {
       length = 0,
@@ -29,42 +38,78 @@ export class SampleVector extends Array<number | undefined> {
       values = new Array<number>(),
       aggregate = AggregateType.value,
       metric = undefined,
-      unit = UnitType.unknown
+      unit = UnitType.unknown,
+      name = "",
+      tags = {},
+      group = undefined
     } = {} as SampleVectorInit
   ) {
-    super(length)
-    if (values.length > 0) {
-      super.push(...values)
-    }
+    this.values = length == 0 ? values : new Array<number | undefined>(length)
     this.capacity = capacity
     this.aggregate = aggregate
     this.metric = metric
     this.unit = unit
-    this.empty = values.length == 0
+    this.empty = this.values.length == 0
+    this.name = name
+    this.tags = tags
+    this.group = group
+
+    Object.defineProperty(this, aggregate as string, { value: true, configurable: true, enumerable: true, writable: true })
   }
 
-  [key: number]: number | undefined
+  hasTags(): boolean {
+    return this.tags != undefined && Object.keys(this.tags).length != 0
+  }
+
+  formatTags(): string {
+    if (!this.hasTags()) {
+      return ""
+    }
+
+    let buff = "{"
+
+    // currently only one tag supported by the go module, so this is one step iteration
+    for (const name in this.tags) {
+      buff += `${name}:${this.tags[name]}`
+    }
+
+    buff += "}"
+
+    return buff
+  }
+
+  get legend(): string {
+    let value = this.aggregate as string
+
+    if (this.metric && this.metric.type != MetricType.trend) {
+      if (this.name.length != 0) {
+        value = this.name + this.formatTags()
+      }
+    }
+
+    return value
+  }
 
   grow(length: number): void {
-    this[length - 1] = undefined
+    this.values[length - 1] = undefined
   }
 
   push(...items: number[]): number {
     let shifted = false
 
     items.forEach((item) => {
-      super.push(item)
+      this.values.push(item)
       this.empty = false
-      if (this.length == this.capacity) {
-        this.shift()
+      if (this.values.length == this.capacity) {
+        this.values.shift()
         shifted = true
       }
     })
 
     if (shifted) {
       this.empty = true
-      for (let i = 0; i < this.length; i++) {
-        if (this[i] != undefined) {
+      for (let i = 0; i < this.values.length; i++) {
+        if (this.values[i] != undefined) {
           this.empty = false
 
           break
@@ -72,14 +117,14 @@ export class SampleVector extends Array<number | undefined> {
       }
     }
 
-    return this.length
+    return this.values.length
   }
 }
 
 export class SamplesView extends Array<SampleVector> {
   constructor(time?: SampleVector) {
     super()
-    if (Array.isArray(time)) {
+    if (time) {
       super.push(time)
     }
   }
@@ -117,34 +162,79 @@ export class Samples {
   private capacity: number
   private metrics: Metrics
   values: Record<string, SampleVector>
-  constructor({ capacity = 10000, metrics = new Metrics(), values = {} as Record<string, SampleVector> } = {}) {
+  vectors: Record<string, SampleVector>
+  lookup: Record<string, Array<SampleVector>>
+  constructor({ capacity = 10000, metrics = new Metrics() } = {}) {
     this.capacity = capacity
     this.metrics = metrics
-    this.values = values
+    this.lookup = {}
+    this.vectors = {}
+
+    // should delete
+    this.values = {}
   }
 
   get length(): number {
-    return this.values[propTime] ? this.values[propTime].length : 0
+    return this.values[propTime] ? this.values[propTime].values.length : 0
   }
 
-  _push(name: string, value: number, prop: AggregateType | undefined = undefined): void {
-    const key = prop ? name + "." + prop : name
-    let array = this.values[key]
+  _push(name: string, value: number, aggregate: AggregateType | undefined = undefined): void {
+    const key = aggregate ? name + "." + aggregate : name
+    let vect = this.vectors[key]
 
-    if (!array) {
-      array = new SampleVector({
-        length: this.length,
-        capacity: this.capacity,
-        metric: this.metrics.values[key],
-        unit: this.metrics.unit(key),
-        aggregate: prop
-      } as SampleVectorInit)
-      this.values[key] = array
-    } else if (array.length < this.length) {
-      array.grow(this.length)
+    if (!vect) {
+      vect = this.newSampleVector(name, aggregate)
+      this.vectors[key] = vect
+      this.values[key] = vect
+
+      let array = this.lookup[vect.name]
+
+      if (!array) {
+        array = new Array<SampleVector>()
+        this.lookup[vect.name] = array
+      }
+
+      array.push(vect)
+    } else if (vect.values.length < this.length) {
+      vect.grow(this.length)
     }
 
-    array.push(value)
+    vect.push(value)
+  }
+
+  newSampleVector(name: string, aggregate: AggregateType | undefined = undefined): SampleVector {
+    const init = {
+      length: this.length,
+      capacity: this.capacity,
+      aggregate: aggregate as AggregateType
+    } as SampleVectorInit
+
+    let sub = ""
+
+    const idx = name.indexOf("{")
+    if (idx && idx > 0) {
+      sub = name.substring(idx)
+      sub = sub.substring(1, sub.length - 1)
+
+      const cidx = sub.indexOf(":")
+
+      const tname = sub.substring(0, cidx)
+      const tvalue = sub.substring(cidx + 1)
+
+      init.tags = { [tname]: tvalue }
+
+      if (tname == "group") {
+        init.group = tvalue.substring(2)
+      }
+
+      name = name.substring(0, idx)
+    }
+
+    init.name = name
+    init.metric = this.metrics.find(name)
+    init.unit = this.metrics.unit(name, aggregate)
+
+    return new SampleVector(init as SampleVectorInit)
   }
 
   onEvent(data: Record<string, Aggregate>) {
@@ -166,7 +256,9 @@ export class Samples {
 
     for (const key in this.values) {
       this.values[key].metric = metrics.find(key)
-      this.values[key].unit = metrics.unit(key)
+
+      const q = new Query(key)
+      this.values[key].unit = metrics.unit(q.name, q.aggregate)
     }
   }
 
@@ -178,23 +270,42 @@ export class Samples {
     }
 
     for (const query of queries) {
-      const [, aggregate] = query.split(".", 2)
+      const vectors = this.queryAll(query)
 
-      let array = this.values[query]
-
-      if (!Array.isArray(array)) {
-        array = new SampleVector({
-          length: data[0].length,
-          capacity: this.capacity,
-          aggregate,
-          metric: this.metrics.find(query),
-          unit: this.metrics.unit(query)
-        } as SampleVectorInit)
+      if (vectors.length > 0) {
+        data.push(...vectors)
       }
-
-      data.push(array)
     }
 
     return data
+  }
+
+  query(expr: string): SampleVector | undefined {
+    const res = jmesspath.search(this.lookup, expr)
+
+    if (Array.isArray(res)) {
+      const array = res as Array<unknown>
+      const first = array.at(0)
+
+      return first instanceof SampleVector ? (first as SampleVector) : undefined
+    }
+
+    return res instanceof SampleVector ? (res as SampleVector) : undefined
+  }
+
+  queryAll(expr: string): Array<SampleVector> {
+    const res = jmesspath.search(this.lookup, expr)
+
+    if (!Array.isArray(res) || (res as Array<SampleVector>).length == 0) {
+      return new Array<SampleVector>()
+    }
+
+    const array = res as Array<unknown>
+
+    if (array.at(0) instanceof SampleVector) {
+      return array as Array<SampleVector>
+    }
+
+    return new Array<SampleVector>()
   }
 }

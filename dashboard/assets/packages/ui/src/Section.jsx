@@ -17,7 +17,7 @@ import { isEmptySection } from "@xk6-dashboard/view"
 
 function SectionBody({ section }) {
   return (
-    <Grid container spacing={1} columns={section.columns || 2}>
+    <Grid container spacing={1} columns={12}>
       {section.panels.map((panel) => {
         return <Panel key={panel.id} panel={panel} />
       })}
@@ -28,7 +28,7 @@ function SectionBody({ section }) {
 export default function Section({ section }) {
   const [open, setOpen] = React.useState(true)
   const digest = useDigest()
-  const empty = isEmptySection(section, digest.samples)
+  const empty = isEmptySection(section, digest)
 
   if (empty) {
     return <></>

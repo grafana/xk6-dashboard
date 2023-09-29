@@ -8,4 +8,6 @@ export { tooltipPlugin } from "./tooltip.ts"
 
 export { Serie, PanelKind, Panel, Section } from "./Config.ts"
 
+export { SummaryTable } from "./SummaryTable.ts"
+
 export { isEmptySection } from "./helper.ts"

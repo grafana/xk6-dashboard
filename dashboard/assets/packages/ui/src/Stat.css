@@ -10,7 +10,7 @@
   white-space: nowrap;
 }
 
-.stat .MuiCardContent-root {
+.stat {
   padding: 5px;
   padding-bottom: 5px !important;
 }

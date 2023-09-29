@@ -15,7 +15,6 @@ var PanelKind = /* @__PURE__ */ ((PanelKind2) => {
   PanelKind2["chart"] = "chart";
   PanelKind2["stat"] = "stat";
   PanelKind2["summary"] = "summary";
-  PanelKind2["trend"] = "trend";
   return PanelKind2;
 })(PanelKind || {});
 var Panel = class {
@@ -34,13 +33,11 @@ var Section = class {
   title;
   id;
   summary;
-  columns;
   panels;
-  constructor({ title, id, summary, columns = 2, panels = [] } = {}) {
+  constructor({ title, id, summary, panels = [] } = {}) {
     this.title = title;
     this.id = id;
     this.summary = summary;
-    this.columns = columns;
     this.panels = panels;
   }
 };
@@ -110,8 +107,8 @@ var ConfigBuilder = class _ConfigBuilder {
     delete this.currentTab;
   }
   section(...args) {
-    var _a, _b, _c, _d;
-    const [title, summary, obj, fn] = getargs(args, { panels: [], columns: 2 });
+    var _a, _b, _c;
+    const [title, summary, obj, fn] = getargs(args, { panels: [] });
     const self = obj;
     self.title = title;
     self.summary = summary;
@@ -121,15 +118,7 @@ var ConfigBuilder = class _ConfigBuilder {
     this.currentSection = self;
     const fun = fn;
     fun({ section: self, panel: this.call(this.panel.name) });
-    if (self.columns == 2) {
-      for (let i = 0; i < (((_c = self.panels) == null ? void 0 : _c.length) ?? 0); i++) {
-        if (self.panels[i].kind == "stat") {
-          self.columns = 6;
-          break;
-        }
-      }
-    }
-    (_d = this.currentTab) == null ? void 0 : _d.sections.push(self);
+    (_c = this.currentTab) == null ? void 0 : _c.sections.push(self);
     delete this.currentSection;
   }
   panel(...args) {
@@ -147,18 +136,6 @@ var ConfigBuilder = class _ConfigBuilder {
     const fun = fn;
     fun({ panel: self, serie: this.call(this.serie.name) });
     if (!self.kind) {
-      self.kind = self.series.length < 2 ? "stat" /* stat */ : "chart" /* chart */;
-    }
-    if (self.kind == "trend" /* trend */) {
-      const serie = self.series[0].query;
-      self.series = [];
-      const aggregates = ["avg", "p(90)", "p(95)", "p(99)"];
-      aggregates.forEach((aggregate) => {
-        self.series.push({
-          query: `${serie}.${aggregate}`,
-          legend: aggregate
-        });
-      });
       self.kind = "chart" /* chart */;
     }
     (_c = this.currentSection) == null ? void 0 : _c.panels.push(self);

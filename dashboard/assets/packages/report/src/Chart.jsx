@@ -1,73 +1,72 @@
-// SPDX-FileCopyrightText: 2023 Iván Szkiba
 // SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
 // SPDX-License-Identifier: AGPL-3.0-only
-// SPDX-License-Identifier: MIT
 
-import { useRef, useState, useLayoutEffect } from "preact/hooks";
-import { MetricsUplot } from "./metrics-uplot";
-import UplotReact from "uplot-react";
-import "uplot/dist/uPlot.min.css";
-import uPlot from "uplot";
-import "./Chart.css";
-import { tooltipPlugin, format, dateFormats } from "@xk6-dashboard/view";
+import React from "react"
+import { useRef, useState, useLayoutEffect } from "preact/hooks"
 
-const sync = uPlot.sync("chart");
+import "uplot/dist/uPlot.min.css"
+import UplotReact from "uplot-react"
+import uPlot from "uplot"
 
-function Chart(props) {
-  const model = new MetricsUplot(props.samples, props.series);
-  const ref = useRef(null);
+import { SeriesPlot, tooltipPlugin, dateFormats, format } from "@xk6-dashboard/view"
 
-  const [width, setWidth] = useState(0);
+import "./Chart.css"
+
+import colors from "./colors"
+
+const sync = uPlot.sync("chart")
+
+export default function Chart({ panel, digest }) {
+  const plot = new SeriesPlot(digest, panel, colors)
+  const ref = useRef(null)
+
+  const [width, setWidth] = useState(0)
 
   useLayoutEffect(() => {
-    let updateWidth = () => setWidth(ref.current.offsetWidth);
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
+    let updateWidth = () => setWidth(ref.current.offsetWidth)
+    updateWidth()
+    window.addEventListener("resize", updateWidth)
 
-    return () => window.removeEventListener("resize", updateWidth);
-  });
+    return () => window.removeEventListener("resize", updateWidth)
+  })
 
-  if (model.data.length < props.series.length + 1) {
-    return <span></span>;
+  if (plot.empty) {
+    return <span ref={ref} />
   }
 
   let options = {
-    width: props.width || width,
-    height: props.height || 250,
-    title: props.title,
-    cursor: {
-      sync: { key: sync.key },
-    },
-    legend: {
-      live: false,
-    },
-    series: model.series,
-    plugins: [tooltipPlugin()],
-  };
+    width: width,
+    height: 250,
+    title: panel.title,
+    cursor: { sync: { key: sync.key } },
+    legend: { live: false },
+    series: plot.series,
+    axes: [{}],
+    plugins: [tooltipPlugin("#fafafa")]
+  }
 
-  if (props.axes) {
-    options.axes = props.axes;
-    options.axes[0].values = dateFormats;
-
-    for (var i = 1; i < options.axes.length; i++) {
-      const fmt = options.axes[i].format;
-
-      if (!fmt) {
-        continue;
-      }
-
-      options.axes[i].values = (self, ticks) =>
-        ticks.map((val) => format(fmt, val));
-      options.axes[i].size = 70;
+  options.axes = plot.samples.units.map((unit) => {
+    return {
+      stroke: "#808080",
+      grid: { stroke: "#f0f0f0" },
+      ticks: { stroke: "#f0f0f0" },
+      values: (self, ticks) => ticks.map((val) => format(unit, val)),
+      size: 70,
+      scale: unit
     }
+  })
+
+  delete options.axes[0].size
+  options.axes[0].values = dateFormats
+
+  if (options.axes.length > 2) {
+    options.axes[2].side = 1
   }
 
   return (
-    <div ref={ref} className="chart">
-      <UplotReact options={options} data={model.data} />
+    <div ref={ref} className="chart panel">
+      <UplotReact options={options} data={plot.data} />
     </div>
-  );
+  )
 }
-
-export { Chart };

@@ -20,9 +20,9 @@ declare enum AggregateType {
     min = "min",
     max = "max",
     med = "med",
-    p90 = "p(90)",
-    p95 = "p(95)",
-    p99 = "p(99)"
+    p90 = "p90",
+    p95 = "p95",
+    p99 = "p99"
 }
 type Aggregate = {
     [x in AggregateType]: number;
@@ -44,10 +44,12 @@ type Metric = {
     type?: MetricType;
 };
 declare class Query {
-    metric: string;
-    aggregate: AggregateType;
-    constructor(metric: string, aggregate: AggregateType);
-    static parse(query: string): Query;
+    name: string;
+    aggregate?: AggregateType;
+    tags?: Record<string, string>;
+    group?: string;
+    scenario?: string;
+    constructor(query: string);
 }
 declare class Metrics {
     values: Record<string, Metric>;
@@ -56,7 +58,7 @@ declare class Metrics {
     });
     onEvent(data: Record<string, object>): void;
     find(query: string): Metric | undefined;
-    unit(query: string): UnitType;
+    unit(name: string, aggregate?: AggregateType): UnitType;
 }
 
 type SampleVectorInit = {
@@ -66,15 +68,24 @@ type SampleVectorInit = {
     values?: number[];
     metric?: Metric;
     unit?: UnitType;
+    tags?: Record<string, string>;
+    group?: string;
+    name: string;
 };
-declare class SampleVector extends Array<number | undefined> {
+declare class SampleVector {
     capacity: number;
     aggregate: AggregateType;
     metric?: Metric;
     unit: UnitType;
     empty: boolean;
-    constructor({ length, capacity, values, aggregate, metric, unit }?: SampleVectorInit);
-    [key: number]: number | undefined;
+    name: string;
+    tags?: Record<string, string>;
+    group?: string;
+    values: Array<number | undefined>;
+    constructor({ length, capacity, values, aggregate, metric, unit, name, tags, group }?: SampleVectorInit);
+    hasTags(): boolean;
+    formatTags(): string;
+    get legend(): string;
     grow(length: number): void;
     push(...items: number[]): number;
 }
@@ -88,29 +99,44 @@ declare class Samples {
     private capacity;
     private metrics;
     values: Record<string, SampleVector>;
-    constructor({ capacity, metrics, values }?: {
+    vectors: Record<string, SampleVector>;
+    lookup: Record<string, Array<SampleVector>>;
+    constructor({ capacity, metrics }?: {
         capacity?: number | undefined;
         metrics?: Metrics | undefined;
-        values?: Record<string, SampleVector> | undefined;
     });
     get length(): number;
-    _push(name: string, value: number, prop?: AggregateType | undefined): void;
+    _push(name: string, value: number, aggregate?: AggregateType | undefined): void;
+    newSampleVector(name: string, aggregate?: AggregateType | undefined): SampleVector;
     onEvent(data: Record<string, Aggregate>): void;
     annotate(metrics: Metrics): void;
     select(queries: Array<string>): SamplesView;
+    query(expr: string): SampleVector | undefined;
+    queryAll(expr: string): Array<SampleVector>;
 }
 
 type SummaryRowInit = {
-    values?: Record<AggregateType, number>;
+    values: Aggregate;
     metric?: Metric;
+    name: string;
 };
 declare class SummaryRow {
-    values: Record<AggregateType, number>;
+    values: Aggregate;
     metric?: Metric;
-    constructor({ values, metric }?: SummaryRowInit);
+    name: string;
+    tags?: Record<string, string>;
+    group?: string;
+    constructor({ values, metric, name }?: SummaryRowInit);
+}
+declare class SummaryView extends Array<SummaryRow> {
+    aggregates: Array<AggregateType>;
+    constructor(values: Array<SummaryRow>);
+    [key: number]: SummaryRow;
+    get empty(): boolean;
 }
 declare class Summary {
     values: Record<string, SummaryRow>;
+    lookup: Array<SummaryRow>;
     metrics: Metrics;
     time: number;
     constructor({ values, metrics, time }?: {
@@ -119,7 +145,10 @@ declare class Summary {
         time?: number | undefined;
     });
     onEvent(data: Record<string, Aggregate>): void;
+    newSummaryRow(name: string, aggregate: Aggregate): SummaryRow;
     annotate(metrics: Metrics): void;
+    select(queries: Array<string>): SummaryView;
+    queryAll(expr: string): Array<SummaryRow>;
 }
 
 declare class Config implements Record<string, unknown> {
@@ -167,4 +196,4 @@ declare class Digest implements EventListenerObject {
     private onCumulative;
 }
 
-export { Config, Digest, EventType, Metric, MetricType, Metrics, Param, Query, SampleVector, SampleVectorInit, Samples, SamplesView, UnitType, ValueType };
+export { Aggregate, AggregateType, Config, Digest, EventType, Metric, MetricType, Metrics, Param, Query, SampleVector, SampleVectorInit, Samples, SamplesView, Summary, SummaryRow, SummaryView, UnitType, ValueType };

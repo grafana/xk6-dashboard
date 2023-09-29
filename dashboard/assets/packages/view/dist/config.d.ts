@@ -10,8 +10,7 @@ declare class Serie {
 declare enum PanelKind {
     chart = "chart",
     stat = "stat",
-    summary = "summary",
-    trend = "trend"
+    summary = "summary"
 }
 declare class Panel {
     title?: string;
@@ -24,9 +23,8 @@ declare class Section {
     title?: string;
     id?: string;
     summary?: string;
-    columns: number;
     panels: Panel[];
-    constructor({ title, id, summary, columns, panels }?: Section);
+    constructor({ title, id, summary, panels }?: Section);
 }
 declare class Tab {
     title?: string;

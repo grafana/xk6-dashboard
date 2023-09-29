@@ -2,9 +2,9 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { UnitType, SamplesView, Digest, Samples } from '@xk6-dashboard/model';
-import { Serie, Section } from './config.js';
-export { Panel, PanelKind } from './config.js';
+import { UnitType, SamplesView, Digest, SummaryView, Metrics, SummaryRow, AggregateType } from '@xk6-dashboard/model';
+import { Panel, Serie, Section } from './config.js';
+export { PanelKind } from './config.js';
 import uPlot from 'uplot';
 
 declare function format(type: UnitType, value: number, compact?: boolean): string;
@@ -17,8 +17,9 @@ type Color = {
 declare class SeriesPlot {
     samples: SamplesView;
     series?: object;
-    constructor(digest: Digest, series: Serie[], colors: Color[]);
+    constructor(digest: Digest, panel: Panel, colors: Color[]);
     get empty(): boolean;
+    get data(): (number | undefined)[][];
     buildSeries(input: Serie[], colors: Color[]): {
         stroke: string;
         fill: string;
@@ -27,6 +28,7 @@ declare class SeriesPlot {
             show: boolean;
         };
         label: string;
+        scale: UnitType;
     }[];
 }
 
@@ -39,6 +41,17 @@ declare function tooltipPlugin(background: string): {
     };
 };
 
-declare function isEmptySection(section: Section, samples: Samples): boolean;
+declare class SummaryTable {
+    view: SummaryView;
+    metrics: Metrics;
+    constructor(panel: Panel, digest: Digest);
+    get empty(): boolean;
+    get cols(): number;
+    get header(): Array<string>;
+    get body(): Array<Array<string>>;
+    format(row: SummaryRow, aggregate: AggregateType): string;
+}
 
-export { Section, Serie, SeriesPlot, dateFormats, format, isEmptySection, tooltipPlugin };
+declare function isEmptySection(section: Section, digest: Digest): boolean;
+
+export { Panel, Section, Serie, SeriesPlot, SummaryTable, dateFormats, format, isEmptySection, tooltipPlugin };

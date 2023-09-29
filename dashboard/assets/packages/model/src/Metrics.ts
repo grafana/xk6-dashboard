@@ -12,9 +12,9 @@ export enum AggregateType {
   min = "min",
   max = "max",
   med = "med",
-  p90 = "p(90)",
-  p95 = "p(95)",
-  p99 = "p(99)"
+  p90 = "p90",
+  p95 = "p95",
+  p99 = "p99"
 }
 
 export type Aggregate = {
@@ -41,17 +41,38 @@ export type Metric = {
 }
 
 export class Query {
-  metric: string
-  aggregate: AggregateType
-  constructor(metric: string, aggregate: AggregateType) {
-    this.metric = metric
-    this.aggregate = aggregate
-  }
+  name: string
+  aggregate?: AggregateType
+  tags?: Record<string, string>
+  group?: string
+  scenario?: string
 
-  static parse(query: string): Query {
-    const [metric, aggregate] = query.split(".", 2)
+  constructor(query: string) {
+    const [name, aggregate] = query.split(".", 2)
 
-    return new Query(metric, aggregate as AggregateType)
+    this.aggregate = aggregate as AggregateType
+    this.name = name
+
+    let sub = ""
+
+    const idx = name.indexOf("{")
+    if (idx && idx > 0) {
+      sub = name.substring(idx)
+      sub = sub.substring(1, sub.length - 1)
+
+      const cidx = sub.indexOf(":")
+
+      const tname = sub.substring(0, cidx)
+      const tvalue = sub.substring(cidx + 1)
+
+      this.tags = { [tname]: tvalue }
+
+      if (tname == "group") {
+        this.group = tvalue.substring(2)
+      }
+
+      this.name = name.substring(0, idx)
+    }
   }
 }
 
@@ -70,20 +91,18 @@ export class Metrics {
   }
 
   find(query: string): Metric | undefined {
-    const q = Query.parse(query)
+    const q = new Query(query)
 
-    return this.values[q.metric]
+    return this.values[q.name]
   }
 
-  unit(query: string): UnitType {
-    const metric = this.find(query)
+  unit(name: string, aggregate?: AggregateType): UnitType {
+    const metric = this.find(name)
     if (!metric) {
       return UnitType.unknown
     }
 
-    const q = Query.parse(query)
-
-    if (!q.aggregate && query != propTime) {
+    if (!aggregate && name != propTime) {
       return UnitType.unknown
     }
 
@@ -91,9 +110,9 @@ export class Metrics {
       case MetricType.counter:
         switch (metric.contains) {
           case ValueType.data:
-            return q.aggregate == AggregateType.count ? UnitType.bytes : UnitType.bps
+            return aggregate == AggregateType.count ? UnitType.bytes : UnitType.bps
           default:
-            return q.aggregate == AggregateType.count ? UnitType.counter : UnitType.rps
+            return aggregate == AggregateType.count ? UnitType.counter : UnitType.rps
         }
 
       case MetricType.rate:

@@ -7,6 +7,10 @@
  */
 
 .usage {
-    color: #808080;
-    font-style: italic;
+  color: #808080;
+  font-style: italic;
+}
+
+.container {
+  padding: 15rem !important;
 }

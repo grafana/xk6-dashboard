@@ -4,7 +4,7 @@
 
 import React, { useRef, useState, useLayoutEffect } from "react"
 import { PropTypes } from "prop-types"
-import { Grid, Card, CardContent, Typography, useTheme } from "@mui/material"
+import { Grid, Typography, useTheme } from "@mui/material"
 
 import UplotReact from "uplot-react"
 import "uplot/dist/uPlot.min.css"
@@ -31,18 +31,16 @@ export default function Stat({ panel }) {
 
   const query = panel.series[0].query
 
-  const series = [{ query }]
-
-  const plot = new SeriesPlot(digest, series, theme.palette.color)
+  const plot = new SeriesPlot(digest, panel, theme.palette.color)
 
   if (plot.empty) {
     return <div ref={ref} />
   }
 
-  const serie = digest.samples.values[query]
+  const serie = digest.samples.query(query)
   var value = 0
-  if (Array.isArray(serie) && serie.length != 0) {
-    value = format(digest.metrics.unit(query), Number(serie.slice(-1)), true)
+  if (serie && Array.isArray(serie.values) && serie.values.length != 0) {
+    value = format(serie.unit, Number(serie.values.slice(-1)), true)
   }
 
   let options = {
@@ -56,17 +54,13 @@ export default function Stat({ panel }) {
   }
 
   return (
-    <Grid className="chart" item xs={1}>
-      <Card className="stat" sx={{ color: "primary" }}>
-        <CardContent>
-          <Typography sx={{ fontSize: "0.8rem" }} color="text.secondary" gutterBottom align="center">
-            {panel.title}
-          </Typography>
-          <div ref={ref}>
-            <UplotReact options={options} data={plot.samples} />
-          </div>
-        </CardContent>
-      </Card>
+    <Grid item className="panel stat" xs={6} sm={4} md={2}>
+      <Typography sx={{ fontSize: "0.8rem" }} color="text.secondary" gutterBottom align="center">
+        {panel.title}
+      </Typography>
+      <div ref={ref}>
+        <UplotReact options={options} data={plot.data} />
+      </div>
     </Grid>
   )
 }

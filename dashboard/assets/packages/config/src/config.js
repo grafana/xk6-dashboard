@@ -2,6 +2,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
+function trend(name) {
+  return `${name}[?!tags && (avg || p90 || p95 || p99)]`
+}
+
 export default (config, { tab }) => {
   config.title = "k6 dashboard"
 
@@ -10,41 +14,41 @@ export default (config, { tab }) => {
 
     // stat section
     section(({ panel }) => {
-      panel("Iteration Rate", ({ serie }) => {
-        serie("iterations.rate")
+      panel("Iteration Rate", "stat", ({ serie }) => {
+        serie("iterations[?!tags && rate]")
       })
-      panel("VUs", ({ serie }) => {
-        serie("vus.value")
+      panel("VUs", "stat", ({ serie }) => {
+        serie("vus[?!tags && value]")
       })
-      panel("HTTP Request Rate", ({ serie }) => {
-        serie("http_reqs.rate")
+      panel("HTTP Request Rate", "stat", ({ serie }) => {
+        serie("http_reqs[?!tags && rate]")
       })
-      panel("HTTP Request Duration", ({ serie }) => {
-        serie("http_req_duration.avg")
+      panel("HTTP Request Duration", "stat", ({ serie }) => {
+        serie("http_req_duration[?!tags && avg]")
       })
-      panel("Received Rate", ({ serie }) => {
-        serie("data_received.rate")
+      panel("Received Rate", "stat", ({ serie }) => {
+        serie("data_received[?!tags && rate]")
       })
-      panel("Sent Rate", ({ serie }) => {
-        serie("data_sent.rate")
+      panel("Sent Rate", "stat", ({ serie }) => {
+        serie("data_sent[?!tags && rate]")
       })
     })
 
     // chart section
     section(({ panel }) => {
       panel("VUs", ({ serie }) => {
-        serie("vus.value", "VUs")
-        serie("http_reqs.rate", "HTTP Request Rate")
+        serie("vus[?!tags && value]")
+        serie("http_reqs[?!tags && rate ]")
       })
       panel("Transfer Rate", ({ serie }) => {
-        serie("data_received.rate", "data received")
-        serie("data_sent.rate", "data sent")
+        serie("data_received[?!tags && rate]")
+        serie("data_sent[?!tags && rate]")
       })
-      panel("HTTP Request Duration", "trend", ({ serie }) => {
-        serie("http_req_duration")
+      panel("HTTP Request Duration", ({ serie }) => {
+        serie(trend("http_req_duration"))
       })
-      panel("Iteration Duration", "trend", ({ serie }) => {
-        serie("iteration_duration")
+      panel("Iteration Duration", ({ serie }) => {
+        serie(trend("iteration_duration"))
       })
     })
   })
@@ -55,71 +59,93 @@ export default (config, { tab }) => {
     section("HTTP", ({ section, panel }) => {
       section.summary = `These metrics are generated only when the test makes HTTP requests.`
 
-      panel("Request Duration", "trend", ({ serie }) => {
-        serie("http_req_duration")
+      panel("Request Duration", ({ serie }) => {
+        serie(trend("http_req_duration"))
       })
-      panel("Request Waiting", "trend", ({ serie }) => {
-        serie("http_req_waiting")
+      panel("Request Waiting", ({ serie }) => {
+        serie(trend("http_req_waiting"))
       })
-      panel("TLS handshaking", "trend", ({ serie }) => {
-        serie("http_req_tls_handshaking")
+      panel("TLS handshaking", ({ serie }) => {
+        serie(trend("http_req_tls_handshaking"))
       })
-      panel("Request Sending", "trend", ({ serie }) => {
-        serie("http_req_sending")
+      panel("Request Sending", ({ serie }) => {
+        serie(trend("http_req_sending"))
       })
-      panel("Request Connecting", "trend", ({ serie }) => {
-        serie("http_req_connecting")
+      panel("Request Connecting", ({ serie }) => {
+        serie(trend("http_req_connecting"))
       })
-      panel("Request Receiving", "trend", ({ serie }) => {
-        serie("http_req_receiving")
+      panel("Request Receiving", ({ serie }) => {
+        serie(trend("http_req_receiving"))
       })
     })
 
     section("Browser", ({ section, panel }) => {
       section.summary = `The k6 browser module emits its own metrics based on the Core Web Vitals and Other Web Vitals.`
 
-      panel("Request Duration", "trend", ({ serie }) => {
-        serie("browser_http_req_duration")
+      panel("Request Duration", ({ serie }) => {
+        serie(trend("browser_http_req_duration"))
       })
-      panel("Largest Contentful Paint", "trend", ({ serie }) => {
-        serie("browser_web_vital_lcp")
+      panel("Largest Contentful Paint", ({ serie }) => {
+        serie(trend("browser_web_vital_lcp"))
       })
-      panel("First Input Delay", "trend", ({ serie }) => {
-        serie("browser_web_vital_fid")
+      panel("First Input Delay", ({ serie }) => {
+        serie(trend("browser_web_vital_fid"))
       })
-      panel("Cumulative Layout Shift", "trend", ({ serie }) => {
-        serie("browser_web_vital_cls")
+      panel("Cumulative Layout Shift", ({ serie }) => {
+        serie(trend("browser_web_vital_cls"))
       })
-      panel("Time to First Byte", "trend", ({ serie }) => {
-        serie("browser_web_vital_ttfb")
+      panel("Time to First Byte", ({ serie }) => {
+        serie(trend("browser_web_vital_ttfb"))
       })
-      panel("First Contentful Paint", "trend", ({ serie }) => {
-        serie("browser_web_vital_fcp")
+      panel("First Contentful Paint", ({ serie }) => {
+        serie(trend("browser_web_vital_fcp"))
       })
-      panel("Interaction to Next Paint", "trend", ({ serie }) => {
-        serie("browser_web_vital_inp")
+      panel("Interaction to Next Paint", ({ serie }) => {
+        serie(trend("browser_web_vital_inp"))
       })
     })
 
     section("WebSocket", ({ section, panel }) => {
       section.summary = `k6 emits the following metrics when interacting with a WebSocket service through the experimental or legacy websockets API.`
 
-      panel("Connect Duration", "trend", ({ serie }) => {
-        serie("ws_connecting")
+      panel("Connect Duration", ({ serie }) => {
+        serie(trend("ws_connecting"))
       })
-      panel("Session Duration", "trend", ({ serie }) => {
-        serie("ws_session_duration")
+      panel("Session Duration", ({ serie }) => {
+        serie(trend("ws_session_duration"))
       })
-      panel("Pong Duration", "trend", ({ serie }) => {
-        serie("ws_ping")
+      panel("Pong Duration", ({ serie }) => {
+        serie(trend("ws_ping"))
       })
     })
 
-    section("gRPC", { columns: 1 }, ({ section, panel }) => {
+    section("gRPC", ({ section, panel }) => {
       section.summary = `k6 emits the following metrics when it interacts with a service through the gRPC API.`
 
-      panel("Request Duration", "trend", ({ serie }) => {
-        serie("grpc_req_duration")
+      panel("Request Duration", ({ serie }) => {
+        serie(trend("grpc_req_duration"))
+      })
+    })
+  })
+
+  tab("Summary", ({ tab, section }) => {
+    tab.summary = `This chapter provides a summary of the test run metrics. The tables contains the aggregated values of the metrics for the entire test run.`
+
+    section("", ({ panel }) => {
+      panel("Trends", "summary", ({ serie }) => {
+        serie("[?!tags && trend]")
+      })
+    })
+
+    section("", ({ panel }) => {
+      panel("Counters", "summary", ({ serie }) => {
+        serie("[?!tags && counter]")
+      })
+      panel("Rates", "summary", ({ serie }) => {
+        serie("[?!tags && rate]")
+      })
+      panel("Gauges", "summary", ({ serie }) => {
+        serie("[?!tags && gauge]")
       })
     })
   })

@@ -9,10 +9,23 @@ import prettyMilliseconds from "pretty-ms";
 import uPlot from "uplot";
 import { UnitType } from "@xk6-dashboard/model";
 function formatDuration(value, compact) {
-  return prettyMilliseconds(value, {
+  let [main, sub] = prettyMilliseconds(value, {
     formatSubMilliseconds: true,
     compact
-  }).split(" ").slice(0, 2).join(" ");
+  }).split(" ").slice(0, 2);
+  if (main.match(/[0-9]+s/) && !compact) {
+    main = main.replace("s", ".");
+    if (sub) {
+      sub = sub.substring(0, 1);
+    } else {
+      sub = "0";
+    }
+    return main + sub + "s";
+  }
+  if (sub) {
+    main += " " + sub;
+  }
+  return main;
 }
 function formatBytes(value) {
   return prettyBytes(value);
@@ -56,29 +69,41 @@ function formatter(unit) {
 var SeriesPlot = class {
   samples;
   series;
-  constructor(digest, series, colors) {
-    const queries = series.map((item) => item.query);
+  constructor(digest, panel, colors) {
+    const queries = panel.series.map((item) => item.query);
     this.samples = digest.samples.select(queries);
     if (!this.samples.empty) {
-      this.series = this.buildSeries(series, colors);
+      this.series = this.buildSeries(panel.series, colors);
     }
   }
   get empty() {
     return this.samples.empty;
+  }
+  get data() {
+    const all = new Array();
+    for (let i = 0; i < this.samples.length; i++) {
+      all.push(this.samples[i].values);
+    }
+    return all;
   }
   buildSeries(input, colors) {
     if (input[0].query != "time") {
       input = [{ query: "time", legend: "time" }, ...input];
     }
     const series = [];
-    for (let i = 0; i < input.length; i++) {
+    for (let i = 0; i < this.samples.length; i++) {
       const pidx = i % colors.length;
+      let legend2 = this.samples[i].legend;
+      if (i < input.length && input[i].legend && input[i].legend.length > 0) {
+        legend2 = input[i].legend;
+      }
       series.push({
         stroke: colors[pidx].stroke,
         fill: colors[pidx].fill,
         value: formatter(this.samples[i].unit),
         points: { show: false },
-        label: input[i].legend
+        label: legend2,
+        scale: this.samples[i].unit
       });
     }
     return series;
@@ -197,7 +222,6 @@ var PanelKind = /* @__PURE__ */ ((PanelKind2) => {
   PanelKind2["chart"] = "chart";
   PanelKind2["stat"] = "stat";
   PanelKind2["summary"] = "summary";
-  PanelKind2["trend"] = "trend";
   return PanelKind2;
 })(PanelKind || {});
 var Panel = class {
@@ -216,28 +240,73 @@ var Section = class {
   title;
   id;
   summary;
-  columns;
   panels;
-  constructor({ title, id, summary, columns = 2, panels = [] } = {}) {
+  constructor({ title, id, summary, panels = [] } = {}) {
     this.title = title;
     this.id = id;
     this.summary = summary;
-    this.columns = columns;
     this.panels = panels;
   }
 };
 
+// src/SummaryTable.ts
+var SummaryTable = class {
+  view;
+  metrics;
+  constructor(panel, digest) {
+    this.metrics = digest.metrics;
+    const queries = panel.series.map((item) => item.query);
+    this.view = digest.summary.select(queries);
+  }
+  get empty() {
+    return this.view.empty;
+  }
+  get cols() {
+    return this.view.aggregates.length;
+  }
+  get header() {
+    return new Array("metric", ...this.view.aggregates.map((a) => a));
+  }
+  get body() {
+    const rows = new Array();
+    for (let i = 0; i < this.view.length; i++) {
+      const row = new Array();
+      row.push(this.view[i].name);
+      row.push(...this.view.aggregates.map((a) => this.format(this.view[i], a)));
+      rows.push(row);
+    }
+    return rows;
+  }
+  format(row, aggregate) {
+    var _a;
+    const unit = this.metrics.unit(((_a = row.metric) == null ? void 0 : _a.name) ?? "", aggregate);
+    return format(unit, row.values[aggregate], true);
+  }
+};
+
 // src/helper.ts
-function isEmptySection(section, samples) {
+function isEmptySection(section, digest) {
   for (let i = 0; i < section.panels.length; i++) {
-    for (let j = 0; j < section.panels[i].series.length; j++) {
-      const vect = samples.values[section.panels[i].series[j].query];
-      if (vect != void 0 && !vect.empty) {
-        return false;
-      }
+    const panel = section.panels[i];
+    if (!isEmptyPanel(panel, digest)) {
+      return false;
     }
   }
   return true;
+}
+function isEmptyPanel(panel, digest) {
+  if (panel.kind == "summary" /* summary */) {
+    return isEmptySummary(panel, digest);
+  }
+  return isEmptyPlot(panel, digest);
+}
+function isEmptyPlot(panel, digest) {
+  const plot = digest.samples.select(panel.series.map((s) => s.query));
+  return plot.empty;
+}
+function isEmptySummary(panel, digest) {
+  const view = digest.summary.select(panel.series.map((s) => s.query));
+  return view.empty;
 }
 export {
   Panel,
@@ -245,6 +314,7 @@ export {
   Section,
   Serie,
   SeriesPlot,
+  SummaryTable,
   dateFormats,
   format,
   isEmptySection,

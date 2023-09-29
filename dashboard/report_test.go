@@ -81,7 +81,7 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 
 	rep := newReporter("", th.assets, th.proc)
 
-	rep.data.cumulative = recursiveJSON(t)
+	rep.data.cumulative = &recorderEnvelope{Name: "dummy", Data: recursiveJSON(t)}
 
 	assert.Error(t, rep.exportJSON(io.Discard))
 
@@ -114,7 +114,7 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 
 	rep := newReporter("", th.assets, th.proc)
 
-	rep.data.cumulative = recursiveJSON(t)
+	rep.data.cumulative = &recorderEnvelope{Name: "dummy", Data: recursiveJSON(t)}
 
 	assert.Error(t, rep.exportBase64(io.Discard))
 
@@ -168,11 +168,13 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n", rep.data.buff.String())
+	exp := `{"event":"snapshot","data":{}}` + "\n"
+
+	assert.Equal(t, exp, rep.data.buff.String())
 
 	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n,{}\n", rep.data.buff.String())
+	assert.Equal(t, exp+exp, rep.data.buff.String())
 
 	data["bad"] = recursiveJSON(t)
 
@@ -184,11 +186,13 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	rep.onEvent(cumulativeEvent, data)
 
-	assert.Equal(t, data, rep.data.cumulative)
+	envelope := &recorderEnvelope{Name: cumulativeEvent, Data: data}
+
+	assert.Equal(t, envelope, rep.data.cumulative)
 }
 
 const (
-	emptyData       = `{"cumulative":null,"param":null,"config":null,"metrics":{},"snapshot":[]}`
-	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKkgsSsyFcZLz89Iy02G83NSSoszkYiWr6lodpeK8xILijPwSJavo2FpAAAAA///7qm9QSQAAAA==`
+	emptyData       = ``
+	emptyDataBase64 = `H4sIAAAAAAAA/wEAAP//AAAAAAAAAAA=`
 	emptyDataScript = `<script id="data" type="application/json; charset=utf-8; gzip; base64">` + emptyDataBase64
 )

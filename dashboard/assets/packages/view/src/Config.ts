@@ -14,8 +14,7 @@ export class Serie {
 export enum PanelKind {
   chart = "chart",
   stat = "stat",
-  summary = "summary",
-  trend = "trend"
+  summary = "summary"
 }
 
 export class Panel {
@@ -35,13 +34,11 @@ export class Section {
   title?: string
   id?: string
   summary?: string
-  columns: number
   panels: Panel[]
-  constructor({ title, id, summary, columns = 2, panels = [] }: Section = {} as Section) {
+  constructor({ title, id, summary, panels = [] }: Section = {} as Section) {
     this.title = title
     this.id = id
     this.summary = summary
-    this.columns = columns
     this.panels = panels
   }
 }
@@ -150,7 +147,7 @@ export class ConfigBuilder {
   }
 
   section(...args: unknown[]) {
-    const [title, summary, obj, fn] = getargs(args, { panels: [], columns: 2 })
+    const [title, summary, obj, fn] = getargs(args, { panels: [] })
 
     const self = obj as Section
 
@@ -165,15 +162,6 @@ export class ConfigBuilder {
     const fun: SectionFunction = fn as SectionFunction
 
     fun({ section: self, panel: this.call(this.panel.name) as PanelFunction })
-
-    if (self.columns == 2) {
-      for (let i = 0; i < (self.panels?.length ?? 0); i++) {
-        if (self.panels[i].kind == "stat") {
-          self.columns = 6
-          break
-        }
-      }
-    }
 
     this.currentTab?.sections.push(self)
 
@@ -202,20 +190,6 @@ export class ConfigBuilder {
     fun({ panel: self, serie: this.call(this.serie.name) as SerieFunction })
 
     if (!self.kind) {
-      self.kind = self.series.length < 2 ? PanelKind.stat : PanelKind.chart
-    }
-
-    if (self.kind == PanelKind.trend) {
-      const serie = self.series[0].query
-      self.series = []
-
-      const aggregates = ["avg", "p(90)", "p(95)", "p(99)"]
-      aggregates.forEach((aggregate) => {
-        self.series.push({
-          query: `${serie}.${aggregate}`,
-          legend: aggregate
-        })
-      })
       self.kind = PanelKind.chart
     }
 

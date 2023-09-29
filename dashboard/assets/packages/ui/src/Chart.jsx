@@ -31,7 +31,7 @@ export default function Chart({ panel }) {
     return () => window.removeEventListener("resize", updateWidth)
   })
 
-  const plot = new SeriesPlot(digest, panel.series, theme.palette.color)
+  const plot = new SeriesPlot(digest, panel, theme.palette.color)
 
   if (plot.empty) {
     return <div ref={ref} />
@@ -56,12 +56,17 @@ export default function Chart({ panel }) {
       grid: { stroke: grid },
       ticks: { stroke: grid },
       values: (self, ticks) => ticks.map((val) => format(unit, val)),
-      size: 70
+      size: 70,
+      scale: unit
     }
   })
 
   delete options.axes[0].size
   options.axes[0].values = dateFormats
+
+  if (options.axes.length > 2) {
+    options.axes[2].side = 1
+  }
 
   let select = theme.palette.mode == "dark" ? "#60606080" : "#d0d0d080"
 
@@ -70,8 +75,8 @@ export default function Chart({ panel }) {
   }
 
   return (
-    <Grid ref={ref} className="chart" item xs={1}>
-      <UplotReact options={options} data={plot.samples} onCreate={onCreate} />
+    <Grid ref={ref} className="chart panel" item md={12} lg={6}>
+      <UplotReact options={options} data={plot.data} onCreate={onCreate} />
     </Grid>
   )
 }

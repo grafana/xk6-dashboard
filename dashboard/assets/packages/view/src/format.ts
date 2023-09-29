@@ -11,14 +11,32 @@ import uPlot from "uplot"
 
 import { UnitType } from "@xk6-dashboard/model"
 
+// should fix, probably prettyMilliseconds is not the best solution...
 function formatDuration(value: number, compact: boolean): string {
-  return prettyMilliseconds(value, {
+  let [main, sub] = prettyMilliseconds(value, {
     formatSubMilliseconds: true,
     compact: compact
   })
     .split(" ")
     .slice(0, 2)
-    .join(" ")
+
+  if (main.match(/[0-9]+s/) && !compact) {
+    main = main.replace("s", ".")
+
+    if (sub) {
+      sub = sub.substring(0, 1)
+    } else {
+      sub = "0"
+    }
+
+    return main + sub + "s"
+  }
+
+  if (sub) {
+    main += " " + sub
+  }
+
+  return main
 }
 
 function formatBytes(value: number): string {
