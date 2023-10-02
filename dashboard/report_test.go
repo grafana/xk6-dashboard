@@ -87,22 +87,18 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 
 	rep.data.cumulative = nil
 
+	data := make(map[string]interface{})
+
+	rep.onEvent(snapshotEvent, data)
+
 	out := newErrorWriter(t)
 
 	assert.Error(t, rep.exportJSON(out))
-	assert.Error(t, rep.exportJSON(out.reset(1)))
-	assert.Error(t, rep.exportJSON(out.reset(2)))
-	assert.Error(t, rep.exportJSON(out.reset(3)))
-	assert.Error(t, rep.exportJSON(out.reset(4)))
-	assert.Error(t, rep.exportJSON(out.reset(5)))
-	assert.Error(t, rep.exportJSON(out.reset(6)))
-	assert.Error(t, rep.exportJSON(out.reset(7)))
-	assert.Error(t, rep.exportJSON(out.reset(8)))
-	assert.Error(t, rep.exportJSON(out.reset(9)))
-	assert.Error(t, rep.exportJSON(out.reset(10)))
+	assert.NoError(t, rep.exportJSON(out.reset(2)))
 
-	assert.NoError(t, rep.exportJSON(out.reset(11)))
-	assert.Equal(t, emptyData, out.String())
+	exp := `{"event":"snapshot","data":{}}` + "\n"
+
+	assert.Equal(t, exp, out.String())
 }
 
 func Test_briefer_exportBase64_error(t *testing.T) {
@@ -180,7 +176,7 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	rep.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
 
-	assert.Equal(t, "{}\n,{}\n,null\n", rep.data.buff.String())
+	assert.Equal(t, exp+exp+"null\n", rep.data.buff.String())
 
 	data["foo"] = "bar"
 
