@@ -32,28 +32,11 @@ The timings tab provides an overview of test run HTTP timing metrics. Graphs plo
 
 ![k6 dashboard timings snapshot](screenshot/k6-dashboard-timings-snapshot.png)
 
-*Custom Tab*
-
-Example of customizing the display of metrics.
-
-![k6 dashboard custom](screenshot/k6-dashboard-custom.png)
-
 *Summary Tab*
 
 The summary tab contains a summary of the test run metrics. The tables contain the aggregated values of the metrics for the entire test run.
 
 ![k6 dashboard summary](screenshot/k6-dashboard-summary.png)
-
-**Report**
-
-The report tab contains a test run report in a printable (or saveable to PDF) format.
-
-*Report Tab*
-![k6 dashboard report](screenshot/k6-dashboard-report.png)
-
-*Report PDF*
-
-See [sample PDF report](screenshot/k6-dashboard-report.pdf).
 
 **HTML Report**
 
@@ -74,8 +57,6 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 - [Docker](#docker)
 - [Save report](#save-report)
 - [Events](#events)
-- [Customization](#customization)
-  - [Examples](#examples)
 - [Command Line](#command-line)
   - [Docker](#docker-1)
 
@@ -205,104 +186,6 @@ Two kind of events will be emitted:
   - `metric` contains new metric definitions
   - `snapshot` contains metric values from last period
   - `cumulative` contains cumulative metric values from the test starting point
-
-## Customization
-
-The embedded user interface can be customized using a single JavaScript configuration file specified in the `XK6_DASHBOARD_CONFIG` environment variable (default: `.dashboard.js` in the current directory). The configuration file is an ES6 module. The module's default export is a JavaScript function which returns a configuration object. The default configuration is passed as argument to the exported function.
-
-The default configuration is loaded from the [assets/packages/config/dist/config.json](assets/packages/config/dist/config.json) file, which can give you ideas for creating your own configuration.
-
-> **Warning**
-> The format of the custom configuration has changed!
-> The stability of the configuration format is still not guaranteed, so you should check the changes before updating the version.
-> In addition, it is possible that the custom configuration will be limited or phased out in the future.
-
-### Examples
-
-**Custom tab**
-![k6 dashboard custom](screenshot/k6-dashboard-custom.png)
-
-In this example, a tab called *Custom* is defined, which contains six panels and two charts. The first two panels are just a reference to the two panels of the built-in *Overview* tab.
-
-```js
-export default function (config) {
-  Array.prototype.getById = function (id) {
-    return this.filter(element => element.id == id).at(0)
-  }
-
-  // helper for adding p(99) to existing chart
-  function addP99 (chart) {
-    chart.series = Object.assign({}, chart.series)
-    chart.series['http_req_duration.p(99)'] = { label: 'p(99)', format: 'duration' }
-  }
-
-  // define request duration panel
-  function durationPanel (suffix) {
-    return {
-      id: `http_req_duration_${suffix}`,
-      title: `HTTP Request Duration ${suffix}`,
-      metric: `http_req_duration.${suffix}`,
-      format: 'duration'
-    }
-  }
-  
-  // copy vus and http_reqs panel from default config
-  const overview = config.tabs.getById('overview_snapshot')
-
-  // define custom panels
-  const customPanels = [
-    overview.panels.getById('vus'),
-    overview.panels.getById('http_reqs'),
-    durationPanel('avg'),
-    durationPanel('p(90)'),
-    durationPanel('p(95)'),
-    durationPanel('p(99)')
-  ]
-
-  // copy http_req_duration chart form default config...
-  const durationChart = Object.assign({}, overview.charts.getById('http_req_duration'))
-
-  // ... and add p(99)
-  addP99(durationChart)
-
-  // define custom tab
-  const customTab = {
-    id: 'custom',
-    title: 'Custom',
-    event: overview.event,
-    panels: customPanels,
-    charts: [overview.charts.getById('http_reqs'), durationChart],
-    description: 'Example of customizing the display of metrics.'
-  }
-
-  // add custom tab to configuration
-  config.tabs.push(customTab)
-
-  return config
-}
-```
-
-**p(99)**
-
-In this example, the 99th percentile value is added to the *Request Duration* chart on the built-in *Overview* tabs.
-
-```js
-export default function (config) {
-  Array.prototype.getById = function (id) {
-    return this.filter((element) => element.id == id).at(0);
-  };
-
-  // helper for adding p(99) to existing chart
-  function addP99(chart) {
-    chart.series["http_req_duration.p(99)"] = { label: "p(99)" };
-  }
-
-  // add p(99) to overview panels request duration charts
-  addP99(config.tabs.getById("overview_snapshot").charts.getById("http_req_duration"));
-
-  return config
-}
-```
 
 ## Command Line
 
