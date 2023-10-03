@@ -81,28 +81,24 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 
 	rep := newReporter("", th.assets, th.proc)
 
-	rep.data.cumulative = recursiveJSON(t)
+	rep.data.cumulative = &recorderEnvelope{Name: "dummy", Data: recursiveJSON(t)}
 
 	assert.Error(t, rep.exportJSON(io.Discard))
 
 	rep.data.cumulative = nil
 
+	data := make(map[string]interface{})
+
+	rep.onEvent(snapshotEvent, data)
+
 	out := newErrorWriter(t)
 
 	assert.Error(t, rep.exportJSON(out))
-	assert.Error(t, rep.exportJSON(out.reset(1)))
-	assert.Error(t, rep.exportJSON(out.reset(2)))
-	assert.Error(t, rep.exportJSON(out.reset(3)))
-	assert.Error(t, rep.exportJSON(out.reset(4)))
-	assert.Error(t, rep.exportJSON(out.reset(5)))
-	assert.Error(t, rep.exportJSON(out.reset(6)))
-	assert.Error(t, rep.exportJSON(out.reset(7)))
-	assert.Error(t, rep.exportJSON(out.reset(8)))
-	assert.Error(t, rep.exportJSON(out.reset(9)))
-	assert.Error(t, rep.exportJSON(out.reset(10)))
+	assert.NoError(t, rep.exportJSON(out.reset(2)))
 
-	assert.NoError(t, rep.exportJSON(out.reset(11)))
-	assert.Equal(t, emptyData, out.String())
+	exp := `{"event":"snapshot","data":{}}` + "\n"
+
+	assert.Equal(t, exp, out.String())
 }
 
 func Test_briefer_exportBase64_error(t *testing.T) {
@@ -114,7 +110,7 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 
 	rep := newReporter("", th.assets, th.proc)
 
-	rep.data.cumulative = recursiveJSON(t)
+	rep.data.cumulative = &recorderEnvelope{Name: "dummy", Data: recursiveJSON(t)}
 
 	assert.Error(t, rep.exportBase64(io.Discard))
 
@@ -168,27 +164,31 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n", rep.data.buff.String())
+	exp := `{"event":"snapshot","data":{}}` + "\n"
+
+	assert.Equal(t, exp, rep.data.buff.String())
 
 	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, "{}\n,{}\n", rep.data.buff.String())
+	assert.Equal(t, exp+exp, rep.data.buff.String())
 
 	data["bad"] = recursiveJSON(t)
 
 	rep.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
 
-	assert.Equal(t, "{}\n,{}\n,null\n", rep.data.buff.String())
+	assert.Equal(t, exp+exp+"null\n", rep.data.buff.String())
 
 	data["foo"] = "bar"
 
 	rep.onEvent(cumulativeEvent, data)
 
-	assert.Equal(t, data, rep.data.cumulative)
+	envelope := &recorderEnvelope{Name: cumulativeEvent, Data: data}
+
+	assert.Equal(t, envelope, rep.data.cumulative)
 }
 
 const (
-	emptyData       = `{"cumulative":null,"param":null,"config":null,"metrics":{},"snapshot":[]}`
-	emptyDataBase64 = `H4sIAAAAAAAA/6pWSi7NLc1JLMksS1WyyivNydFRKkgsSsyFcZLz89Iy02G83NSSoszkYiWr6lodpeK8xILijPwSJavo2FpAAAAA///7qm9QSQAAAA==`
+	emptyData       = ``
+	emptyDataBase64 = `H4sIAAAAAAAA/wEAAP//AAAAAAAAAAA=`
 	emptyDataScript = `<script id="data" type="application/json; charset=utf-8; gzip; base64">` + emptyDataBase64
 )

@@ -4,13 +4,18 @@
   "version": "0.0.1",
   "types": "./src/config.d.ts",
   "files": [
-    "dist/config.json",
-    "src/config.d.ts"
+    "dist/config.json"
   ],
+  "exports": {
+    ".": "./dist/config.json"
+  },
   "scripts": {
     "build": "node main.js dist/config.json"
   },
   "type": "module",
+  "dependencies": {
+    "@xk6-dashboard/view": "0.0.1"
+  },
   "devDependencies": {
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.0.0",

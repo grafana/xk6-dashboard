@@ -1,85 +1,86 @@
-// SPDX-FileCopyrightText: 2023 Iván Szkiba
 // SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
 // SPDX-License-Identifier: AGPL-3.0-only
-// SPDX-License-Identifier: MIT
 
-import React, { useContext, useRef } from 'react'
-import { SamplesContext } from './samples'
-import { MetricsUplot } from './metrics-uplot'
-import './Chart.css'
-import UplotReact from 'uplot-react';
-import 'uplot/dist/uPlot.min.css';
-import uPlot from 'uplot';
-import { tooltipPlugin } from './tooltip';
-import { useParentSize } from '@cutting/use-get-parent-size';
-import { Card } from '@mui/material'
-import {format} from './format'
+import React, { useRef, useState, useLayoutEffect } from "react"
+import { Grid, useTheme } from "@mui/material"
+import { PropTypes } from "prop-types"
 
-const sync = uPlot.sync("chart");
+import UplotReact from "uplot-react"
+import "uplot/dist/uPlot.min.css"
+import uPlot from "uplot"
+import { tooltipPlugin, format, dateFormats, SeriesPlot } from "@xk6-dashboard/view"
 
-function Chart(props) {
-  const model = new MetricsUplot(useContext(SamplesContext), props.series)
-  const ref = useRef(null);
-  const { width } = useParentSize(ref);
+import "./Chart.css"
 
-  if (model.data.length < (props.series.length + 1)) {
-    return (<span></span>)
+import { useDigest } from "./digest"
+
+const sync = uPlot.sync("chart")
+
+export default function Chart({ panel }) {
+  const [width, setWidth] = useState(0)
+  const ref = useRef(null)
+  const digest = useDigest()
+  const theme = useTheme()
+
+  useLayoutEffect(() => {
+    let updateWidth = () => setWidth(ref.current.offsetWidth)
+    updateWidth()
+    window.addEventListener("resize", updateWidth)
+
+    return () => window.removeEventListener("resize", updateWidth)
+  })
+
+  const plot = new SeriesPlot(digest, panel, theme.palette.color)
+
+  if (plot.empty) {
+    return <div ref={ref} />
   }
 
   let options = {
-    width: props.width || width,
-    height: props.height || 250,
-    title: props.title,
-    cursor: {
-      sync: { key: sync.key },
-    },
-    legend: {
-      live: false,
-    },
-    series: model.series,
-    plugins: [tooltipPlugin()],
+    width: width,
+    height: 250,
+    title: panel.title,
+    cursor: { sync: { key: sync.key } },
+    legend: { live: false },
+    series: plot.series,
+    axes: [{}],
+    plugins: [tooltipPlugin(theme.palette.background.paper)]
   }
 
-  if (props.axes) {
-    options.axes = props.axes
-    options.axes[0].values = dateFormats
+  let grid = theme.palette.mode == "dark" ? "#202020" : "#f0f0f0"
 
-    for(var i = 1; i < options.axes.length; i++) {
-      const fmt = options.axes[i].format
-
-      if (!fmt) {
-        continue
-      }
-
-      options.axes[i].values = (self, ticks) => ticks.map(val => format(fmt, val) )
-      options.axes[i].size = 70
+  options.axes = plot.samples.units.map((unit) => {
+    return {
+      stroke: theme.palette.text.primary,
+      grid: { stroke: grid },
+      ticks: { stroke: grid },
+      values: (self, ticks) => ticks.map((val) => format(unit, val)),
+      size: 70,
+      scale: unit
     }
+  })
+
+  delete options.axes[0].size
+  options.axes[0].values = dateFormats
+
+  if (options.axes.length > 2) {
+    options.axes[2].side = 1
   }
 
-  if (props.plain) {
-    options.cursor.show = false
+  let select = theme.palette.mode == "dark" ? "#60606080" : "#d0d0d080"
 
-    return <UplotReact options={options} data={model.data} />
+  function onCreate(chart) {
+    chart.root.querySelector(".u-select").style.background = select
   }
 
   return (
-    <Card ref={ref} >
-      <UplotReact options={options} data={model.data} />
-    </Card>
+    <Grid ref={ref} className="chart panel" item md={12} lg={6}>
+      <UplotReact options={options} data={plot.data} onCreate={onCreate} />
+    </Grid>
   )
 }
 
-// prettier-ignore
-const dateFormats = [
-  // tick incr          default           year                             month    day                       hour     min             sec       mode
-    [3600 * 24 * 365,   "{YYYY}",         null,                            null,    null,                     null,    null,           null,        1],
-    [3600 * 24 * 28,    "{MMM}",          "\n{YYYY}",                      null,    null,                     null,    null,           null,        1],
-    [3600 * 24,         "{MM}-{DD}",      "\n{YYYY}",                      null,    null,                     null,    null,           null,        1],
-    [3600,              "{HH}",           "\n{YYYY}-{MM}-{DD}",            null,    "\n{MM}-{DD}",            null,    null,           null,        1],
-    [60,                "{HH}:{mm}",      "\n{YYYY}-{MM}-{DD}",            null,    "\n{MM}-{DD}",            null,    null,           null,        1],
-    [1,                 ":{ss}",          "\n{YYYY}-{MM}-{DD} {HH}:{mm}",  null,    "\n{MM}-{DD} {HH}:{mm}",  null,    "\n{HH}:{mm}",  null,        1],
-    [0.001,             ":{ss}.{fff}",    "\n{YYYY}-{MM}-{DD} {HH}:{mm}",  null,    "\n{MM}-{DD} {HH}:{mm}",  null,    "\n{HH}:{mm}",  null,        1],
-]
-
-export { Chart }
+Chart.propTypes = {
+  panel: PropTypes.any.isRequired
+}

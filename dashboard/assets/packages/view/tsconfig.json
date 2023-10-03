@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "emitDeclarationOnly": true,
+    "declaration": true
+  }
+}

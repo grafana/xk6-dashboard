@@ -6,6 +6,11 @@
  * SPDX-License-Identifier: MIT
  */
 
+.chart {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .u-title,
 .u-label {
   font-weight: 300 !important;
@@ -19,46 +24,4 @@
   .u-title {
     font-weight: 400 !important;
   }
-
-  div.chart {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-  }
-
-  .u-tooltip {
-    font-size: small;
-    position: absolute;
-    display: none;
-    background: white;
-    padding: 0.2rem;
-    color: black;
-    border: 1px solid #7b65fa;
-    box-shadow: 2px 2px lightgrey;
-    z-index: 10;
-    pointer-events: none;
-    margin: 0.5rem;
-  }
-
-  .u-tooltip table caption {
-    caption-side: top;
-    background-color: unset;
-    border: unset;
-  }
-
-}
-
-.u-tooltip table td {
-  text-align: left;
-  padding: 0.1rem;
-}
-
-@media print {
-  div.chart {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    }
-  
-    .u-tooltip {
-      display: none;
-    }
 }

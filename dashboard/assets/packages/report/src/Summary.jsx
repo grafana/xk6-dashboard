@@ -1,42 +1,45 @@
-// SPDX-FileCopyrightText: 2023 Iván Szkiba
 // SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
 // SPDX-License-Identifier: AGPL-3.0-only
-// SPDX-License-Identifier: MIT
 
-import "./Summary.css";
+import React from "react"
 
-import { Digest } from "./Digest";
+import "./Summary.css"
 
-export default function SummarySection(props) {
-  const { summary, title, description } = props;
+import { SummaryTable } from "@xk6-dashboard/view"
+
+export default function Summary({ panel, digest }) {
+  const table = new SummaryTable(panel, digest)
+
+  if (table.empty) {
+    return <div />
+  }
 
   return (
-    <section id="summary" className="container">
-      <h2>{title}</h2>
-      <p>{description}</p>
-      <div className="row">
-        <div className="col">
-          <Digest summary={summary} type="trend" caption="Trends" />
-        </div>
-      </div>
-      <div className="row">
-        <div className="col-7">
-          <Digest summary={summary} type="counter" caption="Counters" />
-        </div>
-        <div className="col-5">
-          <div className="row">
-            <div className="col">
-              <Digest summary={summary} type="rate" caption="Rates" />
-            </div>
-          </div>
-          <div className="row">
-            <div className="col">
-              <Digest summary={summary} type="gauge" caption="Gauges" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+    <div className="panel">
+      <table className="table table-hover caption-top">
+        <caption>{panel.title}</caption>
+        <thead>
+          <tr>
+            {table.header.map((name, idx) => (
+              <th key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"}>
+                {name}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.body.map((row, idx) => (
+            <tr key={panel.id + "row" + idx}>
+              {row.map((cell, cidx) => (
+                <td key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
 }

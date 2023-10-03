@@ -22,4 +22,47 @@
 @import "bootstrap/scss/grid";
 @import "bootstrap/scss/tables";
 
+// local
+@media print {
+    .chapter {
+        break-after: page;
+    }
+
+    .usage {
+        display: none;
+    }
+
+    .container {
+        margin-left:unset;
+    }
+}
+
+@media screen {
+    .container {
+        max-width: unset !important;
+    }
+
+    body {
+        margin: 1rem;
+    }
+}
+
+h1, h2, h3 {
+    font-weight: 400;
+}
+
+h2 {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+@media print {
+    h1 {
+        padding-left: unset !important;
+        padding-right: unset !important;
+    }
+}
+
+h1 {
+    text-align: center;
+}
 

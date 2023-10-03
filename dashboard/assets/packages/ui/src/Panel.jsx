@@ -1,62 +1,28 @@
-// SPDX-FileCopyrightText: 2023 Iván Szkiba
 // SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
 //
 // SPDX-License-Identifier: AGPL-3.0-only
-// SPDX-License-Identifier: MIT
 
-import React, { useContext, useRef } from 'react'
-import { SamplesContext } from './samples'
-import { MetricsUplot } from './metrics-uplot'
-import './Panel.css'
-import UplotReact from 'uplot-react';
-import 'uplot/dist/uPlot.min.css';
-import { useParentSize } from '@cutting/use-get-parent-size';
-import { Card, CardContent, Typography, useTheme } from '@mui/material'
-import { format } from './format';
+import React from "react"
+import { PropTypes } from "prop-types"
 
-function Panel(props) {
-  const theme = useTheme()
-  const summaries = useContext(SamplesContext)
+import { PanelKind } from "@xk6-dashboard/view"
 
-  const series = {}
-  series[props.metric] = { label: "" }
+import Chart from "./Chart"
+import Stat from "./Stat"
+import Summary from "./Summary"
 
-  const model = new MetricsUplot(summaries, series)
-  const ref = useRef(null);
-  const { width, height } = useParentSize(ref);
-
-  const seria = summaries.values[props.metric]
-
-  var value = Array.isArray(seria) && seria.length != 0 ? Number(seria.slice(-1)) : 0
-  value = format(props.format, value, true)
-
-
-  let options = {
-    width: width,
-    height: 32,
-    title: value,
-    series: model.series,
-    axes: [{ show: false }, { show: false }],
-    legend: { show: false },
-    cursor: { show: false },
+export default function Panel({ panel }) {
+  if (panel.kind == PanelKind.chart) {
+    return <Chart panel={panel} />
   }
-
-  const color = props.failure ? theme.palette.error.main : theme.palette.primary.main
-
-  options.series[1].points = { show: false }
-  options.series[1].stroke = color
-  options.series[1].fill = color + "40"
-
-  return (
-    <Card className="summary-panel" sx={{ color: color }}>
-      <CardContent>
-        <Typography sx={{ fontSize: "0.8rem" }} color="text.secondary" gutterBottom align='center'>{props.title}</Typography>
-        <div ref={ref}>
-          <UplotReact options={options} data={model.data} />
-        </div>
-      </CardContent>
-    </Card>
-  )
+  if (panel.kind == PanelKind.stat) {
+    return <Stat panel={panel} />
+  }
+  if (panel.kind == PanelKind.summary) {
+    return <Summary panel={panel} />
+  }
 }
 
-export { Panel }
+Panel.propTypes = {
+  panel: PropTypes.any.isRequired
+}

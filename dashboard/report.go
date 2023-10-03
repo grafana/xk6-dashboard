@@ -81,41 +81,19 @@ func (rep *reporter) onEvent(name string, data interface{}) {
 	rep.mu.Lock()
 	defer rep.mu.Unlock()
 
+	if name == configEvent {
+		return
+	}
+
+	envelope := &recorderEnvelope{Name: name, Data: data}
+
 	if name == cumulativeEvent {
-		rep.data.cumulative = data
+		rep.data.cumulative = envelope
 
 		return
 	}
 
-	if name == paramEvent {
-		rep.data.param = data
-
-		return
-	}
-
-	if name == metricEvent {
-		if metrics, ok := data.(map[string]metricData); ok {
-			for key, value := range metrics {
-				rep.data.metrics[key] = value
-			}
-		}
-
-		return
-	}
-
-	if name != snapshotEvent {
-		return
-	}
-
-	if rep.data.buff.Len() != 0 {
-		if _, err := rep.data.buff.WriteRune(','); err != nil {
-			rep.proc.logger.Error(err)
-
-			return
-		}
-	}
-
-	if err := rep.data.encoder.Encode(data); err != nil {
+	if err := rep.data.encoder.Encode(envelope); err != nil {
 		if eerr := rep.data.encoder.Encode(nil); eerr != nil {
 			rep.proc.logger.Error(err)
 		}
@@ -203,77 +181,44 @@ func (rep *reporter) inject(
 }
 
 type reportData struct {
-	config     json.RawMessage
-	param      interface{}
+	config     *recorderEnvelope
 	buff       bytes.Buffer
 	encoder    *json.Encoder
-	cumulative interface{}
-	metrics    map[string]metricData
+	cumulative *recorderEnvelope
 }
 
-func newReportData(config []byte) *reportData {
+func newReportData(config json.RawMessage) *reportData {
 	data := new(reportData)
 
-	data.config = config
-	data.metrics = make(map[string]metricData)
+	if config != nil {
+		data.config = &recorderEnvelope{Name: configEvent, Data: config}
+	}
+
 	data.encoder = json.NewEncoder(&data.buff)
 
 	return data
 }
 
-func encodeJSONprop(out io.Writer, prefix string, name string, value interface{}) error {
-	if _, err := out.Write([]byte(prefix + `"` + name + `":`)); err != nil {
-		return err
-	}
-
-	if raw, ok := value.(json.RawMessage); ok {
-		if len(raw) == 0 {
-			raw = []byte("null")
-		}
-
-		_, err := out.Write(raw)
-
-		return err
-	}
-
-	bin, err := json.Marshal(value)
-	if err != nil {
-		return err
-	}
-
-	_, err = out.Write(bin)
-
-	return err
-}
-
 func (data *reportData) exportJSON(out io.Writer) error {
-	if err := encodeJSONprop(out, "{", "cumulative", data.cumulative); err != nil {
-		return err
+	encoder := json.NewEncoder(out)
+
+	if data.config != nil {
+		if err := encoder.Encode(data.config); err != nil {
+			return err
+		}
 	}
 
-	if err := encodeJSONprop(out, ",", "param", data.param); err != nil {
-		return err
+	if data.buff.Len() != 0 {
+		if _, err := out.Write(data.buff.Bytes()); err != nil {
+			return err
+		}
 	}
 
-	if err := encodeJSONprop(out, ",", "config", data.config); err != nil {
-		return err
+	if data.cumulative != nil {
+		return encoder.Encode(data.cumulative)
 	}
 
-	if err := encodeJSONprop(out, ",", "metrics", data.metrics); err != nil {
-		return err
-	}
-
-	if _, err := out.Write([]byte(`,"snapshot":[`)); err != nil {
-		return err
-	}
-
-	if _, err := out.Write(data.buff.Bytes()); err != nil {
-		return err
-	}
-
-	_, err := out.Write([]byte("]}"))
-
-	return err
+	return nil
 }
 
 const dataTag = `<script id="data" type="application/json; charset=utf-8; gzip; base64">`

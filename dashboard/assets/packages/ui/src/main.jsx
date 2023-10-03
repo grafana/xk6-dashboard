@@ -4,33 +4,23 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { SSEProvider } from 'react-hooks-sse';
-import { ThemeProvider, createTheme } from '@mui/material'
-import Dashboard from './Dashboard'
-import './index.css'
+import React from "react"
+import ReactDOM from "react-dom/client"
 
-const base = new URLSearchParams(window.location.search).get("endpoint") || "http://localhost:5665/";
+import App from "./App"
+import Themed from "./Themed"
+import { DigestProvider } from "./digest"
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#7b65fa',
-    },
-    secondary: {
-      main: '#A47D4F',
-    },
-  }
-});
+const base = new URLSearchParams(window.location.search).get("endpoint") || "http://localhost:5665/"
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <SSEProvider endpoint={base + "events"}>
-      <ThemeProvider theme={theme}>
-        <Dashboard/>
-      </ThemeProvider>
-    </SSEProvider>
-  </React.StrictMode>,
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <>
+    {/*<React.StrictMode>*/}
+    <Themed>
+      <DigestProvider endpoint={base + "events"}>
+        <App />
+      </DigestProvider>
+    </Themed>
+    {/*</React.StrictMode>*/}
+  </>
 )

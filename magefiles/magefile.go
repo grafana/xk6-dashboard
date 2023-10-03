@@ -93,7 +93,7 @@ func jsonout(script string) string {
 
 // Run run sample script
 func Run(script string) error {
-	return xk6run("--out", out(script), "--out", jsonout(script), "script.js")
+	return xk6run("--out", out(script), "--out", jsonout(script), script)
 }
 
 // Replay replay test from recorded JSON file

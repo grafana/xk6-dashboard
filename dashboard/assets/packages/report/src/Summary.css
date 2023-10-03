@@ -1,7 +1,38 @@
 /*
- * SPDX-FileCopyrightText: 2023 Iván Szkiba
  * SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
  *
  * SPDX-License-Identifier: AGPL-3.0-only
- * SPDX-License-Identifier: MIT
  */
+
+.container {
+  padding: 0 !important;
+}
+
+.panel table {
+  break-inside: avoid;
+}
+
+tr:hover {
+  background-color: #f8f8f8;
+}
+
+thead tr th {
+  font-weight: 700;
+}
+
+tr td:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+
+tr th:not(:first-child),
+td {
+  text-align: right;
+}
+
+caption {
+  text-align: center !important;
+  font-weight: 400;
+  color: #404040 !important;
+  padding: 4px !important;
+}
