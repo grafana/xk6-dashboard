@@ -24,19 +24,22 @@ The test run report can be exported to a responsive self-contained HTML file, wh
 
 The overview tab provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.
 
-![k6 dashboard overview snapshot](screenshot/k6-dashboard-overview-snapshot.png)
+![k6 dashboard overview dark](screenshot/k6-dashboard-overview-dark.png#gh-dark-mode-only)
+![k6 dashboard overview light](screenshot/k6-dashboard-overview-light.png#gh-light-mode-only)
 
 *Timings*
 
 The timings tab provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.
 
-![k6 dashboard timings snapshot](screenshot/k6-dashboard-timings-snapshot.png)
+![k6 dashboard timings dark](screenshot/k6-dashboard-timings-dark.png#gh-dark-mode-only)
+![k6 dashboard timings light](screenshot/k6-dashboard-timings-light.png#gh-light-mode-only)
 
 *Summary Tab*
 
 The summary tab contains a summary of the test run metrics. The tables contain the aggregated values of the metrics for the entire test run.
 
-![k6 dashboard summary](screenshot/k6-dashboard-summary.png)
+![k6 dashboard summary dark](screenshot/k6-dashboard-summary-dark.png#gh-dark-mode-only)
+![k6 dashboard summary light](screenshot/k6-dashboard-summary-light.png#gh-light-mode-only)
 
 **HTML Report**
 
