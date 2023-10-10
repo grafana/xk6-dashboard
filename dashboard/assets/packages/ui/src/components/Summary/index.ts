@@ -2,4 +2,4 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-export { default } from './Summary'
+export { default } from "./Summary"

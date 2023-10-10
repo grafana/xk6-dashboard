@@ -4,14 +4,14 @@
 
 import React from "react"
 import { Grid, Table, TableContainer, TableCell, TableHead, TableRow, TableBody, useTheme } from "@mui/material"
-import { SummaryTable } from "@xk6-dashboard/view"
+import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
 import { useDigest } from "store/digest"
 
 import "./Summary.css"
 
 interface SummaryProps {
-  panel: any
+  panel: Panel
 }
 
 export default function Summary({ panel }: SummaryProps) {

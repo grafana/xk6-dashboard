@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React, { createContext, useMemo, useState, ReactNode } from "react"
-import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from "@mui/material"
+import { CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material"
+import { createTheme } from "@mui/material/styles"
 import {
   red,
   pink,
@@ -26,11 +27,13 @@ import {
   blueGrey
 } from "@mui/material/colors"
 
+import { Color } from "types/theme"
+
 import "./Themed.css"
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
-const colors = {
+const colors: Record<string, Color> = {
   red,
   pink,
   purple,
@@ -92,9 +95,9 @@ export default function Themed({ children }: ThemedProps) {
   )
 
   const theme = useMemo(() => {
-    let extra = []
+    const extra = []
 
-    for (var i = 0; i < order.length; i++) {
+    for (let i = 0; i < order.length; i++) {
       const name = order[i]
       const color = {
         stroke: mode == "dark" ? colors[name][500] : colors[name][800],
@@ -103,10 +106,9 @@ export default function Themed({ children }: ThemedProps) {
 
       colors[name].stroke = mode ? "dark" : colors[name][500]
       extra.push(color)
-      extra[name] = color
     }
 
-    let theme = createTheme({
+    const theme = createTheme({
       palette: {
         mode,
         primary: {

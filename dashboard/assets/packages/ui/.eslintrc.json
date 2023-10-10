@@ -24,5 +24,10 @@
     "prettier/prettier": "error",
     "react/prop-types": 0,
     "react-refresh/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "settings": {
+    "react": {
+      "version": "detect" // React version. "detect" automatically picks the version you have installed.
+    }
   }
 }

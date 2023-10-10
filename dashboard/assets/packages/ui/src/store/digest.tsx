@@ -6,7 +6,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import defaultConfig from "@xk6-dashboard/config"
 import { Digest, Config, EventType } from "@xk6-dashboard/model"
 
-const DigestContext = createContext(() => new Digest({ config: defaultConfig }))
+const DigestContext = createContext(() => new Digest({ config: defaultConfig } as Digest))
 DigestContext.displayName = "Digest"
 
 interface DigestProviderProps {

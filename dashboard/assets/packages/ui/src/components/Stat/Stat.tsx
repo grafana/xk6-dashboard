@@ -5,16 +5,17 @@
 import React, { useRef, useState, useLayoutEffect } from "react"
 import { Grid, Typography, useTheme } from "@mui/material"
 import "uplot/dist/uPlot.min.css"
-import { Options } from "uplot"
+import { AlignedData, Options, Series } from "uplot"
 import UplotReact from "uplot-react"
-import { format, SeriesPlot } from "@xk6-dashboard/view"
+import { format, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
+import { ColorParams } from "types/theme"
 import { useDigest } from "store/digest"
 
 import "./Stat.css"
 
 interface StatProps {
-  panel: any
+  panel: Panel
 }
 
 export default function Stat({ panel }: StatProps) {
@@ -38,7 +39,7 @@ export default function Stat({ panel }: StatProps) {
 
   const query = panel.series[0].query
 
-  const plot = new SeriesPlot(digest, panel, theme.palette.color)
+  const plot = new SeriesPlot(digest, panel, theme.palette.color as Required<ColorParams>[])
 
   if (plot.empty) {
     return <div ref={ref} />
@@ -55,7 +56,7 @@ export default function Stat({ panel }: StatProps) {
     width: width,
     height: 32,
     title: value,
-    series: plot.series,
+    series: plot.series as Series[],
     axes: [{ show: false }, { show: false }],
     legend: { show: false },
     cursor: { show: false }
@@ -67,7 +68,7 @@ export default function Stat({ panel }: StatProps) {
         {panel.title}
       </Typography>
       <div ref={ref}>
-        <UplotReact options={options} data={plot.data} />
+        <UplotReact options={options} data={plot.data as AlignedData} />
       </div>
     </Grid>
   )

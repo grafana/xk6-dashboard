@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --emptyOutDir",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:eslint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:format": "prettier --ignore-unknown --check \"./**/*\"",
+    "lint:types": "tsc --noEmit",
+    "lint": "yarn lint:eslint && yarn lint:types && yarn lint:format"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",

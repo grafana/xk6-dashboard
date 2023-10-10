@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
-//
-// SPDX-License-Identifier: AGPL-3.0-only
-
 declare const enum UnitType {
     bytes = "bytes",
     bps = "bps",
@@ -179,8 +175,8 @@ declare class Digest implements EventListenerObject {
     constructor({ config, param, start, stop, metrics, samples, summary }?: {
         config?: Config | undefined;
         param?: Param | undefined;
-        start?: undefined;
-        stop?: undefined;
+        start?: Date | undefined;
+        stop?: Date | undefined;
         metrics?: Metrics | undefined;
         samples?: Samples | undefined;
         summary?: Summary | undefined;

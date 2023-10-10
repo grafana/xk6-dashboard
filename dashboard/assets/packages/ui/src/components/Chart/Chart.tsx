@@ -5,10 +5,11 @@
 import React, { useRef, useState, useLayoutEffect } from "react"
 import { Grid, useTheme } from "@mui/material"
 import "uplot/dist/uPlot.min.css"
-import uPlot, { Options } from "uplot"
+import uPlot, { AlignedData, Options, Series } from "uplot"
 import UplotReact from "uplot-react"
-import { tooltipPlugin, format, dateFormats, SeriesPlot } from "@xk6-dashboard/view"
+import { tooltipPlugin, format, dateFormats, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
+import { ColorParams } from "types/theme"
 import { useDigest } from "store/digest"
 
 import "./Chart.css"
@@ -16,7 +17,7 @@ import "./Chart.css"
 const sync = uPlot.sync("chart")
 
 interface ChartProps {
-  panel: any
+  panel: Panel
 }
 
 export default function Chart({ panel }: ChartProps) {
@@ -38,7 +39,7 @@ export default function Chart({ panel }: ChartProps) {
     return () => window.removeEventListener("resize", updateWidth)
   })
 
-  const plot = new SeriesPlot(digest, panel, theme.palette.color)
+  const plot = new SeriesPlot(digest, panel, theme.palette.color as Required<ColorParams>[])
 
   if (plot.empty) {
     return <div ref={ref} />
@@ -50,7 +51,7 @@ export default function Chart({ panel }: ChartProps) {
     title: panel.title,
     cursor: { sync: { key: sync.key } },
     legend: { live: false },
-    series: plot.series,
+    series: plot.series as Series[],
     axes: [{}],
     plugins: [tooltipPlugin(theme.palette.background.paper)]
   }
@@ -86,7 +87,7 @@ export default function Chart({ panel }: ChartProps) {
 
   return (
     <Grid ref={ref} className="chart panel" item md={12} lg={6}>
-      <UplotReact options={options} data={plot.data} onCreate={onCreate} />
+      <UplotReact options={options} data={plot.data as AlignedData} onCreate={onCreate} />
     </Grid>
   )
 }
