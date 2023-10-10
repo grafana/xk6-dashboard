@@ -4,27 +4,34 @@
 
 import React, { useRef, useState, useLayoutEffect } from "react"
 import { Grid, useTheme } from "@mui/material"
-import { PropTypes } from "prop-types"
-
-import UplotReact from "uplot-react"
 import "uplot/dist/uPlot.min.css"
-import uPlot from "uplot"
+import uPlot, { Options } from "uplot"
+import UplotReact from "uplot-react"
 import { tooltipPlugin, format, dateFormats, SeriesPlot } from "@xk6-dashboard/view"
+
+import { useDigest } from "store/digest"
 
 import "./Chart.css"
 
-import { useDigest } from "./digest"
-
 const sync = uPlot.sync("chart")
 
-export default function Chart({ panel }) {
+interface ChartProps {
+  panel: any
+}
+
+export default function Chart({ panel }: ChartProps) {
   const [width, setWidth] = useState(0)
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
   const digest = useDigest()
   const theme = useTheme()
 
   useLayoutEffect(() => {
-    let updateWidth = () => setWidth(ref.current.offsetWidth)
+    const updateWidth = () => {
+      if (ref.current) {
+        setWidth(ref.current.offsetWidth)
+      }
+    }
+
     updateWidth()
     window.addEventListener("resize", updateWidth)
 
@@ -37,7 +44,7 @@ export default function Chart({ panel }) {
     return <div ref={ref} />
   }
 
-  let options = {
+  const options: Options = {
     width: width,
     height: 250,
     title: panel.title,
@@ -48,14 +55,14 @@ export default function Chart({ panel }) {
     plugins: [tooltipPlugin(theme.palette.background.paper)]
   }
 
-  let grid = theme.palette.mode == "dark" ? "#202020" : "#f0f0f0"
+  const grid = theme.palette.mode == "dark" ? "#202020" : "#f0f0f0"
 
   options.axes = plot.samples.units.map((unit) => {
     return {
       stroke: theme.palette.text.primary,
       grid: { stroke: grid },
       ticks: { stroke: grid },
-      values: (self, ticks) => ticks.map((val) => format(unit, val)),
+      values: (_, ticks) => ticks.map((val) => format(unit, val)),
       size: 70,
       scale: unit
     }
@@ -68,10 +75,13 @@ export default function Chart({ panel }) {
     options.axes[2].side = 1
   }
 
-  let select = theme.palette.mode == "dark" ? "#60606080" : "#d0d0d080"
+  function onCreate(chart: uPlot) {
+    const color = theme.palette.mode == "dark" ? "#60606080" : "#d0d0d080"
+    const element = chart.root.querySelector(".u-select") as HTMLElement
 
-  function onCreate(chart) {
-    chart.root.querySelector(".u-select").style.background = select
+    if (element) {
+      element.style.background = color
+    }
   }
 
   return (
@@ -79,8 +89,4 @@ export default function Chart({ panel }) {
       <UplotReact options={options} data={plot.data} onCreate={onCreate} />
     </Grid>
   )
-}
-
-Chart.propTypes = {
-  panel: PropTypes.any.isRequired
 }

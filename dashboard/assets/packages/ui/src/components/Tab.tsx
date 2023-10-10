@@ -3,10 +3,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React from "react"
-import { PropTypes } from "prop-types"
 import Section from "./Section"
 
-export default function Tab({ tab }) {
+interface TabProps {
+  tab: any
+}
+
+export default function Tab({ tab }: TabProps) {
   return (
     <>
       {tab.sections.map((section) => (
@@ -14,8 +17,4 @@ export default function Tab({ tab }) {
       ))}
     </>
   )
-}
-
-Tab.propTypes = {
-  tab: PropTypes.any.isRequired
 }

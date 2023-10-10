@@ -3,17 +3,21 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React, { useContext } from "react"
-
 import { Button, IconButton, AppBar, Typography, Toolbar, useTheme } from "@mui/material"
+import { Config } from "@xk6-dashboard/model"
 
-import { ReactComponent as DarkModeIcon } from "./icons/dark_mode.svg"
-import { ReactComponent as LightModeIcon } from "./icons/light_mode.svg"
+import { ColorModeContext } from "components/Themed/Themed"
+import { ReactComponent as DarkModeIcon } from "assets/icons/dark_mode.svg"
+import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
 
 import "./Header.css"
 
-import { ColorModeContext } from "./Themed"
+interface HeaderProps {
+  config: Config
+}
 
-export default function Header({ config: { title } }) {
+export default function Header({ config }: HeaderProps) {
+  const { title } = config
   const theme = useTheme()
   const colorMode = useContext(ColorModeContext)
 

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React from "react"
+import React, { createContext, useMemo, useState, ReactNode } from "react"
 import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from "@mui/material"
 import {
   red,
@@ -25,10 +25,10 @@ import {
   grey,
   blueGrey
 } from "@mui/material/colors"
-import { PropTypes } from "prop-types"
-import "./index.css"
 
-export const ColorModeContext = React.createContext({ toggleColorMode: () => {} })
+import "./Themed.css"
+
+export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
 const colors = {
   red,
@@ -50,7 +50,7 @@ const colors = {
   brown,
   grey,
   blueGrey
-}
+} as const
 
 const order = [
   "grey",
@@ -72,13 +72,17 @@ const order = [
   "yellow",
   "deepOrange",
   "blueGrey"
-]
+] as const
 
-export default function Themed({ children }) {
+interface ThemedProps {
+  children: ReactNode
+}
+
+export default function Themed({ children }: ThemedProps) {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-  const [mode, setMode] = React.useState(prefersDarkMode ? "dark" : "light")
+  const [mode, setMode] = useState<"dark" | "light">(prefersDarkMode ? "dark" : "light")
 
-  const colorMode = React.useMemo(
+  const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
         setMode((prevMode) => (prevMode === "light" ? "dark" : "light"))
@@ -87,7 +91,7 @@ export default function Themed({ children }) {
     []
   )
 
-  const theme = React.useMemo(() => {
+  const theme = useMemo(() => {
     let extra = []
 
     for (var i = 0; i < order.length; i++) {
@@ -96,6 +100,7 @@ export default function Themed({ children }) {
         stroke: mode == "dark" ? colors[name][500] : colors[name][800],
         fill: (mode == "dark" ? colors[name][300] : colors[name][600]) + "20"
       }
+
       colors[name].stroke = mode ? "dark" : colors[name][500]
       extra.push(color)
       extra[name] = color
@@ -129,8 +134,4 @@ export default function Themed({ children }) {
       </ThemeProvider>
     </ColorModeContext.Provider>
   )
-}
-
-Themed.propTypes = {
-  children: PropTypes.node
 }
