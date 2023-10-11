@@ -8,11 +8,11 @@ export interface Tab {
   title?: string
   id?: string
   summary?: string
-  report: boolean
+  report?: boolean
   sections: Section[]
 }
 
-export interface DigestConfig {
-  title?: string
+export interface UIConfig {
+  title: string
   tabs: Tab[]
 }

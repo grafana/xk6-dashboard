@@ -4,14 +4,14 @@
 
 import React from "react"
 
-import { PanelKind, Panel as ViewPanel } from "@xk6-dashboard/view"
+import { PanelKind, Panel as PanelClass } from "@xk6-dashboard/view"
 
 import Chart from "components/Chart"
 import Stat from "components/Stat"
 import Summary from "components/Summary"
 
 interface PanelProps {
-  panel: ViewPanel
+  panel: PanelClass
 }
 
 export default function Panel({ panel }: PanelProps) {

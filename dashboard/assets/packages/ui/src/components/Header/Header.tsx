@@ -5,7 +5,7 @@
 import React, { useContext } from "react"
 import { Button, IconButton, AppBar, Typography, Toolbar, useTheme } from "@mui/material"
 
-import { DigestConfig } from "types/config"
+import { UIConfig } from "types/config"
 import { ColorModeContext } from "components/Themed/Themed"
 import { ReactComponent as DarkModeIcon } from "assets/icons/dark_mode.svg"
 import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
@@ -13,7 +13,7 @@ import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
 import "./Header.css"
 
 interface HeaderProps {
-  config: DigestConfig
+  config: UIConfig
 }
 
 export default function Header({ config }: HeaderProps) {

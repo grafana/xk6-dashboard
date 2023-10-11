@@ -4,7 +4,7 @@
 
 import React, { useState } from "react"
 import { Box, Collapse, Typography, Grid } from "@mui/material"
-import { isEmptySection, Section as ViewSection } from "@xk6-dashboard/view"
+import { isEmptySection, Section as SectionClass } from "@xk6-dashboard/view"
 
 import { useDigest } from "store/digest"
 import { ReactComponent as ExpandLessIcon } from "assets/icons/expand_less.svg"
@@ -13,7 +13,7 @@ import { ReactComponent as ExpandMoreIcon } from "assets/icons/expand_more.svg"
 import Panel from "./Panel"
 
 interface SectionBodyProps {
-  section: ViewSection
+  section: SectionClass
 }
 
 function SectionBody({ section }: SectionBodyProps) {
@@ -27,7 +27,7 @@ function SectionBody({ section }: SectionBodyProps) {
 }
 
 interface SectionProps {
-  section: ViewSection
+  section: SectionClass
 }
 
 export default function Section({ section }: SectionProps) {

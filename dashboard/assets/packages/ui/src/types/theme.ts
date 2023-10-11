@@ -2,12 +2,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-export interface ColorParams {
-  fill?: string | undefined
-  stroke?: string | undefined
+export interface VectorAttrs {
+  fill: string
+  stroke: string
 }
 
-export interface Color extends ColorParams {
+export interface Colors {
   50: string
   100: string
   200: string

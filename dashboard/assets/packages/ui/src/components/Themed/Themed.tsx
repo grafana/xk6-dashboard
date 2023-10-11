@@ -27,13 +27,13 @@ import {
   blueGrey
 } from "@mui/material/colors"
 
-import { Color } from "types/theme"
+import { Colors, VectorAttrs } from "types/theme"
 
 import "./Themed.css"
 
 export const ColorModeContext = createContext({ toggleColorMode: () => {} })
 
-const colors: Record<string, Color> = {
+const colorMap: Record<string, Colors & Partial<VectorAttrs>> = {
   red,
   pink,
   purple,
@@ -95,17 +95,17 @@ export default function Themed({ children }: ThemedProps) {
   )
 
   const theme = useMemo(() => {
-    const extra = []
+    const vectorAttrsArr = []
 
     for (let i = 0; i < order.length; i++) {
       const name = order[i]
-      const color = {
-        stroke: mode == "dark" ? colors[name][500] : colors[name][800],
-        fill: (mode == "dark" ? colors[name][300] : colors[name][600]) + "20"
+      const vectorAttrs = {
+        stroke: mode == "dark" ? colorMap[name][500] : colorMap[name][800],
+        fill: (mode == "dark" ? colorMap[name][300] : colorMap[name][600]) + "20"
       }
 
-      colors[name].stroke = mode ? "dark" : colors[name][500]
-      extra.push(color)
+      colorMap[name].stroke = mode ? "dark" : colorMap[name][500]
+      vectorAttrsArr.push(vectorAttrs)
     }
 
     const theme = createTheme({
@@ -117,7 +117,7 @@ export default function Themed({ children }: ThemedProps) {
         secondary: {
           main: "#A47D4F"
         },
-        color: extra
+        color: vectorAttrsArr
       }
     })
 

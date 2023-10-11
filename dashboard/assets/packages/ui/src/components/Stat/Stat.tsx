@@ -9,7 +9,6 @@ import { AlignedData, Options, Series } from "uplot"
 import UplotReact from "uplot-react"
 import { format, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
-import { ColorParams } from "types/theme"
 import { useDigest } from "store/digest"
 
 import "./Stat.css"
@@ -39,7 +38,7 @@ export default function Stat({ panel }: StatProps) {
 
   const query = panel.series[0].query
 
-  const plot = new SeriesPlot(digest, panel, theme.palette.color as Required<ColorParams>[])
+  const plot = new SeriesPlot(digest, panel, theme.palette.color)
 
   if (plot.empty) {
     return <div ref={ref} />

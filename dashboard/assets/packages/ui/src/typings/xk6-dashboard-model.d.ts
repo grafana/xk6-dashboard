@@ -4,12 +4,12 @@
 
 import "@xk6-dashboard/model"
 
-import { DigestConfig } from "types/config"
+import { UIConfig } from "types/config"
 
 declare module "@xk6-dashboard/model" {
-  interface Config extends DigestConfig {}
+  interface Config extends UIConfig {}
 
   interface Digest {
-    config?: DigestConfig
+    config?: UIConfig
   }
 }
