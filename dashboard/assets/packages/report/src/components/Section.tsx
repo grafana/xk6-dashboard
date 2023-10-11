@@ -3,19 +3,24 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React from "react"
-
-import { SummaryTable, isEmptySection } from "@xk6-dashboard/view"
+import { Digest } from "@xk6-dashboard/model"
+import { Panel as PanelClass, Section as SectionClass, SummaryTable, isEmptySection } from "@xk6-dashboard/view"
 
 import Panel from "./Panel"
 
-export default function Section({ section, digest }) {
+interface SectionProps {
+  section: SectionClass
+  digest: Digest
+}
+
+export default function Section({ section, digest }: SectionProps) {
   const empty = isEmptySection(section, digest)
 
   if (empty) {
     return <></>
   }
 
-  const foo = (panel) => {
+  const createClassName = (panel: PanelClass) => {
     if (panel.kind == "chart") {
       return "col-lg-6 rcol-md-12"
     }
@@ -40,8 +45,8 @@ export default function Section({ section, digest }) {
       <p>{section.summary}</p>
       <div className="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2" key={section.id + "row"}>
         {section.panels.map((panel) => (
-          <div key={panel.id + "col"} className={"col " + foo(panel)}>
-            <Panel key={panel.id} panel={panel} digest={digest} columns={section.columns} />
+          <div key={panel.id + "col"} className={"col " + createClassName(panel)}>
+            <Panel key={panel.id} panel={panel} digest={digest} />
           </div>
         ))}
       </div>

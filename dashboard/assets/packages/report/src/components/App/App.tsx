@@ -5,11 +5,16 @@
 // SPDX-License-Identifier: MIT
 
 import React from "react"
+import { Digest } from "@xk6-dashboard/model"
+
+import Tab from "components/Tab"
 import "./App.css"
 
-import Tab from "./Tab"
+interface AppProps {
+  digest: Digest
+}
 
-export default function App({ digest }) {
+export default function App({ digest }: AppProps) {
   return (
     <article className="container-fluid report">
       <h1>k6 report</h1>
