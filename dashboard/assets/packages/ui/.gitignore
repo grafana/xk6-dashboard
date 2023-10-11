@@ -25,3 +25,5 @@ node_modules
 *.njsproj
 *.sln
 *.sw?
+
+bundle-stats.html
