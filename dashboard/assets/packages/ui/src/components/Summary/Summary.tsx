@@ -3,16 +3,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React from "react"
-import { PropTypes } from "prop-types"
 import { Grid, Table, TableContainer, TableCell, TableHead, TableRow, TableBody, useTheme } from "@mui/material"
+import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
-import { useDigest } from "./digest"
+import { useDigest } from "store/digest"
 
 import "./Summary.css"
 
-import { SummaryTable } from "@xk6-dashboard/view"
+interface SummaryProps {
+  panel: Panel
+}
 
-export default function Summary({ panel }) {
+export default function Summary({ panel }: SummaryProps) {
   const digest = useDigest()
   const theme = useTheme()
 
@@ -58,8 +60,4 @@ export default function Summary({ panel }) {
       </TableContainer>
     </Grid>
   )
-}
-
-Summary.propTypes = {
-  panel: PropTypes.any.isRequired
 }

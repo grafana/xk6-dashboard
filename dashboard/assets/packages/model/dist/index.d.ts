@@ -179,8 +179,8 @@ declare class Digest implements EventListenerObject {
     constructor({ config, param, start, stop, metrics, samples, summary }?: {
         config?: Config | undefined;
         param?: Param | undefined;
-        start?: undefined;
-        stop?: undefined;
+        start?: Date | undefined;
+        stop?: Date | undefined;
         metrics?: Metrics | undefined;
         samples?: Samples | undefined;
         summary?: Summary | undefined;

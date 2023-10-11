@@ -2,20 +2,21 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React from "react"
-import { PropTypes } from "prop-types"
+import React, { useState } from "react"
 import { Box, Collapse, Typography, Grid } from "@mui/material"
+import { isEmptySection, Section as SectionClass } from "@xk6-dashboard/view"
 
-import { ReactComponent as ExpandLessIcon } from "./icons/expand_less.svg"
-import { ReactComponent as ExpandMoreIcon } from "./icons/expand_more.svg"
+import { useDigest } from "store/digest"
+import { ReactComponent as ExpandLessIcon } from "assets/icons/expand_less.svg"
+import { ReactComponent as ExpandMoreIcon } from "assets/icons/expand_more.svg"
 
 import Panel from "./Panel"
 
-import { useDigest } from "./digest"
+interface SectionBodyProps {
+  section: SectionClass
+}
 
-import { isEmptySection } from "@xk6-dashboard/view"
-
-function SectionBody({ section }) {
+function SectionBody({ section }: SectionBodyProps) {
   return (
     <Grid container spacing={1} columns={12}>
       {section.panels.map((panel) => {
@@ -25,8 +26,12 @@ function SectionBody({ section }) {
   )
 }
 
-export default function Section({ section }) {
-  const [open, setOpen] = React.useState(true)
+interface SectionProps {
+  section: SectionClass
+}
+
+export default function Section({ section }: SectionProps) {
+  const [open, setOpen] = useState(true)
   const digest = useDigest()
   const empty = isEmptySection(section, digest)
 
@@ -56,8 +61,4 @@ export default function Section({ section }) {
       </Collapse>
     </Box>
   )
-}
-
-Section.propTypes = {
-  section: PropTypes.any.isRequired
 }

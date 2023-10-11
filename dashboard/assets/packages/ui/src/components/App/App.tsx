@@ -2,25 +2,27 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React from "react"
+import React, { useState, ReactNode } from "react"
 import { Tabs, Tab as TabNav, Box } from "@mui/material"
-import { PropTypes } from "prop-types"
 
-import "./App.css"
+import { useDigest } from "store/digest"
+import Header from "components/Header"
+import Tab from "components/Tab"
 
-import Header from "./Header"
-import Tab from "./Tab"
-
-import { useDigest } from "./digest"
-
-function a11yProps(index) {
+function a11yProps(index: number) {
   return {
     id: `tab-${index}`,
     "aria-controls": `tabpanel-${index}`
   }
 }
 
-function TabPanel({ children, active, idx, ...other }) {
+interface TabPanelProps {
+  children: ReactNode
+  active: number
+  idx: number
+}
+
+function TabPanel({ children, active, idx, ...other }: TabPanelProps) {
   return (
     <div role="tabpanel" hidden={active !== idx} id={`tabpanel-${idx}`} aria-labelledby={`tab-${idx}`} {...other}>
       <Box p={3} sx={{ padding: "0.5rem" }}>
@@ -30,15 +32,9 @@ function TabPanel({ children, active, idx, ...other }) {
   )
 }
 
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  idx: PropTypes.any.isRequired,
-  active: PropTypes.any.isRequired
-}
-
 export default function App() {
   const config = useDigest().config
-  const [active, setActive] = React.useState(0)
+  const [active, setActive] = useState(0)
 
   return (
     <>
