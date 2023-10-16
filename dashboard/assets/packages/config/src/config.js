@@ -62,6 +62,15 @@ export default (config, { tab }) => {
       panel("Request Duration", ({ serie }) => {
         serie(trend("http_req_duration"))
       })
+
+      panel("Request Failed Rate", ({ serie }) => {
+        serie("http_req_failed[?!tags && rate ]")
+      })
+
+      panel("Request Rate", ({ serie }) => {
+        serie("http_reqs[?!tags && rate]")
+      })
+
       panel("Request Waiting", ({ serie }) => {
         serie(trend("http_req_waiting"))
       })
@@ -77,6 +86,10 @@ export default (config, { tab }) => {
       panel("Request Receiving", ({ serie }) => {
         serie(trend("http_req_receiving"))
       })
+
+      panel("Request Blocked", ({ serie }) => {
+        serie(trend("http_req_blocked"))
+      })
     })
 
     section("Browser", ({ section, panel }) => {
@@ -85,6 +98,11 @@ export default (config, { tab }) => {
       panel("Request Duration", ({ serie }) => {
         serie(trend("browser_http_req_duration"))
       })
+
+      panel("Request Failed Rate", ({ serie }) => {
+        serie("browser_http_req_failed[?!tags && rate ]")
+      })
+
       panel("Largest Contentful Paint", ({ serie }) => {
         serie(trend("browser_web_vital_lcp"))
       })
@@ -117,6 +135,15 @@ export default (config, { tab }) => {
       panel("Pong Duration", ({ serie }) => {
         serie(trend("ws_ping"))
       })
+
+      panel("Transfer Rate", ({ serie }) => {
+        serie("ws_msgs_sent[?!tags && rate]")
+        serie("ws_msgs_received[?!tags && rate]")
+      })
+
+      panel("Sessions Rate", ({ serie }) => {
+        serie("ws_sessions[?!tags && rate]")
+      })
     })
 
     section("gRPC", ({ section, panel }) => {
@@ -124,6 +151,15 @@ export default (config, { tab }) => {
 
       panel("Request Duration", ({ serie }) => {
         serie(trend("grpc_req_duration"))
+      })
+
+      panel("Transfer Rate", ({ serie }) => {
+        serie("grpc_streams_msgs_sent[?!tags && rate]")
+        serie("grpc_streams_msgs_received[?!tags && rate]")
+      })
+
+      panel("Streams Rate", ({ serie }) => {
+        serie("grpc_streams[?!tags && rate]")
       })
     })
   })

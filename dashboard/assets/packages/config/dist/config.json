@@ -141,11 +141,31 @@
             {
               "series": [
                 {
+                  "query": "http_req_failed[?!tags && rate ]"
+                }
+              ],
+              "title": "Request Failed Rate",
+              "id": "tab-1.section-0.panel-1",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
+                  "query": "http_reqs[?!tags && rate]"
+                }
+              ],
+              "title": "Request Rate",
+              "id": "tab-1.section-0.panel-2",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
                   "query": "http_req_waiting[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Request Waiting",
-              "id": "tab-1.section-0.panel-1",
+              "id": "tab-1.section-0.panel-3",
               "kind": "chart"
             },
             {
@@ -155,7 +175,7 @@
                 }
               ],
               "title": "TLS handshaking",
-              "id": "tab-1.section-0.panel-2",
+              "id": "tab-1.section-0.panel-4",
               "kind": "chart"
             },
             {
@@ -165,7 +185,7 @@
                 }
               ],
               "title": "Request Sending",
-              "id": "tab-1.section-0.panel-3",
+              "id": "tab-1.section-0.panel-5",
               "kind": "chart"
             },
             {
@@ -175,7 +195,7 @@
                 }
               ],
               "title": "Request Connecting",
-              "id": "tab-1.section-0.panel-4",
+              "id": "tab-1.section-0.panel-6",
               "kind": "chart"
             },
             {
@@ -185,7 +205,17 @@
                 }
               ],
               "title": "Request Receiving",
-              "id": "tab-1.section-0.panel-5",
+              "id": "tab-1.section-0.panel-7",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
+                  "query": "http_req_blocked[?!tags && (avg || p90 || p95 || p99)]"
+                }
+              ],
+              "title": "Request Blocked",
+              "id": "tab-1.section-0.panel-8",
               "kind": "chart"
             }
           ],
@@ -208,11 +238,21 @@
             {
               "series": [
                 {
+                  "query": "browser_http_req_failed[?!tags && rate ]"
+                }
+              ],
+              "title": "Request Failed Rate",
+              "id": "tab-1.section-1.panel-1",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
                   "query": "browser_web_vital_lcp[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
               "title": "Largest Contentful Paint",
-              "id": "tab-1.section-1.panel-1",
+              "id": "tab-1.section-1.panel-2",
               "kind": "chart"
             },
             {
@@ -222,7 +262,7 @@
                 }
               ],
               "title": "First Input Delay",
-              "id": "tab-1.section-1.panel-2",
+              "id": "tab-1.section-1.panel-3",
               "kind": "chart"
             },
             {
@@ -232,7 +272,7 @@
                 }
               ],
               "title": "Cumulative Layout Shift",
-              "id": "tab-1.section-1.panel-3",
+              "id": "tab-1.section-1.panel-4",
               "kind": "chart"
             },
             {
@@ -242,7 +282,7 @@
                 }
               ],
               "title": "Time to First Byte",
-              "id": "tab-1.section-1.panel-4",
+              "id": "tab-1.section-1.panel-5",
               "kind": "chart"
             },
             {
@@ -252,7 +292,7 @@
                 }
               ],
               "title": "First Contentful Paint",
-              "id": "tab-1.section-1.panel-5",
+              "id": "tab-1.section-1.panel-6",
               "kind": "chart"
             },
             {
@@ -262,7 +302,7 @@
                 }
               ],
               "title": "Interaction to Next Paint",
-              "id": "tab-1.section-1.panel-6",
+              "id": "tab-1.section-1.panel-7",
               "kind": "chart"
             }
           ],
@@ -301,6 +341,29 @@
               "title": "Pong Duration",
               "id": "tab-1.section-2.panel-2",
               "kind": "chart"
+            },
+            {
+              "series": [
+                {
+                  "query": "ws_msgs_sent[?!tags && rate]"
+                },
+                {
+                  "query": "ws_msgs_received[?!tags && rate]"
+                }
+              ],
+              "title": "Transfer Rate",
+              "id": "tab-1.section-2.panel-3",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
+                  "query": "ws_sessions[?!tags && rate]"
+                }
+              ],
+              "title": "Sessions Rate",
+              "id": "tab-1.section-2.panel-4",
+              "kind": "chart"
             }
           ],
           "title": "WebSocket",
@@ -317,6 +380,29 @@
               ],
               "title": "Request Duration",
               "id": "tab-1.section-3.panel-0",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
+                  "query": "grpc_streams_msgs_sent[?!tags && rate]"
+                },
+                {
+                  "query": "grpc_streams_msgs_received[?!tags && rate]"
+                }
+              ],
+              "title": "Transfer Rate",
+              "id": "tab-1.section-3.panel-1",
+              "kind": "chart"
+            },
+            {
+              "series": [
+                {
+                  "query": "grpc_streams[?!tags && rate]"
+                }
+              ],
+              "title": "Streams Rate",
+              "id": "tab-1.section-3.panel-2",
               "kind": "chart"
             }
           ],
