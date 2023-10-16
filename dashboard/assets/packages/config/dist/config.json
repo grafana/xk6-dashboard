@@ -13,7 +13,8 @@
               ],
               "title": "Iteration Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-0"
+              "id": "tab-0.section-0.panel-0",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -23,7 +24,8 @@
               ],
               "title": "VUs",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-1"
+              "id": "tab-0.section-0.panel-1",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -33,7 +35,8 @@
               ],
               "title": "HTTP Request Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-2"
+              "id": "tab-0.section-0.panel-2",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -43,7 +46,8 @@
               ],
               "title": "HTTP Request Duration",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-3"
+              "id": "tab-0.section-0.panel-3",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -53,7 +57,8 @@
               ],
               "title": "Received Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-4"
+              "id": "tab-0.section-0.panel-4",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -63,7 +68,8 @@
               ],
               "title": "Sent Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-5"
+              "id": "tab-0.section-0.panel-5",
+              "summary": "<placeholder panel summary>"
             }
           ],
           "id": "tab-0.section-0"
@@ -81,6 +87,7 @@
               ],
               "title": "VUs",
               "id": "tab-0.section-1.panel-0",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -94,6 +101,7 @@
               ],
               "title": "Transfer Rate",
               "id": "tab-0.section-1.panel-1",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -104,6 +112,7 @@
               ],
               "title": "HTTP Request Duration",
               "id": "tab-0.section-1.panel-2",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -114,6 +123,7 @@
               ],
               "title": "Iteration Duration",
               "id": "tab-0.section-1.panel-3",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
@@ -136,6 +146,7 @@
               ],
               "title": "Request Duration",
               "id": "tab-1.section-0.panel-0",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -146,6 +157,7 @@
               ],
               "title": "Request Failed Rate",
               "id": "tab-1.section-0.panel-1",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -156,6 +168,7 @@
               ],
               "title": "Request Rate",
               "id": "tab-1.section-0.panel-2",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -166,6 +179,7 @@
               ],
               "title": "Request Waiting",
               "id": "tab-1.section-0.panel-3",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -176,6 +190,7 @@
               ],
               "title": "TLS handshaking",
               "id": "tab-1.section-0.panel-4",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -186,6 +201,7 @@
               ],
               "title": "Request Sending",
               "id": "tab-1.section-0.panel-5",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -196,6 +212,7 @@
               ],
               "title": "Request Connecting",
               "id": "tab-1.section-0.panel-6",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -206,6 +223,7 @@
               ],
               "title": "Request Receiving",
               "id": "tab-1.section-0.panel-7",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -216,6 +234,7 @@
               ],
               "title": "Request Blocked",
               "id": "tab-1.section-0.panel-8",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
@@ -233,6 +252,7 @@
               ],
               "title": "Request Duration",
               "id": "tab-1.section-1.panel-0",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -243,6 +263,7 @@
               ],
               "title": "Request Failed Rate",
               "id": "tab-1.section-1.panel-1",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -253,6 +274,7 @@
               ],
               "title": "Largest Contentful Paint",
               "id": "tab-1.section-1.panel-2",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -263,6 +285,7 @@
               ],
               "title": "First Input Delay",
               "id": "tab-1.section-1.panel-3",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -273,6 +296,7 @@
               ],
               "title": "Cumulative Layout Shift",
               "id": "tab-1.section-1.panel-4",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -283,6 +307,7 @@
               ],
               "title": "Time to First Byte",
               "id": "tab-1.section-1.panel-5",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -293,6 +318,7 @@
               ],
               "title": "First Contentful Paint",
               "id": "tab-1.section-1.panel-6",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -303,6 +329,7 @@
               ],
               "title": "Interaction to Next Paint",
               "id": "tab-1.section-1.panel-7",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
@@ -320,6 +347,7 @@
               ],
               "title": "Connect Duration",
               "id": "tab-1.section-2.panel-0",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -330,6 +358,7 @@
               ],
               "title": "Session Duration",
               "id": "tab-1.section-2.panel-1",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -340,6 +369,7 @@
               ],
               "title": "Ping Duration",
               "id": "tab-1.section-2.panel-2",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -353,6 +383,7 @@
               ],
               "title": "Transfer Rate",
               "id": "tab-1.section-2.panel-3",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -363,6 +394,7 @@
               ],
               "title": "Sessions Rate",
               "id": "tab-1.section-2.panel-4",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
@@ -380,6 +412,7 @@
               ],
               "title": "Request Duration",
               "id": "tab-1.section-3.panel-0",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -393,6 +426,7 @@
               ],
               "title": "Transfer Rate",
               "id": "tab-1.section-3.panel-1",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
             {
@@ -403,6 +437,7 @@
               ],
               "title": "Streams Rate",
               "id": "tab-1.section-3.panel-2",
+              "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
@@ -427,7 +462,8 @@
               ],
               "title": "Trends",
               "kind": "summary",
-              "id": "tab-2.section-0.panel-0"
+              "id": "tab-2.section-0.panel-0",
+              "summary": "<placeholder panel summary>"
             }
           ],
           "title": "",
@@ -443,7 +479,8 @@
               ],
               "title": "Counters",
               "kind": "summary",
-              "id": "tab-2.section-1.panel-0"
+              "id": "tab-2.section-1.panel-0",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -453,7 +490,8 @@
               ],
               "title": "Rates",
               "kind": "summary",
-              "id": "tab-2.section-1.panel-1"
+              "id": "tab-2.section-1.panel-1",
+              "summary": "<placeholder panel summary>"
             },
             {
               "series": [
@@ -463,7 +501,8 @@
               ],
               "title": "Gauges",
               "kind": "summary",
-              "id": "tab-2.section-1.panel-2"
+              "id": "tab-2.section-1.panel-2",
+              "summary": "<placeholder panel summary>"
             }
           ],
           "title": "",
