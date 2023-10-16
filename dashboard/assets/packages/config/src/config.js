@@ -132,7 +132,7 @@ export default (config, { tab }) => {
       panel("Session Duration", ({ serie }) => {
         serie(trend("ws_session_duration"))
       })
-      panel("Pong Duration", ({ serie }) => {
+      panel("Ping Duration", ({ serie }) => {
         serie(trend("ws_ping"))
       })
 

@@ -338,7 +338,7 @@
                   "query": "ws_ping[?!tags && (avg || p90 || p95 || p99)]"
                 }
               ],
-              "title": "Pong Duration",
+              "title": "Ping Duration",
               "id": "tab-1.section-2.panel-2",
               "kind": "chart"
             },
