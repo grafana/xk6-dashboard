@@ -3,12 +3,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React from "react"
+import { Digest } from "@xk6-dashboard/model"
+import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
 import "./Summary.css"
 
-import { SummaryTable } from "@xk6-dashboard/view"
+interface SummaryProps {
+  panel: Panel
+  digest: Digest
+}
 
-export default function Summary({ panel, digest }) {
+export default function Summary({ panel, digest }: SummaryProps) {
   const table = new SummaryTable(panel, digest)
 
   if (table.empty) {

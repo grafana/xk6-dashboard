@@ -6,11 +6,11 @@
 
 import React from "react"
 import { render } from "preact"
-import digest from "./digest"
-
 import "uplot/dist/uPlot.min.css"
-import "./styles.scss"
 
-import App from "./App.jsx"
+import digest from "utils/digest"
+import App from "components/App"
+import "theme/styles.scss"
 
-digest().then((d) => render(<App digest={d} />, document.getElementById("root")))
+const rootElement = document.getElementById("root") as HTMLDivElement
+digest().then((d) => render(<App digest={d} />, rootElement))
