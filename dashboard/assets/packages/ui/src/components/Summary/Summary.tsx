@@ -6,7 +6,6 @@ import React from "react"
 import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
 import { useDigest } from "store/digest"
-import { useTheme } from "store/theme"
 import { Grid } from "components"
 
 import * as styles from "./Summary.css"
@@ -17,7 +16,6 @@ interface SummaryProps {
 
 export default function Summary({ panel }: SummaryProps) {
   const digest = useDigest()
-  const { theme } = useTheme()
   const table = new SummaryTable(panel, digest)
 
   if (table.empty) {
@@ -30,7 +28,7 @@ export default function Summary({ panel }: SummaryProps) {
 
   return (
     <Grid.Column xs={12} md={md} lg={lg}>
-      <div key={panel.id} className={styles.summary[theme]}>
+      <div key={panel.id} className={styles.summary}>
         <table className={styles.table}>
           <caption className={styles.caption}>{panel.title}</caption>
           <thead>

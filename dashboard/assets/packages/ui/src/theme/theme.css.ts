@@ -2,7 +2,7 @@
 
 import { createGlobalTheme, createTheme, createThemeContract } from "@vanilla-extract/css"
 
-import { colors } from "./colors.css"
+import { brand, common, grey } from "./colors.css"
 import { sizes } from "./sizes.css"
 import * as typography from "./typography.css"
 
@@ -12,57 +12,69 @@ const root = createGlobalTheme("#root", {
 })
 
 const colorsTheme = createThemeContract({
+  component: {
+    table: {
+      main: null,
+      hover: null,
+      border: null
+    }
+  },
+  primary: {
+    main: null
+  },
   text: {
     primary: null,
     secondary: null
   },
   background: {
-    primary: null,
-    secondary: null
+    default: null,
+    header: null
   },
-  border: {
-    primary: null,
-    secondary: null
-  },
-  link: {
-    text: null
-  }
+  divider: null
 })
 
 export const lightTheme = createTheme(colorsTheme, {
+  component: {
+    table: {
+      main: grey[100],
+      hover: grey[200],
+      border: grey[300]
+    }
+  },
+  primary: {
+    main: brand.purple
+  },
   text: {
-    primary: colors.black,
-    secondary: colors.white
+    primary: common.black,
+    secondary: common.white
   },
   background: {
-    primary: colors.white,
-    secondary: colors.purple
+    default: common.white,
+    header: brand.purple
   },
-  border: {
-    primary: colors.gray1,
-    secondary: colors.gray2
-  },
-  link: {
-    text: colors.purple
-  }
+  divider: grey[200]
 })
 
 export const darkTheme = createTheme(colorsTheme, {
+  component: {
+    table: {
+      main: brand.darkGrey,
+      hover: grey[900],
+      border: grey[800]
+    }
+  },
+  primary: {
+    main: brand.purple
+  },
   text: {
-    primary: colors.white,
-    secondary: colors.white
+    primary: common.white,
+    secondary: common.white
   },
   background: {
-    primary: colors.black,
-    secondary: colors.gray10
+    default: common.black,
+    header: grey[900]
   },
-  border: {
-    primary: colors.gray9,
-    secondary: colors.gray10
-  },
-  link: {
-    text: colors.purple
-  }
+  divider: grey[900]
 })
 
 export const vars = { ...root, colors: colorsTheme }

@@ -4,12 +4,12 @@ import { vars } from "theme"
 
 export const header = style({
   padding: vars.sizes.size5,
-  border: `1px solid ${vars.colors.border.primary}`,
+  border: `1px solid ${vars.colors.divider}`,
   cursor: "pointer"
 })
 
 export const content = style({
   padding: vars.sizes.size5,
-  border: `1px solid ${vars.colors.border.primary}`,
+  border: `1px solid ${vars.colors.divider}`,
   borderTop: "none"
 })

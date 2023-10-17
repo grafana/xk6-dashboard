@@ -6,8 +6,8 @@ import { vars } from "theme"
 const borderSize = 2
 
 export const tabsBase = style({
-  background: vars.colors.background.primary,
-  borderBottom: `${borderSize}px solid ${vars.colors.border.primary}`
+  background: vars.colors.background.default,
+  borderBottom: `${borderSize}px solid ${vars.colors.divider}`
 })
 
 export const tabBase = style({
@@ -20,11 +20,11 @@ export const tabBase = style({
 const tabsProperties = defineProperties({
   properties: {
     color: {
-      active: vars.colors.link.text,
+      active: vars.colors.primary.main,
       inactive: vars.colors.text.primary
     },
     borderBottom: {
-      active: `2px solid ${vars.colors.link.text}`,
+      active: `2px solid ${vars.colors.primary.main}`,
       inactive: "transparent"
     }
   }

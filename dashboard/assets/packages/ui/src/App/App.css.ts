@@ -6,7 +6,7 @@ import { style } from "@vanilla-extract/css"
 import { vars } from "theme"
 
 export const container = style({
-  backgroundColor: vars.colors.background.primary,
+  backgroundColor: vars.colors.background.default,
   height: "100%",
   color: vars.colors.text.primary
 })

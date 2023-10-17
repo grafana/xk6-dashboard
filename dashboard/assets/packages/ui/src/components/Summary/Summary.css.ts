@@ -8,23 +8,10 @@ import { style, styleVariants } from "@vanilla-extract/css"
 
 import { vars } from "theme"
 
-export const summaryBase = style({
-  paddingTop: vars.sizes.size3
-})
-
-export const summary = styleVariants({
-  light: [
-    summaryBase,
-    {
-      backgroundColor: "#f6f6f6c0"
-    }
-  ],
-  dark: [
-    summaryBase,
-    {
-      backgroundColor: "#202020c0"
-    }
-  ]
+export const summary = style({
+  paddingTop: vars.sizes.size3,
+  overflowX: "auto",
+  backgroundColor: vars.colors.component.table.main
 })
 
 export const table = style({
@@ -34,11 +21,11 @@ export const table = style({
 
 export const th = style({
   padding: vars.sizes.size3,
-  fontWeight: vars.fontWeights.weight900
+  fontWeight: vars.fontWeights.weight700
 })
 
 const trBase = style({
-  borderBottom: `1px solid ${vars.colors.border.primary}`
+  borderBottom: `1px solid ${vars.colors.component.table.border}`
 })
 
 export const tr = styleVariants({
@@ -48,6 +35,9 @@ export const tr = styleVariants({
     {
       ":last-child": {
         borderBottom: "none"
+      },
+      ":hover": {
+        backgroundColor: vars.colors.component.table.hover
       }
     }
   ]

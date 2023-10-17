@@ -8,7 +8,7 @@ import uPlot, { AlignedData, Options, Series } from "uplot"
 import UplotReact from "uplot-react"
 import { tooltipPlugin, format, dateFormats, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
-import { colors } from "theme/colors.css"
+import { common, grey } from "theme/colors.css"
 import { createColorScheme } from "utils"
 import { useDigest } from "store/digest"
 import { useTheme } from "store/theme"
@@ -28,9 +28,9 @@ export default function Chart({ panel }: ChartProps) {
   const digest = useDigest()
   const { theme } = useTheme()
 
-  const tooltipColor = theme == "dark" ? colors.black : colors.white
-  const gridColor = theme == "dark" ? colors.gray10 : colors.gray0
-  const axesColor = theme == "dark" ? colors.white : colors.black
+  const tooltipColor = theme == "dark" ? common.black : common.white
+  const gridColor = theme == "dark" ? grey[900] : grey[100]
+  const axesColor = theme == "dark" ? common.white : common.black
 
   useLayoutEffect(() => {
     const updateWidth = () => {
