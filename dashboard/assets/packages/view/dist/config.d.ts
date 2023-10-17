@@ -15,9 +15,10 @@ declare enum PanelKind {
 declare class Panel {
     title?: string;
     id?: string;
+    summary?: string;
     kind?: PanelKind;
     series: Serie[];
-    constructor({ title, id, kind, series }?: Panel);
+    constructor({ title, id, summary, kind, series }?: Panel);
 }
 declare class Section {
     title?: string;
