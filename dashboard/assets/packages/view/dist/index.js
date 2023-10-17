@@ -227,11 +227,13 @@ var PanelKind = /* @__PURE__ */ ((PanelKind2) => {
 var Panel = class {
   title;
   id;
+  summary;
   kind;
   series;
-  constructor({ title, id, kind = "chart" /* chart */, series = [] } = {}) {
+  constructor({ title, id, summary, kind = "chart" /* chart */, series = [] } = {}) {
     this.title = title;
     this.id = id;
+    this.summary = summary;
     this.kind = kind;
     this.series = series;
   }
