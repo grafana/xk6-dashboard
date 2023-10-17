@@ -42,7 +42,7 @@ export const lightTheme = createTheme(colorsTheme, {
     }
   },
   primary: {
-    main: brand.purple
+    main: brand.violet
   },
   text: {
     primary: common.black,
@@ -50,7 +50,7 @@ export const lightTheme = createTheme(colorsTheme, {
   },
   background: {
     default: common.white,
-    header: brand.purple
+    header: brand.violet
   },
   divider: grey[200]
 })
@@ -64,7 +64,7 @@ export const darkTheme = createTheme(colorsTheme, {
     }
   },
   primary: {
-    main: brand.purple
+    main: brand.violet
   },
   text: {
     primary: common.white,

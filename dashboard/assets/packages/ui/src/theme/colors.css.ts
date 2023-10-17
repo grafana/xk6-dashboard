@@ -4,7 +4,7 @@ export const common = {
 }
 
 export const brand = {
-  purple: "#7C65FA",
+  violet: "#7C65FA",
   darkGrey: "#1C1C1C"
 }
 
