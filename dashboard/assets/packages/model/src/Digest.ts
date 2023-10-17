@@ -43,8 +43,8 @@ export class Digest implements EventListenerObject {
   constructor({
     config = {} as Config,
     param = {} as Param,
-    start = undefined,
-    stop = undefined,
+    start = undefined as Date | undefined,
+    stop = undefined as Date | undefined,
     metrics = new Metrics(),
     samples = new Samples(),
     summary = new Summary()

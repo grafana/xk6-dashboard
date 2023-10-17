@@ -3,26 +3,33 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React, { useRef, useState, useLayoutEffect } from "react"
-import { PropTypes } from "prop-types"
 import { Grid, Typography, useTheme } from "@mui/material"
-
-import UplotReact from "uplot-react"
 import "uplot/dist/uPlot.min.css"
+import { AlignedData, Options, Series } from "uplot"
+import UplotReact from "uplot-react"
+import { format, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
-import { format, SeriesPlot } from "@xk6-dashboard/view"
-
-import { useDigest } from "./digest"
+import { useDigest } from "store/digest"
 
 import "./Stat.css"
 
-export default function Stat({ panel }) {
+interface StatProps {
+  panel: Panel
+}
+
+export default function Stat({ panel }: StatProps) {
   const [width, setWidth] = useState(0)
-  const ref = useRef(null)
+  const ref = useRef<HTMLDivElement>(null)
   const digest = useDigest()
   const theme = useTheme()
 
   useLayoutEffect(() => {
-    let updateWidth = () => setWidth(ref.current.offsetWidth)
+    const updateWidth = () => {
+      if (ref.current) {
+        setWidth(ref.current.offsetWidth)
+      }
+    }
+
     updateWidth()
     window.addEventListener("resize", updateWidth)
 
@@ -38,16 +45,17 @@ export default function Stat({ panel }) {
   }
 
   const serie = digest.samples.query(query)
-  var value = 0
+  let value: string | undefined
+
   if (serie && Array.isArray(serie.values) && serie.values.length != 0) {
     value = format(serie.unit, Number(serie.values.slice(-1)), true)
   }
 
-  let options = {
+  const options: Options = {
     width: width,
     height: 32,
     title: value,
-    series: plot.series,
+    series: plot.series as Series[],
     axes: [{ show: false }, { show: false }],
     legend: { show: false },
     cursor: { show: false }
@@ -59,12 +67,8 @@ export default function Stat({ panel }) {
         {panel.title}
       </Typography>
       <div ref={ref}>
-        <UplotReact options={options} data={plot.data} />
+        <UplotReact options={options} data={plot.data as AlignedData} />
       </div>
     </Grid>
   )
-}
-
-Stat.propTypes = {
-  panel: PropTypes.any.isRequired
 }

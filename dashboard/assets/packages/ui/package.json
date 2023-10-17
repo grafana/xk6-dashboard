@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --emptyOutDir",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:eslint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:format": "prettier --ignore-unknown --check \"./**/*\"",
+    "lint:types": "tsc --noEmit",
+    "lint": "yarn lint:eslint && yarn lint:types && yarn lint:format"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -24,6 +28,8 @@
   "devDependencies": {
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "@typescript-eslint/parser": "^6.7.5",
     "@vitejs/plugin-react-swc": "^3.0.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.0.0",
@@ -33,7 +39,11 @@
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
     "prettier": "3.0.2",
-    "vite": "^4.1.0"
+    "typescript": "^5.2.2",
+    "vite": "^4.4.11",
+    "vite-tsconfig-paths": "^4.2.1"
   }
 }
