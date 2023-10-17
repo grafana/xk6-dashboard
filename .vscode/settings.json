@@ -3,5 +3,6 @@
   "go.lintFlags": ["--fast"],
   "go.formatTool": "golines",
   "conventionalCommits.scopes": ["module", "ui", "report"],
-  "go.buildTags": "mage"
+  "go.buildTags": "mage",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

@@ -2,33 +2,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { useEffect, useState } from "react"
-
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react"
 import defaultConfig from "@xk6-dashboard/config"
-
 import { Digest, Config, EventType } from "@xk6-dashboard/model"
 
-const DigestContext = React.createContext(() => new Digest({ config: defaultConfig }))
+const DigestContext = createContext(() => new Digest({ config: defaultConfig } as Digest))
 DigestContext.displayName = "Digest"
 
-function DigestProvider({ endpoint = "/events", children }) {
-  const [source, setSource] = useState(null)
+interface DigestProviderProps {
+  children: ReactNode
+  endpoint: string
+}
+
+function DigestProvider({ endpoint = "/events", children }: DigestProviderProps) {
   const [digest, setDigest] = useState(new Digest({ config: new Config(defaultConfig) }))
 
   useEffect(() => {
-    if (source == null) {
-      const source = new EventSource(endpoint)
+    const source = new EventSource(endpoint)
 
-      const listener = (e) => {
-        digest.handleEvent(e)
-        setDigest(new Digest(digest))
-      }
+    const listener = (event: MessageEvent) => {
+      digest.handleEvent(event)
+      setDigest(new Digest(digest))
+    }
 
-      for (const type in EventType) {
-        source.addEventListener(type, listener)
-      }
-
-      setSource(source)
+    for (const type in EventType) {
+      source.addEventListener(type, listener)
     }
   }, [])
 
@@ -36,7 +34,8 @@ function DigestProvider({ endpoint = "/events", children }) {
 }
 
 function useDigest() {
-  const context = React.useContext(DigestContext)
+  const context = useContext(DigestContext)
+
   if (context === undefined) {
     throw new Error("useDigest must be used within a DigestProvider")
   }

@@ -7,20 +7,17 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
 
-import App from "./App"
-import Themed from "./Themed"
-import { DigestProvider } from "./digest"
+import { DigestProvider } from "store/digest"
+import App from "components/App"
+import Themed from "components/Themed/Themed"
 
 const base = new URLSearchParams(window.location.search).get("endpoint") || "http://localhost:5665/"
+const rootElement = document.getElementById("root") as HTMLDivElement
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <>
-    {/*<React.StrictMode>*/}
-    <Themed>
-      <DigestProvider endpoint={base + "events"}>
-        <App />
-      </DigestProvider>
-    </Themed>
-    {/*</React.StrictMode>*/}
-  </>
+ReactDOM.createRoot(rootElement).render(
+  <Themed>
+    <DigestProvider endpoint={base + "events"}>
+      <App />
+    </DigestProvider>
+  </Themed>
 )
