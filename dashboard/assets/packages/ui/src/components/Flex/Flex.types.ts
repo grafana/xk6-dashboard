@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 type AlignItems = "stretch" | "flex-start" | "flex-end" | "center" | "baseline" | "start" | "end" | "self-start" | "self-end"
 
 type FlexBasis = "auto" | string
@@ -22,14 +26,12 @@ export interface FlexElementProps {
   align?: AlignItems
   direction?: FlexDirection
   gap?: 1 | 2 | 3 | 4
-  rowGap?: number
-  columnGap?: number
   justify?: JustifyContent
   wrap?: FlexWrap
   basis?: FlexBasis
   grow?: number
   shrink?: number
-  padding?: number
+  padding?: 1 | 2 | 3 | 4
   height?: string | number
   width?: string | number
 }

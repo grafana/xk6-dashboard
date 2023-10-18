@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { createContext, useContext, useState, Dispatch, ReactNode, SetStateAction } from "react"
+import React, { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from "react"
 
 import { darkTheme, lightTheme } from "theme"
 

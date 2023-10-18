@@ -1,4 +1,8 @@
-import React, { createContext, useContext, ReactNode } from "react"
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
+import React, { createContext, useContext, type ReactNode } from "react"
 
 import { Flex } from "../Flex"
 

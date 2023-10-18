@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react"
+import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import defaultConfig from "@xk6-dashboard/config"
 import { Digest, Config, EventType } from "@xk6-dashboard/model"
 

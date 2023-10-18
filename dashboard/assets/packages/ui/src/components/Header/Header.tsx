@@ -4,7 +4,7 @@
 
 import React from "react"
 
-import { UIConfig } from "types/config"
+import type { UIConfig } from "types/config"
 import { useTheme } from "store/theme"
 import { Button, Flex } from "components"
 import { ReactComponent as DarkModeIcon } from "assets/icons/dark_mode.svg"

@@ -4,7 +4,7 @@
 
 import React, { useRef, useState, useLayoutEffect } from "react"
 import "uplot/dist/uPlot.min.css"
-import uPlot, { AlignedData, Options, Series } from "uplot"
+import uPlot, { type AlignedData, type Options, type Series } from "uplot"
 import UplotReact from "uplot-react"
 import { tooltipPlugin, format, dateFormats, Panel, SeriesPlot } from "@xk6-dashboard/view"
 

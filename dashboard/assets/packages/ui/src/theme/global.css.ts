@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import { globalStyle } from "@vanilla-extract/css"
 
 import { fonts, letterSpacings } from "./typography.css"

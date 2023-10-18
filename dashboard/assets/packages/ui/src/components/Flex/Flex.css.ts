@@ -1,13 +1,13 @@
-import { style } from "@vanilla-extract/css"
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
+import { style, createThemeContract } from "@vanilla-extract/css"
 import { createSprinkles, defineProperties } from "@vanilla-extract/sprinkles"
 
 import { vars } from "theme"
 
-export const root = style({
-  display: "flex;"
-})
-
-const flexProperties = defineProperties({
+const variantProps = defineProperties({
   properties: {
     flexDirection: ["row", "column"],
     flexWrap: ["nowrap", "wrap", "wrap-reverse"],
@@ -29,8 +29,27 @@ const flexProperties = defineProperties({
       2: vars.sizes.size2,
       3: vars.sizes.size5,
       4: vars.sizes.size10
+    },
+    padding: {
+      1: vars.sizes.size000,
+      2: vars.sizes.size2,
+      3: vars.sizes.size5,
+      4: vars.sizes.size10
     }
   }
 })
 
-export const variants = createSprinkles(flexProperties)
+export const theme = createThemeContract({
+  flexGrow: null,
+  flexShrink: null,
+  flexBasis: null,
+  height: null,
+  width: null
+})
+
+export const root = style({
+  display: "flex",
+  ...theme
+})
+
+export const variants = createSprinkles(variantProps)

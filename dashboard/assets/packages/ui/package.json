@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@vanilla-extract/css": "^1.13.0",
+    "@vanilla-extract/dynamic": "^2.0.3",
     "@vanilla-extract/sprinkles": "^1.6.1",
     "@xk6-dashboard/config": "0.0.1",
     "@xk6-dashboard/model": "0.0.1",

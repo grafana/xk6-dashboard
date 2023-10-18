@@ -1,6 +1,10 @@
-import React, { forwardRef, ElementType, ReactNode, Ref, HTMLAttributes } from "react"
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
 
-import { GridElementProps, GridColumnElementProps } from "./Grid.types"
+import React, { forwardRef, type ElementType, type ReactNode, type Ref, type HTMLAttributes } from "react"
+
+import type { GridElementProps, GridColumnElementProps } from "./Grid.types"
 import { column, container } from "./Grid.css"
 import { toClassName } from "utils"
 

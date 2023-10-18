@@ -1,11 +1,13 @@
-/** @format */
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { forwardRef, ReactNode, Ref, ElementType, HTMLAttributes } from "react"
+import React, { forwardRef, type ReactNode, type Ref, type ElementType, type HTMLAttributes } from "react"
 
-import { toClassName } from "utils"
+import { toClassName, toStyle } from "utils"
 
-import { FlexElementProps } from "./Flex.types"
-import { root, variants } from "./Flex.css"
+import type { FlexElementProps } from "./Flex.types"
+import { root, theme, variants } from "./Flex.css"
 
 export interface FlexProps extends HTMLAttributes<HTMLOrSVGElement>, FlexElementProps {
   children: ReactNode
@@ -14,23 +16,39 @@ export interface FlexProps extends HTMLAttributes<HTMLOrSVGElement>, FlexElement
 }
 
 function FlexBase(
-  { children, as: Tag = "div", className, align, direction, gap = 1, justify, wrap, ...props }: FlexProps,
+  {
+    as: Tag = "div",
+    align,
+    basis,
+    children,
+    className,
+    direction,
+    gap = 3,
+    grow,
+    height,
+    justify,
+    padding = 1,
+    shrink,
+    width,
+    wrap,
+    ...props
+  }: FlexProps,
   ref: Ref<HTMLElement>
 ) {
-  const classNames = toClassName(
-    className,
-    root,
-    variants({
-      alignItems: align,
-      flexDirection: direction,
-      flexWrap: wrap,
-      gap,
-      justifyContent: justify
-    })
-  )
+  const variantClassName = variants({
+    alignItems: align,
+    flexDirection: direction,
+    flexWrap: wrap,
+    gap,
+    justifyContent: justify,
+    padding
+  })
+
+  const classNames = toClassName(root, variantClassName, className)
+  const styles = toStyle(theme, { basis, grow, height, shrink, width })
 
   return (
-    <Tag ref={ref} className={classNames} {...props}>
+    <Tag ref={ref} className={classNames} style={styles} {...props}>
       {children}
     </Tag>
   )
