@@ -15,9 +15,6 @@ const root = createGlobalTheme("#root", {
 
 const colorsTheme = createThemeContract({
   component: {
-    tab: {
-      main: null
-    },
     table: {
       main: null,
       hover: null,
@@ -49,9 +46,6 @@ const colorsTheme = createThemeContract({
 
 export const lightTheme = createTheme(colorsTheme, {
   component: {
-    tab: {
-      main: grey[600]
-    },
     table: {
       main: grey[100],
       hover: grey[200],
@@ -83,9 +77,6 @@ export const lightTheme = createTheme(colorsTheme, {
 
 export const darkTheme = createTheme(colorsTheme, {
   component: {
-    tab: {
-      main: common.white
-    },
     table: {
       main: brand.darkGrey,
       hover: grey[900],
