@@ -6,7 +6,7 @@ import React from "react"
 import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
 import { useDigest } from "store/digest"
-import { Grid } from "components"
+import { Grid } from "components/Grid"
 
 import * as styles from "./Summary.css"
 

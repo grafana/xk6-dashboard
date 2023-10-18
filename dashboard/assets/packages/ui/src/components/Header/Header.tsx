@@ -6,7 +6,8 @@ import React from "react"
 
 import type { UIConfig } from "types/config"
 import { useTheme } from "store/theme"
-import { Button, Flex } from "components"
+import { Button } from "components/Button"
+import { Flex } from "components/Flex"
 import { ReactComponent as DarkModeIcon } from "assets/icons/dark_mode.svg"
 import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
 

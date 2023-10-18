@@ -12,7 +12,7 @@ import { common, grey } from "theme/colors.css"
 import { createColorScheme } from "utils"
 import { useDigest } from "store/digest"
 import { useTheme } from "store/theme"
-import { Grid } from "components"
+import { Grid } from "components/Grid"
 
 import * as styles from "./Chart.css"
 

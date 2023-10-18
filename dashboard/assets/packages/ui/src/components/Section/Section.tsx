@@ -7,7 +7,9 @@ import React, { useState } from "react"
 import { isEmptySection, Section as SectionClass } from "@xk6-dashboard/view"
 
 import { useDigest } from "store/digest"
-import { Collapse, Flex, Grid } from "components"
+import { Collapse } from "components/Collapse"
+import { Flex } from "components/Flex"
+import { Grid } from "components/Grid"
 
 import Panel from "../Panel"
 import * as styles from "./Section.css"

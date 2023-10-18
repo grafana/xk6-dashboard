@@ -11,7 +11,7 @@ import { format, Panel, SeriesPlot } from "@xk6-dashboard/view"
 import { createColorScheme } from "utils"
 import { useDigest } from "store/digest"
 import { useTheme } from "store/theme"
-import { Grid } from "components"
+import { Grid } from "components/Grid"
 
 import * as styles from "./Stat.css"
 
