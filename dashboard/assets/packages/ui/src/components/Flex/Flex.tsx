@@ -27,7 +27,7 @@ function FlexBase(
     grow,
     height,
     justify,
-    padding = 1,
+    padding,
     shrink,
     width,
     wrap,

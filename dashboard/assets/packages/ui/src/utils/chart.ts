@@ -71,18 +71,8 @@ const order = [
 ] as const
 
 export const createColorScheme = (mode: string) => {
-  const scheme = []
-
-  for (let i = 0; i < order.length; i++) {
-    const name = order[i]
-    const vectorAttrs = {
-      stroke: mode == "dark" ? colors[name][500] : colors[name][800],
-      fill: (mode == "dark" ? colors[name][300] : colors[name][600]) + "20"
-    }
-
-    colors[name].stroke = mode ? "dark" : colors[name][500]
-    scheme.push(vectorAttrs)
-  }
-
-  return scheme
+  return order.map((name) => ({
+    stroke: mode == "dark" ? colors[name][500] : colors[name][800],
+    fill: (mode == "dark" ? colors[name][300] : colors[name][600]) + "20"
+  }))
 }
