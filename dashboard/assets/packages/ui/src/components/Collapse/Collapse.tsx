@@ -22,7 +22,7 @@ export const Collapse = ({ children, title, isOpen, onClick }: CollapseProps) =>
     <div>
       <Flex align="center" className={styles.header} onClick={onClick}>
         {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-        <h3>{title}</h3>
+        <h2 className={styles.title}>{title}</h2>
       </Flex>
 
       {isOpen && <div className={styles.content}>{children}</div>}

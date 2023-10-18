@@ -16,6 +16,7 @@ export const tabsBase = style({
 
 export const tabBase = style({
   padding: `${vars.sizes.size3} ${vars.sizes.size5}`,
+  fontSize: vars.fontSizes.size5,
   cursor: "pointer",
   textTransform: "uppercase",
   marginBottom: `-${borderSize}px`
@@ -25,7 +26,7 @@ const tabsProperties = defineProperties({
   properties: {
     color: {
       active: vars.colors.primary.main,
-      inactive: vars.colors.text.primary
+      inactive: vars.colors.text.disabled
     },
     borderBottom: {
       active: `2px solid ${vars.colors.primary.main}`,

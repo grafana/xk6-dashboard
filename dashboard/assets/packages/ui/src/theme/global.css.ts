@@ -4,7 +4,7 @@
 
 import { globalStyle } from "@vanilla-extract/css"
 
-import { fonts, letterSpacings } from "./typography.css"
+import { fontSizes, fonts, letterSpacings } from "./typography.css"
 
 globalStyle("*, *::before, *::after", {
   boxSizing: "border-box",
@@ -42,6 +42,10 @@ globalStyle("input, button, textarea, select", {
 
 globalStyle("p, h1, h2, h3, h4, h5, h6", {
   overflowWrap: "break-word"
+})
+
+globalStyle("p", {
+  fontSize: fontSizes.size5
 })
 
 globalStyle("#root", {

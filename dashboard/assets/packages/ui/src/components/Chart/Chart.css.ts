@@ -10,10 +10,10 @@ export const uplot = style({
 })
 
 globalStyle(`${uplot} > .u-title`, {
-  fontSize: vars.fontSizes.size5,
-  fontWeight: `${vars.fontWeights.weight400} !important`
+  fontSize: vars.fontSizes.size6,
+  fontWeight: `${vars.fontWeights.weight300} !important`
 })
 
-globalStyle(`${uplot} > .u-label`, {
+globalStyle(`${uplot} .u-label`, {
   fontWeight: `${vars.fontWeights.weight300} !important`
 })

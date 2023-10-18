@@ -19,7 +19,8 @@ export const table = style({
 
 export const th = style({
   padding: vars.sizes.size3,
-  fontWeight: vars.fontWeights.weight700
+  fontSize: vars.fontSizes.size4,
+  fontWeight: vars.fontWeights.weight600
 })
 
 const trBase = style({
@@ -42,13 +43,16 @@ export const tr = styleVariants({
 })
 
 export const td = style({
-  padding: vars.sizes.size3
+  padding: vars.sizes.size3,
+  fontSize: vars.fontSizes.size4
 })
 
 export const caption = style({
   textAlign: "center",
+  color: vars.colors.text.disabled,
   padding: vars.sizes.size1,
-  fontWeight: 700,
+  fontSize: vars.fontSizes.size4,
+  fontWeight: vars.fontWeights.weight500,
   display: "table-caption",
   captionSide: "top"
 })

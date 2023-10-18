@@ -8,8 +8,9 @@ import { vars } from "theme"
 export const uplot = style({})
 
 globalStyle(`${uplot} > .u-title`, {
-  fontSize: vars.fontSizes.size5,
-  fontWeight: `${vars.fontWeights.weight500} !important`,
+  color: vars.colors.text.primary,
+  fontSize: vars.fontSizes.size7,
+  fontWeight: `${vars.fontWeights.weight400} !important`,
   whiteSpace: "nowrap"
 })
 
@@ -18,8 +19,8 @@ export const container = style({
 })
 
 export const title = style({
-  fontSize: vars.fontSizes.size1,
-  color: vars.colors.text.primary,
+  fontSize: vars.fontSizes.size4,
+  color: vars.colors.secondary.main,
   marginBottom: vars.sizes.size2,
   textAlign: "center"
 })
