@@ -8,8 +8,10 @@ import { defineConfig } from "vite"
 import preact from "@preact/preset-vite"
 import { viteSingleFile } from "vite-plugin-singlefile"
 import handlebars from "vite-plugin-handlebars"
+import tsconfigPaths from "vite-tsconfig-paths"
+
 import testcontext from "./.testcontext"
 
 export default defineConfig({
-  plugins: [preact(), viteSingleFile(), handlebars({ context: testcontext })]
+  plugins: [preact(), viteSingleFile(), tsconfigPaths(), handlebars({ context: testcontext })]
 })

@@ -7,14 +7,22 @@
 import { Digest } from "@xk6-dashboard/model"
 
 export default async function () {
-  var blob = new Blob([Uint8Array.from(atob(document.getElementById("data").innerText), (m) => m.codePointAt(0))])
-  var resp = await new Response(blob.stream().pipeThrough(new DecompressionStream("gzip")).pipeThrough(new TextDecoderStream()))
+  const dataElement = document.getElementById("data")!
+  const codePointAt = (m: string) => m.codePointAt(0)!
 
   const digest = new Digest()
+  const blob = new Blob([Uint8Array.from(atob(dataElement.innerText), codePointAt)])
+  const resp = await new Response(
+    blob.stream().pipeThrough(new DecompressionStream("gzip")).pipeThrough(new TextDecoderStream())
+  )
 
-  for await (let line of makeTextFileLineIterator(resp.body.getReader())) {
+  if (!resp.body) {
+    return digest
+  }
+
+  for await (const line of makeTextFileLineIterator(resp.body.getReader())) {
     if (!line || line.length == 0) continue
-    let envelope = JSON.parse(line)
+    const envelope = JSON.parse(line)
     digest.onEvent(envelope.event, envelope.data)
   }
 
@@ -22,20 +30,20 @@ export default async function () {
 }
 
 // based on https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader/read#example_2_-_handling_text_line_by_line
-async function* makeTextFileLineIterator(reader) {
+async function* makeTextFileLineIterator(reader: ReadableStreamDefaultReader) {
   let { value, done } = await reader.read()
 
-  let re = /\r\n|\n|\r/gm
+  const re = /\r\n|\n|\r/gm
   let startIndex = 0
 
   while (true) {
-    let result = re.exec(value)
+    const result = re.exec(value)
     if (!result) {
       if (done) {
         break
       }
 
-      let remainder = value.substr(startIndex)
+      const remainder = value.substr(startIndex)
       ;({ value, done } = await reader.read())
       value = remainder + (value || "")
       startIndex = re.lastIndex = 0

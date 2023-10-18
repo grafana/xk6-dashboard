@@ -2,29 +2,39 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React from "react"
+import React, { Ref } from "react"
 import { useRef, useState, useLayoutEffect } from "preact/hooks"
 
 import "uplot/dist/uPlot.min.css"
 import UplotReact from "uplot-react"
-import uPlot from "uplot"
+import uPlot, { AlignedData, Options, Series } from "uplot"
 
-import { SeriesPlot, tooltipPlugin, dateFormats, format } from "@xk6-dashboard/view"
+import { Digest } from "@xk6-dashboard/model"
+import { Panel, SeriesPlot, tooltipPlugin, dateFormats, format } from "@xk6-dashboard/view"
 
+import colors from "utils/colors"
 import "./Chart.css"
-
-import colors from "./colors"
 
 const sync = uPlot.sync("chart")
 
-export default function Chart({ panel, digest }) {
+interface ChartProps {
+  panel: Panel
+  digest: Digest
+}
+
+export default function Chart({ panel, digest }: ChartProps) {
   const plot = new SeriesPlot(digest, panel, colors)
-  const ref = useRef(null)
+  const ref = useRef<HTMLSpanElement | HTMLDivElement>(null)
 
   const [width, setWidth] = useState(0)
 
   useLayoutEffect(() => {
-    let updateWidth = () => setWidth(ref.current.offsetWidth)
+    const updateWidth = () => {
+      if (ref.current) {
+        setWidth(ref.current.offsetWidth)
+      }
+    }
+
     updateWidth()
     window.addEventListener("resize", updateWidth)
 
@@ -35,13 +45,13 @@ export default function Chart({ panel, digest }) {
     return <span ref={ref} />
   }
 
-  let options = {
+  const options: Options = {
     width: width,
     height: 250,
     title: panel.title,
     cursor: { sync: { key: sync.key } },
     legend: { live: false },
-    series: plot.series,
+    series: plot.series as Series[],
     axes: [{}],
     plugins: [tooltipPlugin("#fafafa")]
   }
@@ -51,7 +61,7 @@ export default function Chart({ panel, digest }) {
       stroke: "#808080",
       grid: { stroke: "#f0f0f0" },
       ticks: { stroke: "#f0f0f0" },
-      values: (self, ticks) => ticks.map((val) => format(unit, val)),
+      values: (_, ticks) => ticks.map((val) => format(unit, val)),
       size: 70,
       scale: unit
     }
@@ -65,8 +75,8 @@ export default function Chart({ panel, digest }) {
   }
 
   return (
-    <div ref={ref} className="chart panel">
-      <UplotReact options={options} data={plot.data} />
+    <div ref={ref as Ref<HTMLDivElement>} className="chart panel">
+      <UplotReact options={options} data={plot.data as AlignedData} />
     </div>
   )
 }

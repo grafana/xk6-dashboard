@@ -6,13 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --emptyOutDir",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint:eslint": "eslint \"./src/**/*.{js,jsx,ts,tsx}\"",
+    "lint:format": "prettier --ignore-unknown --check \"./**/*\"",
+    "lint:types": "tsc --noEmit",
+    "lint": "yarn lint:eslint && yarn lint:types && yarn lint:format"
   },
   "dependencies": {
     "@xk6-dashboard/config": "0.0.1",
     "@xk6-dashboard/model": "0.0.1",
     "@xk6-dashboard/view": "0.0.1",
-    "bootstrap": "^5.3.1",
+    "bootstrap": "^5.3.2",
     "preact": "^10.16.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
@@ -22,9 +26,15 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.5",
+    "@typescript-eslint/parser": "^6.7.5",
+    "eslint": "^8.51.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.1",
     "sass": "^1.65.1",
-    "vite": "^4.4.5",
+    "vite": "^4.4.11",
     "vite-plugin-handlebars": "^1.6.0",
-    "vite-plugin-singlefile": "^0.13.5"
+    "vite-plugin-singlefile": "^0.13.5",
+    "vite-tsconfig-paths": "^4.2.1"
   }
 }
