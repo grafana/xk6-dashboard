@@ -22,8 +22,8 @@ interface ThemeProviderProps {
 }
 
 function ThemeProvider({ children }: ThemeProviderProps) {
-  const isSystemDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-  const [theme, setTheme] = useState<Themes>(isSystemDarkMode ? "dark" : "light")
+  const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
+  const [theme, setTheme] = useState<Themes>(isDarkMode ? "dark" : "light")
 
   const context = {
     theme,
