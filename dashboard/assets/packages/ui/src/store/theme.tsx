@@ -5,6 +5,7 @@
 import React, { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from "react"
 
 import { darkTheme, lightTheme } from "theme"
+import { useMediaQuery } from "usehooks-ts"
 
 type Themes = "light" | "dark"
 
@@ -21,7 +22,8 @@ interface ThemeProviderProps {
 }
 
 function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Themes>("light")
+  const isSystemDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
+  const [theme, setTheme] = useState<Themes>(isSystemDarkMode ? "dark" : "light")
 
   const context = {
     theme,

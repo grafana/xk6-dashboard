@@ -105,7 +105,7 @@ export const darkTheme = createTheme(colorsTheme, {
   text: {
     primary: common.white,
     secondary: common.white,
-    disabled: common.white
+    disabled: grey[500]
   },
   background: {
     default: common.black,

@@ -20,7 +20,7 @@ export const container = style({
 
 export const title = style({
   fontSize: vars.fontSizes.size4,
-  color: vars.colors.secondary.main,
+  color: vars.colors.text.disabled,
   marginBottom: vars.sizes.size2,
   textAlign: "center"
 })
