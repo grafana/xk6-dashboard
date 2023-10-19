@@ -3,15 +3,18 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React, { useRef, useState, useLayoutEffect } from "react"
-import { Grid, useTheme } from "@mui/material"
 import "uplot/dist/uPlot.min.css"
-import uPlot, { AlignedData, Options, Series } from "uplot"
+import uPlot, { type AlignedData, type Options, type Series } from "uplot"
 import UplotReact from "uplot-react"
 import { tooltipPlugin, format, dateFormats, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
+import { common, grey } from "theme/colors.css"
+import { createColorScheme } from "utils"
 import { useDigest } from "store/digest"
+import { useTheme } from "store/theme"
+import { Grid } from "components/Grid"
 
-import "./Chart.css"
+import * as styles from "./Chart.css"
 
 const sync = uPlot.sync("chart")
 
@@ -23,7 +26,11 @@ export default function Chart({ panel }: ChartProps) {
   const [width, setWidth] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const digest = useDigest()
-  const theme = useTheme()
+  const { theme } = useTheme()
+
+  const tooltipColor = theme == "dark" ? common.black : common.white
+  const gridColor = theme == "dark" ? grey[900] : grey[100]
+  const axesColor = theme == "dark" ? common.white : common.black
 
   useLayoutEffect(() => {
     const updateWidth = () => {
@@ -38,13 +45,14 @@ export default function Chart({ panel }: ChartProps) {
     return () => window.removeEventListener("resize", updateWidth)
   })
 
-  const plot = new SeriesPlot(digest, panel, theme.palette.color)
+  const plot = new SeriesPlot(digest, panel, createColorScheme(theme))
 
   if (plot.empty) {
     return <div ref={ref} />
   }
 
   const options: Options = {
+    class: styles.uplot,
     width: width,
     height: 250,
     title: panel.title,
@@ -52,16 +60,14 @@ export default function Chart({ panel }: ChartProps) {
     legend: { live: false },
     series: plot.series as Series[],
     axes: [{}],
-    plugins: [tooltipPlugin(theme.palette.background.paper)]
+    plugins: [tooltipPlugin(tooltipColor)]
   }
-
-  const grid = theme.palette.mode == "dark" ? "#202020" : "#f0f0f0"
 
   options.axes = plot.samples.units.map((unit) => {
     return {
-      stroke: theme.palette.text.primary,
-      grid: { stroke: grid },
-      ticks: { stroke: grid },
+      stroke: axesColor,
+      grid: { stroke: gridColor, width: 1 },
+      ticks: { stroke: gridColor },
       values: (_, ticks) => ticks.map((val) => format(unit, val)),
       size: 70,
       scale: unit
@@ -76,7 +82,7 @@ export default function Chart({ panel }: ChartProps) {
   }
 
   function onCreate(chart: uPlot) {
-    const color = theme.palette.mode == "dark" ? "#60606080" : "#d0d0d080"
+    const color = theme == "dark" ? "#60606080" : "#d0d0d080"
     const element = chart.root.querySelector(".u-select") as HTMLElement
 
     if (element) {
@@ -85,8 +91,8 @@ export default function Chart({ panel }: ChartProps) {
   }
 
   return (
-    <Grid ref={ref} className="chart panel" item md={12} lg={6}>
+    <Grid.Column ref={ref} xs={12} lg={6}>
       <UplotReact options={options} data={plot.data as AlignedData} onCreate={onCreate} />
-    </Grid>
+    </Grid.Column>
   )
 }

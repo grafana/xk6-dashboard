@@ -3,15 +3,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React, { useRef, useState, useLayoutEffect } from "react"
-import { Grid, Typography, useTheme } from "@mui/material"
 import "uplot/dist/uPlot.min.css"
-import { AlignedData, Options, Series } from "uplot"
+import { type AlignedData, type Options, type Series } from "uplot"
 import UplotReact from "uplot-react"
 import { format, Panel, SeriesPlot } from "@xk6-dashboard/view"
 
+import { createColorScheme } from "utils"
 import { useDigest } from "store/digest"
+import { useTheme } from "store/theme"
+import { Grid } from "components/Grid"
 
-import "./Stat.css"
+import * as styles from "./Stat.css"
 
 interface StatProps {
   panel: Panel
@@ -21,7 +23,10 @@ export default function Stat({ panel }: StatProps) {
   const [width, setWidth] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const digest = useDigest()
-  const theme = useTheme()
+  const { theme } = useTheme()
+
+  const query = panel.series[0].query
+  const plot = new SeriesPlot(digest, panel, createColorScheme(theme))
 
   useLayoutEffect(() => {
     const updateWidth = () => {
@@ -36,10 +41,6 @@ export default function Stat({ panel }: StatProps) {
     return () => window.removeEventListener("resize", updateWidth)
   })
 
-  const query = panel.series[0].query
-
-  const plot = new SeriesPlot(digest, panel, theme.palette.color)
-
   if (plot.empty) {
     return <div ref={ref} />
   }
@@ -52,6 +53,7 @@ export default function Stat({ panel }: StatProps) {
   }
 
   const options: Options = {
+    class: styles.uplot,
     width: width,
     height: 32,
     title: value,
@@ -62,13 +64,11 @@ export default function Stat({ panel }: StatProps) {
   }
 
   return (
-    <Grid item className="panel stat" xs={6} sm={4} md={2}>
-      <Typography sx={{ fontSize: "0.8rem" }} color="text.secondary" gutterBottom align="center">
-        {panel.title}
-      </Typography>
+    <Grid.Column className={styles.container} xs={6} sm={4} md={2}>
+      <p className={styles.title}>{panel.title}</p>
       <div ref={ref}>
         <UplotReact options={options} data={plot.data as AlignedData} />
       </div>
-    </Grid>
+    </Grid.Column>
   )
 }
