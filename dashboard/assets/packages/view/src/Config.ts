@@ -20,11 +20,13 @@ export enum PanelKind {
 export class Panel {
   title?: string
   id?: string
+  summary?: string
   kind?: PanelKind
   series: Serie[]
-  constructor({ title, id, kind = PanelKind.chart, series = [] }: Panel = {} as Panel) {
+  constructor({ title, id, summary, kind = PanelKind.chart, series = [] }: Panel = {} as Panel) {
     this.title = title
     this.id = id
+    this.summary = summary
     this.kind = kind
     this.series = series
   }
