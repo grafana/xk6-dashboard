@@ -8,7 +8,7 @@ import { brand, common, grey } from "./colors.css"
 import { sizes } from "./sizes.css"
 import * as typography from "./typography.css"
 
-const root = createGlobalTheme("#root", {
+const root = createGlobalTheme(":root", {
   sizes,
   ...typography
 })
