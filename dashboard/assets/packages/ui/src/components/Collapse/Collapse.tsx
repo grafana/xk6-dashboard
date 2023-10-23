@@ -4,10 +4,10 @@
 
 import React, { type ReactNode } from "react"
 
-import { Flex } from "../Flex"
+import { toClassName } from "utils"
+import { Flex } from "components/Flex"
+import { Icon } from "components/Icon"
 
-import { ReactComponent as ExpandLessIcon } from "assets/icons/expand_less.svg"
-import { ReactComponent as ExpandMoreIcon } from "assets/icons/expand_more.svg"
 import * as styles from "./Collapse.css"
 
 interface CollapseProps {
@@ -20,8 +20,11 @@ interface CollapseProps {
 export const Collapse = ({ children, title, isOpen, onClick }: CollapseProps) => {
   return (
     <div>
-      <Flex align="center" className={styles.header} onClick={onClick}>
-        {isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+      <Flex
+        align="center"
+        className={toClassName(styles.header, styles.border({ borderRadius: String(isOpen) as "true" | "false" }))}
+        onClick={onClick}>
+        {isOpen ? <Icon name="chevron-up" /> : <Icon name="chevron-down" />}
         <h2 className={styles.title}>{title}</h2>
       </Flex>
 

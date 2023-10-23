@@ -11,13 +11,14 @@ import Stat from "components/Stat"
 import Summary from "components/Summary"
 
 interface PanelProps {
+  container?: boolean
   panel: PanelClass
 }
 
-export default function Panel({ panel }: PanelProps) {
+export default function Panel({ container, panel }: PanelProps) {
   switch (panel.kind) {
     case PanelKind.chart: {
-      return <Chart panel={panel} />
+      return <Chart panel={panel} container={container} />
     }
     case PanelKind.stat: {
       return <Stat panel={panel} />

@@ -9,6 +9,7 @@ import { useDigest } from "store/digest"
 import { Grid } from "components/Grid"
 
 import * as styles from "./Summary.css"
+import { Card } from "components/Card"
 
 interface SummaryProps {
   panel: Panel
@@ -28,31 +29,35 @@ export default function Summary({ panel }: SummaryProps) {
 
   return (
     <Grid.Column xs={12} md={md} lg={lg}>
-      <div key={panel.id} className={styles.summary}>
-        <table className={styles.table}>
-          <caption className={styles.caption}>{panel.title}</caption>
-          <thead>
-            <tr className={styles.tr.thead}>
-              {table.header.map((name, idx) => (
-                <th key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"} className={styles.th}>
-                  {name}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {table.body.map((row, idx) => (
-              <tr key={panel.id + "row" + idx} className={styles.tr.tbody}>
-                {row.map((cell, cidx) => (
-                  <td key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"} className={styles.td}>
-                    {cell}
-                  </td>
+      <Card key={panel.id} className={styles.container} title={panel.title}>
+        <div className={styles.body}>
+          <table className={styles.table}>
+            <thead>
+              <tr className={styles.tr.thead}>
+                {table.header.map((name, idx) => (
+                  <th key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"} className={styles.th}>
+                    {name}
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {table.body.map((row, idx) => (
+                <tr key={panel.id + "row" + idx} className={styles.tr.tbody}>
+                  {row.map((cell, cidx) => (
+                    <td
+                      key={panel.id + "_value_" + idx + "_" + cidx}
+                      align={cidx == 0 ? "left" : "right"}
+                      className={styles.td}>
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Card>
     </Grid.Column>
   )
 }

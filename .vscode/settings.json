@@ -4,5 +4,8 @@
   "go.formatTool": "golines",
   "conventionalCommits.scopes": ["module", "ui", "report"],
   "go.buildTags": "mage",
-  "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  }
 }

@@ -9,11 +9,35 @@ import { useDigest } from "store/digest"
 import { useTheme } from "store/theme"
 import { Flex } from "components/Flex"
 import { Header } from "components/Header"
+import { LoadingContainer } from "components/LoadingContainer"
 import { Section } from "components/Section/Section"
-import { Tabs } from "components/Tabs/Tabs"
 
 import * as styles from "./App.css"
-import { getA11yProps } from "./App.utils"
+
+export default function App() {
+  const digest = useDigest()
+  const { themeClassName } = useTheme()
+  const [tab, setTab] = useState(0)
+
+  const hasData = !!digest.samples.length
+
+  return (
+    <Flex className={`${themeClassName} ${styles.container}`} direction="column">
+      <Header config={digest.config} tab={tab} onTabChange={setTab} />
+      <Flex as="main" className={styles.main} direction="column" grow={!hasData ? 1 : 0}>
+        <LoadingContainer isLoading={!hasData} message="Loading...">
+          {digest.config.tabs.map((data, idx) => (
+            <TabPanel key={data.id} active={tab} idx={idx}>
+              {data.sections.map((section) => (
+                <Section key={section.id} section={section} />
+              ))}
+            </TabPanel>
+          ))}
+        </LoadingContainer>
+      </Flex>
+    </Flex>
+  )
+}
 
 interface TabPanelProps {
   children: ReactNode
@@ -21,44 +45,14 @@ interface TabPanelProps {
   idx: number
 }
 
-function TabPanel({ children, active, idx, ...other }: TabPanelProps) {
+function TabPanel({ children, active, idx }: TabPanelProps) {
   if (active !== idx) {
     return null
   }
 
   return (
-    <div role="tabpanel" id={`tabpanel-${idx}`} aria-labelledby={`tab-${idx}`} {...other}>
-      <Flex direction="column" gap={3}>
-        {children}
-      </Flex>
-    </div>
-  )
-}
-
-export default function App() {
-  const { config } = useDigest()
-  const { themeClassName } = useTheme()
-  const [active, setActive] = useState(0)
-
-  return (
-    <div className={`${themeClassName} ${styles.container}`}>
-      <header className={styles.header}>
-        <Header config={config} />
-        <Tabs value={active} onChange={setActive}>
-          {config.tabs.map((tab, idx) => (
-            <Tabs.Tab key={tab.id} label={tab.title} index={idx} {...getA11yProps(idx)} />
-          ))}
-        </Tabs>
-      </header>
-      <main className={styles.main}>
-        {config.tabs.map((tab, idx) => (
-          <TabPanel key={tab.id} active={active} idx={idx}>
-            {tab.sections.map((section) => (
-              <Section key={section.id} section={section} />
-            ))}
-          </TabPanel>
-        ))}
-      </main>
-    </div>
+    <Flex direction="column" gap={3} role="tabpanel" id={`tabpanel-${idx}`} aria-labelledby={`tab-${idx}`}>
+      {children}
+    </Flex>
   )
 }

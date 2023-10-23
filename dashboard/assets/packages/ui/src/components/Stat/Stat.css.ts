@@ -15,12 +15,13 @@ globalStyle(`${uplot} > .u-title`, {
 })
 
 export const container = style({
-  paddingTop: vars.sizes.size5
+  padding: vars.sizes.size5
 })
 
 export const title = style({
-  fontSize: vars.fontSizes.size4,
-  color: vars.colors.text.disabled,
-  marginBottom: vars.sizes.size2,
+  fontSize: vars.fontSizes.size5,
+  fontWeight: vars.fontWeights.weight500,
+  color: vars.colors.text.secondary,
+  paddingTop: vars.sizes.size5,
   textAlign: "center"
 })

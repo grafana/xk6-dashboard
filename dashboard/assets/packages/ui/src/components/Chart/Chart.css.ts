@@ -9,6 +9,12 @@ export const uplot = style({
   breakInside: "avoid"
 })
 
+export const title = style({
+  color: vars.colors.text.secondary,
+  fontSize: vars.fontSizes.size5,
+  fontWeight: vars.fontWeights.weight500
+})
+
 globalStyle(`${uplot} > .u-title`, {
   fontSize: vars.fontSizes.size6,
   fontWeight: `${vars.fontWeights.weight300} !important`
