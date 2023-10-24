@@ -6,6 +6,7 @@ import { createGlobalTheme, createTheme, createThemeContract } from "@vanilla-ex
 
 import { common, grey, midnight, violet } from "./colors.css"
 import { sizes } from "./sizes.css"
+import * as animation from "./animation.css"
 import * as typography from "./typography.css"
 
 const root = createGlobalTheme(":root", {
@@ -15,6 +16,7 @@ const root = createGlobalTheme(":root", {
     large: "10px"
   },
   sizes,
+  animation,
   ...typography
 })
 
