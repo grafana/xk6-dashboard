@@ -7,6 +7,7 @@ import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
 import { useDigest } from "store/digest"
 import { Grid } from "components/Grid"
+import { Table } from "components/Table"
 
 import * as styles from "./Summary.css"
 import { Card } from "components/Card"
@@ -31,31 +32,28 @@ export default function Summary({ panel }: SummaryProps) {
     <Grid.Column xs={12} md={md} lg={lg}>
       <Card key={panel.id} className={styles.container} title={panel.title}>
         <div className={styles.body}>
-          <table className={styles.table}>
-            <thead>
-              <tr className={styles.tr.thead}>
+          <Table>
+            <Table.Head>
+              <Table.Row isHead>
                 {table.header.map((name, idx) => (
-                  <th key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"} className={styles.th}>
+                  <Table.Header key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"}>
                     {name}
-                  </th>
+                  </Table.Header>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
               {table.body.map((row, idx) => (
-                <tr key={panel.id + "row" + idx} className={styles.tr.tbody}>
+                <Table.Row key={panel.id + "row" + idx}>
                   {row.map((cell, cidx) => (
-                    <td
-                      key={panel.id + "_value_" + idx + "_" + cidx}
-                      align={cidx == 0 ? "left" : "right"}
-                      className={styles.td}>
+                    <Table.Cell key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"}>
                       {cell}
-                    </td>
+                    </Table.Cell>
                   ))}
-                </tr>
+                </Table.Row>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </div>
       </Card>
     </Grid.Column>
