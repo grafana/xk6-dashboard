@@ -15,7 +15,10 @@ interface IconButtonProps extends Omit<ButtonProps, "children"> {
   title?: string
 }
 
-function IconButtonBase({ className, name, title, variant = "fill", ...props }: IconButtonProps, ref: Ref<HTMLButtonElement>) {
+function IconButtonBase(
+  { className, name, title, variant = "fill", ...props }: IconButtonProps,
+  ref: Ref<HTMLButtonElement & HTMLAnchorElement>
+) {
   return (
     <Button ref={ref} className={toClassName(styles.button, className)} variant={variant} {...props}>
       <Icon className={styles.icon[variant]} name={name} title={title} />
