@@ -12,5 +12,5 @@ export const container = style({
 })
 
 export const main = style({
-  padding: `0 ${vars.sizes.size6}`
+  padding: vars.sizes.size6
 })

@@ -22,7 +22,7 @@ export default function App() {
   const hasData = !!digest.samples.length
 
   return (
-    <Flex className={`${themeClassName} ${styles.container}`} direction="column">
+    <Flex className={`${themeClassName} ${styles.container}`} direction="column" gap={0}>
       <Header config={digest.config} tab={tab} onTabChange={setTab} />
       <Flex as="main" className={styles.main} direction="column" grow={!hasData ? 1 : 0}>
         <LoadingContainer isLoading={!hasData} message="Loading...">
