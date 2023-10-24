@@ -17,8 +17,6 @@ export const ClickAwayListener = ({ children, onClickAway }: ClickAwayListenerPr
   const handleRef = useForkRef(nodeRef, children.ref)
 
   const handleClickAway = useEventCallback((event: MouseEvent) => {
-    console.log({ documentRef, nodeRef })
-
     if (!nodeRef.current) {
       throw new Error("ClickAwayListener: missing ref")
     }
