@@ -8,7 +8,9 @@ import { vars } from "theme"
 export const popperBase = style({
   backgroundColor: vars.colors.secondary.main,
   border: `1px solid ${vars.colors.primary.main}`,
+  padding: 0,
   minWidth: 150,
+  overflow: "hidden",
   zIndex: 10
 })
 
@@ -27,7 +29,11 @@ export const popper = styleVariants({
   ]
 })
 
-export const text = style({
+export const item = style({
   cursor: "pointer",
-  fontSize: vars.sizes.size5
+  fontSize: vars.sizes.size5,
+  padding: vars.sizes.size3,
+  ":hover": {
+    backgroundColor: vars.colors.action.hover
+  }
 })

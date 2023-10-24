@@ -25,7 +25,7 @@ type JustifyContent =
 export interface FlexElementProps {
   align?: AlignItems
   direction?: FlexDirection
-  gap?: 1 | 2 | 3 | 4
+  gap?: 0 | 1 | 2 | 3 | 4
   justify?: JustifyContent
   wrap?: FlexWrap
   basis?: FlexBasis

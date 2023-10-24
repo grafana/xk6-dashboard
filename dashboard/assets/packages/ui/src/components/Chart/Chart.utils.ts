@@ -12,7 +12,7 @@ const AXIS_SIZE = 70
 const CHART_HEIGHT = 250
 const sync = uPlot.sync("chart")
 
-export const createChartTheme = (theme: Theme) => ({
+const createChartTheme = (theme: Theme) => ({
   tooltip: theme === "dark" ? midnight[900] : common.white,
   grid: theme === "dark" ? midnight[700] : grey[300],
   axes: theme === "dark" ? common.white : common.black

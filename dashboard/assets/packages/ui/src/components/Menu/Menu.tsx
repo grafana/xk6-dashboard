@@ -7,12 +7,12 @@ import { usePopper } from "react-popper"
 
 import { useTheme } from "store/theme"
 import { Button } from "components/Button"
-import { Card } from "components/Card"
 import { ClickAwayListener } from "components/ClickAwayListener"
 import { Flex } from "components/Flex"
 import { IconButton } from "components/IconButton"
+import { Paper } from "components/Paper"
 
-import { popper, text } from "./Menu.css"
+import { popper, item } from "./Menu.css"
 
 interface MenuProps {
   children: ReactNode
@@ -34,14 +34,16 @@ export function MenuBase({ children }: MenuProps) {
 
       {isOpen && (
         <ClickAwayListener onClickAway={() => setIsOpen(false)}>
-          <Card
+          <Paper
             {...attributes.popper}
             ref={setPopperElement}
             className={popper[theme]}
             style={styles.popper}
             onMouseLeave={() => setIsOpen(false)}>
-            <Flex direction="column">{children}</Flex>
-          </Card>
+            <Flex direction="column" gap={0}>
+              {children}
+            </Flex>
+          </Paper>
         </ClickAwayListener>
       )}
     </>
@@ -56,7 +58,7 @@ interface MenuItemProps {
 function MenuItem({ children, onClick }: MenuItemProps) {
   return (
     <Button variant="text" onClick={onClick}>
-      <Flex className={text} align="center" gap={2}>
+      <Flex className={item} align="center" gap={2}>
         {children}
       </Flex>
     </Button>

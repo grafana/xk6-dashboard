@@ -23,11 +23,6 @@ export const options = style({
   padding: 0
 })
 
-export const option = style({
-  cursor: "pointer",
-  fontSize: vars.sizes.size5
-})
-
 export const divider = style({
   "@media": {
     [`(min-width: ${sizes.md})`]: {

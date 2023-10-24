@@ -4,16 +4,15 @@
 
 import React, { forwardRef, type ComponentProps, type FunctionComponent, type Ref } from "react"
 
+import { ReactComponent as DarkModeIcon } from "assets/icons/dark_mode.svg"
 import { ReactComponent as ExpandLessIcon } from "assets/icons/expand_less.svg"
 import { ReactComponent as ExpandMoreIcon } from "assets/icons/expand_more.svg"
 import { ReactComponent as InfoIcon } from "assets/icons/info.svg"
-import { ReactComponent as OptionsIcon } from "assets/icons/options.svg"
+import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
 import { ReactComponent as LogoIcon } from "assets/icons/logo.svg"
+import { ReactComponent as OptionsIcon } from "assets/icons/options.svg"
 import { ReactComponent as QuestionIcon } from "assets/icons/question.svg"
 import { ReactComponent as SpinnerIcon } from "assets/icons/spinner.svg"
-
-import { ReactComponent as DarkModeIcon } from "assets/icons/dark_mode.svg"
-import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
 
 interface IconCommonProps extends ComponentProps<"svg"> {
   className?: string
@@ -24,7 +23,7 @@ interface IconProps extends IconCommonProps {
   name: keyof typeof IconMap
 }
 
-export function IconBase({ className, name, title, ...props }: IconProps, ref: Ref<HTMLSpanElement>) {
+function IconBase({ className, name, title, ...props }: IconProps, ref: Ref<HTMLSpanElement>) {
   const IconComponent = IconMap[name]
 
   return (

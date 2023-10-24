@@ -25,6 +25,7 @@ const variantProps = defineProperties({
       "space-evenly"
     ],
     gap: {
+      0: 0,
       1: vars.sizes.size000,
       2: vars.sizes.size2,
       3: vars.sizes.size6,

@@ -36,6 +36,10 @@ const colorsTheme = createThemeContract({
     disabled: null,
     hover: null
   },
+  action: {
+    active: null,
+    hover: null
+  },
   shadow: null,
   border: null,
   components: {
@@ -65,6 +69,10 @@ export const lightTheme = createTheme(colorsTheme, {
     disabled: grey[400],
     hover: grey[600]
   },
+  action: {
+    active: grey[300],
+    hover: grey[200]
+  },
   shadow: grey[300],
   border: grey[300],
   components: {
@@ -93,6 +101,10 @@ export const darkTheme = createTheme(colorsTheme, {
     secondary: midnight[100],
     disabled: midnight[600],
     hover: midnight[50]
+  },
+  action: {
+    active: midnight[600],
+    hover: midnight[700]
   },
   shadow: midnight[900],
   border: midnight[700],

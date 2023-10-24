@@ -28,7 +28,7 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
   const digest = useDigest()
   const { theme, setTheme } = useTheme()
 
-  const percentage = getTestPercentage(digest, new Date())
+  const percentage = !digest.stop && getTestPercentage(digest, new Date())
 
   function handleHelpClick() {
     window.open("https://github.com/grafana/xk6-dashboard", "_blank")
@@ -51,17 +51,17 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
             <Menu>
               <Menu.Item onClick={handleHelpClick}>
                 <Icon name="question" />
-                <span className={styles.option}>Help</span>
+                <span>Help</span>
               </Menu.Item>
               <Menu.Item onClick={handleThemeChange}>
                 <Icon name={theme === "dark" ? "sun" : "moon"} />
-                <span className={styles.option}>{theme === "dark" ? "Light" : "Dark"} mode</span>
+                <span>{theme === "dark" ? "Light" : "Dark"} mode</span>
               </Menu.Item>
             </Menu>
           </Flex>
         </Flex>
 
-        {!digest.stop ? <Progress value={percentage} /> : <Divider className={styles.divider} />}
+        {percentage ? <Progress value={percentage} /> : <Divider className={styles.divider} />}
         <Nav isMobile options={config.tabs} value={tab} onChange={onTabChange} />
       </header>
     </>
