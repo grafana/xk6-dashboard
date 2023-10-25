@@ -69,7 +69,7 @@ export const lightTheme = createTheme(colorsTheme, {
     primary: grey[900],
     secondary: grey[700],
     disabled: grey[400],
-    hover: grey[600]
+    hover: grey[500]
   },
   action: {
     active: grey[300],
