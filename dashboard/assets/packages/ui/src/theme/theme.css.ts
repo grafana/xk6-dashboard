@@ -61,9 +61,9 @@ export const lightTheme = createTheme(colorsTheme, {
     dark: violet[300]
   },
   secondary: {
-    light: grey[50],
-    main: grey[100],
-    dark: grey[200]
+    light: common.white,
+    main: grey[50],
+    dark: grey[300]
   },
   text: {
     primary: grey[900],

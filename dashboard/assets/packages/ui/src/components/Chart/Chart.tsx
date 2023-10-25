@@ -32,6 +32,7 @@ export default function Chart({ panel, container }: ChartProps) {
   const [ref, { width }] = useElementSize()
 
   const plot = new SeriesPlot(digest, panel, createColorScheme(theme))
+  const Wrapper = container ? Fragment : Paper
 
   if (plot.empty) {
     return null
@@ -47,8 +48,6 @@ export default function Chart({ panel, container }: ChartProps) {
       element.style.background = color
     }
   }
-
-  const Wrapper = container ? Fragment : Paper
 
   return (
     <Grid.Column xs={12} lg={6}>
