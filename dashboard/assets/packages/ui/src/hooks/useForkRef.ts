@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import { useMemo, type MutableRefObject, type RefCallback, type Ref } from "react"
 
 type PossibleRef<T> = Ref<T> | undefined

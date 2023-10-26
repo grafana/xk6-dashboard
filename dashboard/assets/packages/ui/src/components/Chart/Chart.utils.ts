@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 import uPlot, { type Axis, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
 import { dateFormats, format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
