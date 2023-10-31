@@ -13,10 +13,12 @@
     "lint": "yarn lint:eslint && yarn lint:types && yarn lint:format"
   },
   "dependencies": {
+    "@vanilla-extract/css": "^1.13.0",
+    "@vanilla-extract/dynamic": "^2.0.3",
+    "@vanilla-extract/sprinkles": "^1.6.1",
     "@xk6-dashboard/config": "0.0.1",
     "@xk6-dashboard/model": "0.0.1",
     "@xk6-dashboard/view": "0.0.1",
-    "bootstrap": "^5.3.2",
     "preact": "^10.16.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
@@ -28,6 +30,7 @@
     "@preact/preset-vite": "^2.5.0",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
+    "@vanilla-extract/vite-plugin": "^3.9.0",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",

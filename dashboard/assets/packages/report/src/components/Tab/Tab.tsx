@@ -6,21 +6,27 @@ import React from "react"
 import { Digest } from "@xk6-dashboard/model"
 
 import { Tab as TabType } from "types/config"
-import Section from "./Section"
+import { Flex } from "components/Flex"
+import { Section } from "components/Section"
+
+import * as styles from "./Tab.css"
 
 interface TabProps {
   tab: TabType
   digest: Digest
 }
 
-export default function Tab({ tab, digest }: TabProps) {
+export function Tab({ tab, digest }: TabProps) {
   return (
-    <section className="chapter" id="tab.id">
-      <h2 id={tab.id}>{tab.title}</h2>
-      <p>{tab.summary}</p>
+    <Flex id={tab.id} direction="column" gap={4}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>{tab.title}</h2>
+        <p>{tab.summary}</p>
+      </div>
+
       {tab.sections.map((section) => (
         <Section key={section.id} section={section} digest={digest} />
       ))}
-    </section>
+    </Flex>
   )
 }

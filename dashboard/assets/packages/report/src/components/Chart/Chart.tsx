@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { Ref } from "react"
+import React from "react"
 import { useRef, useState, useLayoutEffect } from "preact/hooks"
 
 import "uplot/dist/uPlot.min.css"
@@ -13,7 +13,8 @@ import { Digest } from "@xk6-dashboard/model"
 import { Panel, SeriesPlot, tooltipPlugin, dateFormats, format } from "@xk6-dashboard/view"
 
 import colors from "utils/colors"
-import "./Chart.css"
+
+import * as styles from "./Chart.css"
 
 const sync = uPlot.sync("chart")
 
@@ -24,7 +25,7 @@ interface ChartProps {
 
 export default function Chart({ panel, digest }: ChartProps) {
   const plot = new SeriesPlot(digest, panel, colors)
-  const ref = useRef<HTMLSpanElement | HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
 
   const [width, setWidth] = useState(0)
 
@@ -42,13 +43,12 @@ export default function Chart({ panel, digest }: ChartProps) {
   })
 
   if (plot.empty) {
-    return <span ref={ref} />
+    return null
   }
 
   const options: Options = {
     width: width,
     height: 250,
-    title: panel.title,
     cursor: { sync: { key: sync.key } },
     legend: { live: false },
     series: plot.series as Series[],
@@ -75,7 +75,8 @@ export default function Chart({ panel, digest }: ChartProps) {
   }
 
   return (
-    <div ref={ref as Ref<HTMLDivElement>} className="chart panel">
+    <div ref={ref} className={styles.chart}>
+      <h3 className={styles.title}>{panel.title}</h3>
       <UplotReact options={options} data={plot.data as AlignedData} />
     </div>
   )

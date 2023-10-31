@@ -5,13 +5,14 @@
 // SPDX-License-Identifier: MIT
 
 import { defineConfig } from "vite"
-import preact from "@preact/preset-vite"
 import { viteSingleFile } from "vite-plugin-singlefile"
+import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin"
+import svgr from "vite-plugin-svgr"
+import preact from "@preact/preset-vite"
 import handlebars from "vite-plugin-handlebars"
 import tsconfigPaths from "vite-tsconfig-paths"
-
 import testcontext from "./.testcontext"
 
 export default defineConfig({
-  plugins: [preact(), viteSingleFile(), tsconfigPaths(), handlebars({ context: testcontext })]
+  plugins: [preact(), svgr(), viteSingleFile(), tsconfigPaths(), vanillaExtractPlugin(), handlebars({ context: testcontext })]
 })

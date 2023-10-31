@@ -7,8 +7,14 @@
 import React from "react"
 import { Digest } from "@xk6-dashboard/model"
 
-import Tab from "components/Tab"
-import "./App.css"
+import "theme/global.css"
+import { theme } from "theme"
+import { toClassName } from "utils"
+import { Flex } from "components/Flex"
+import { Header } from "components/Header"
+import { Tab } from "components/Tab/Tab"
+
+import * as styles from "./App.css"
 
 interface AppProps {
   digest: Digest
@@ -16,18 +22,19 @@ interface AppProps {
 
 export default function App({ digest }: AppProps) {
   return (
-    <article className="container-fluid report">
-      <h1>k6 report</h1>
+    <Flex as="main" className={toClassName(theme, styles.main)} direction="column" gap={4}>
+      <Header />
 
       {digest.config.tabs.map((tab) => (
-        <Tab tab={tab} digest={digest} key={tab.id} />
+        <Tab key={tab.id} tab={tab} digest={digest} />
       ))}
-      <section className="usage">
+
+      <section>
         <hr />
-        <p className="usage">
+        <p className={styles.usage}>
           Select a time interval by holding down the mouse on any graph to zoom. To cancel zoom, double click on any graph.
         </p>
       </section>
-    </article>
+    </Flex>
   )
 }
