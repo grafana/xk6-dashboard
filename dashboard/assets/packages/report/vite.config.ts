@@ -9,9 +9,18 @@ import preact from "@preact/preset-vite"
 import { viteSingleFile } from "vite-plugin-singlefile"
 import handlebars from "vite-plugin-handlebars"
 import tsconfigPaths from "vite-tsconfig-paths"
+import { visualizer } from "rollup-plugin-visualizer"
 
 import testcontext from "./.testcontext"
 
 export default defineConfig({
-  plugins: [preact(), viteSingleFile(), tsconfigPaths(), handlebars({ context: testcontext })]
+  plugins: [
+    preact(),
+    viteSingleFile(),
+    tsconfigPaths(),
+    handlebars({ context: testcontext }),
+    visualizer({
+      filename: "bundle-stats.html"
+    })
+  ]
 })
