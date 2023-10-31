@@ -13,9 +13,9 @@
     "lint": "yarn lint:eslint && yarn lint:types && yarn lint:format"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.13.0",
+    "@vanilla-extract/css": "^1.13.0",
+    "@vanilla-extract/dynamic": "^2.0.3",
+    "@vanilla-extract/sprinkles": "^1.6.1",
     "@xk6-dashboard/config": "0.0.1",
     "@xk6-dashboard/model": "0.0.1",
     "@xk6-dashboard/view": "0.0.1",
@@ -23,6 +23,7 @@
     "react-dom": "^18.2.0",
     "uplot": "^1.6.24",
     "uplot-react": "1.1.4",
+    "usehooks-ts": "^2.9.1",
     "vite-plugin-svgr": "^3.2.0"
   },
   "devDependencies": {
@@ -30,6 +31,7 @@
     "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
+    "@vanilla-extract/vite-plugin": "^3.9.0",
     "@vitejs/plugin-react-swc": "^3.0.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^9.0.0",
