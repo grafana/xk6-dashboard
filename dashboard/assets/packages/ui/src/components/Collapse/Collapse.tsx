@@ -21,8 +21,11 @@ export const Collapse = ({ children, title, isOpen, onClick }: CollapseProps) =>
   return (
     <div>
       <Flex
+        as="button"
         align="center"
+        aria-expanded={isOpen}
         className={toClassName(styles.header, styles.border({ borderRadius: String(isOpen) as "true" | "false" }))}
+        width="100%"
         onClick={onClick}>
         {isOpen ? <Icon name="chevron-up" /> : <Icon name="chevron-down" />}
         <h2 className={styles.title}>{title}</h2>

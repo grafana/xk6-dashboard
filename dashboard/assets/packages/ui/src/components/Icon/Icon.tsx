@@ -28,7 +28,7 @@ function IconBase({ className, name, title, ...props }: IconProps, ref: Ref<HTML
 
   return (
     <span ref={ref}>
-      <IconComponent className={className} title={title} {...props} />
+      <IconComponent aria-hidden="true" className={className} title={title} {...props} />
     </span>
   )
 }

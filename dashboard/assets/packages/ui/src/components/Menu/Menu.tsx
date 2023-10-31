@@ -36,6 +36,7 @@ export function MenuBase({ children }: MenuProps) {
         <ClickAwayListener onClickAway={() => setIsOpen(false)}>
           <Paper
             {...attributes.popper}
+            aria-label="Menu"
             ref={setPopperElement}
             className={popper[theme]}
             style={styles.popper}

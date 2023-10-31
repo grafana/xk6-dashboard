@@ -12,6 +12,7 @@ import { Panel, SeriesPlot } from "@xk6-dashboard/view"
 import { createColorScheme } from "utils"
 import { useDigest } from "store/digest"
 import { useTheme } from "store/theme"
+import { Flex } from "components/Flex"
 import { Grid } from "components/Grid"
 import { Paper } from "components/Paper"
 
@@ -38,10 +39,12 @@ export default function Stat({ panel }: StatProps) {
   return (
     <Grid.Column xs={6} md={4} lg={2}>
       <Paper className={styles.container}>
-        <p className={styles.title}>{panel.title}</p>
-        <div ref={ref}>
-          <UplotReact options={options} data={plot.data as AlignedData} />
-        </div>
+        <Flex direction="column" justify="end" gap={0} height="100%">
+          <p className={styles.title}>{panel.title}</p>
+          <div ref={ref}>
+            <UplotReact options={options} data={plot.data as AlignedData} />
+          </div>
+        </Flex>
       </Paper>
     </Grid.Column>
   )

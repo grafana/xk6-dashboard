@@ -5,6 +5,7 @@
 import React from "react"
 
 import { toClassName } from "utils"
+import { Button } from "components/Button"
 import { Flex } from "components/Flex"
 
 import * as styles from "./Nav.css"
@@ -24,6 +25,7 @@ interface NavProps {
 export function Nav({ isMobile = false, options, value, onChange }: NavProps) {
   return (
     <Flex
+      as="nav"
       gap={2}
       className={toClassName(
         styles.nav,
@@ -56,11 +58,12 @@ interface ItemProps {
 }
 
 function Item({ index, label, value, onChange, ...props }: ItemProps) {
-  const state = index === value ? "active" : "inactive"
+  const isActive = index === value
+  const state = isActive ? "active" : "inactive"
 
   return (
-    <div className={styles.item[state]} onClick={() => onChange(index)} {...props}>
+    <Button aria-current={isActive} className={styles.item[state]} variant="text" onClick={() => onChange(index)} {...props}>
       {label}
-    </div>
+    </Button>
   )
 }

@@ -20,7 +20,8 @@ export const header = style({
   color: vars.colors.text.secondary,
   padding: vars.sizes.size6,
   backgroundColor: vars.colors.secondary.light,
-  cursor: "pointer"
+  cursor: "pointer",
+  border: "none"
 })
 
 export const title = style({
