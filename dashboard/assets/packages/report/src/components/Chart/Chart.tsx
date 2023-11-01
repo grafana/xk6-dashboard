@@ -30,7 +30,7 @@ export default function Chart({ panel, digest }: ChartProps) {
     return null
   }
 
-  const options = createOptions({ panel, plot, width })
+  const options = createOptions({ plot, width })
 
   return (
     <div ref={ref} className={styles.chart}>

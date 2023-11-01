@@ -45,14 +45,13 @@ interface CreateOptionsProps {
   width: number
 }
 
-export const createOptions = ({ panel, plot, width }: CreateOptionsProps): Options => {
+export const createOptions = ({ plot, width }: CreateOptionsProps): Options => {
   const units = plot.samples.units
   const axes = units.map(createAxis(units.length))
 
   return {
     width: width,
     height: 250,
-    title: panel.title,
     cursor: { sync: { key: sync.key } },
     legend: { live: false },
     series: plot.series as Series[],
