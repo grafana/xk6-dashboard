@@ -22,9 +22,9 @@ interface SectionProps {
 
 export function Section({ section, digest }: SectionProps) {
   const isEmpty = isEmptySection(section, digest)
-  const isAllStat = section.panels.every((panel) => panel.kind === PanelKind.stat)
+  const panelsExcludingStats = section.panels.filter((panel) => panel.kind !== PanelKind.stat)
 
-  if (isEmpty || isAllStat) {
+  if (isEmpty || !panelsExcludingStats.length) {
     return null
   }
 
@@ -44,7 +44,7 @@ export function Section({ section, digest }: SectionProps) {
 
       <div className={styles.panel}>
         <Grid key={section.id + "row"}>
-          {section.panels.map((panel) => (
+          {panelsExcludingStats.map((panel) => (
             <Grid.Column key={panel.id + "col"} {...getColumnSizes(panel, digest)}>
               <Panel key={panel.id} panel={panel} digest={digest} />
             </Grid.Column>
