@@ -1,6 +1,6 @@
 import uPlot, { type Axis, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
-import { dateFormats, format, tooltipPlugin, type Panel, type SeriesPlot } from "@xk6-dashboard/view"
+import { dateFormats, format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
 
 import { common, grey } from "theme/colors.css"
 
@@ -40,7 +40,6 @@ const createAxis = (length: number) => {
 }
 
 interface CreateOptionsProps {
-  panel: Panel
   plot: SeriesPlot
   width: number
 }
