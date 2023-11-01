@@ -12,7 +12,7 @@ import uPlot, { AlignedData, Options, Series } from "uplot"
 import { Digest } from "@xk6-dashboard/model"
 import { Panel, SeriesPlot, tooltipPlugin, dateFormats, format } from "@xk6-dashboard/view"
 
-import colors from "utils/colors"
+import { colors } from "utils"
 
 import * as styles from "./Chart.css"
 
