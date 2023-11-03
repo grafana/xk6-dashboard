@@ -51,7 +51,7 @@ function TabPanel({ children, active, idx }: TabPanelProps) {
   }
 
   return (
-    <Flex direction="column" gap={3} role="tabpanel" id={`tabpanel-${idx}`} aria-labelledby={`tab-${idx}`}>
+    <Flex direction="column" gap={3}>
       {children}
     </Flex>
   )

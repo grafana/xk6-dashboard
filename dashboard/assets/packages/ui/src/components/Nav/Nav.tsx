@@ -37,14 +37,7 @@ export function Nav({ isMobile = false, options, value, onChange }: NavProps) {
         })
       )}>
       {options.map((option, index) => (
-        <Item
-          key={option.id}
-          aria-controls={`nav-${index}`}
-          label={option.title}
-          index={index}
-          value={value}
-          onChange={onChange}
-        />
+        <Item key={option.id} label={option.title} index={index} value={value} onChange={onChange} />
       ))}
     </Flex>
   )

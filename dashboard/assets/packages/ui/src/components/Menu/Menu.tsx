@@ -30,13 +30,19 @@ export function MenuBase({ children }: MenuProps) {
 
   return (
     <>
-      <IconButton ref={setReferenceElement} name="options" variant="text" onClick={() => setIsOpen(!isOpen)} />
+      <IconButton
+        ref={setReferenceElement}
+        aria-expanded={isOpen ? "true" : "false"}
+        aria-label="Menu"
+        name="options"
+        variant="text"
+        onClick={() => setIsOpen(!isOpen)}
+      />
 
       {isOpen && (
         <ClickAwayListener onClickAway={() => setIsOpen(false)}>
           <Paper
             {...attributes.popper}
-            aria-label="Menu"
             ref={setPopperElement}
             className={popper[theme]}
             style={styles.popper}
