@@ -29,13 +29,15 @@ const variantProps = defineProperties({
       1: vars.sizes.size000,
       2: vars.sizes.size2,
       3: vars.sizes.size6,
-      4: vars.sizes.size11
+      4: vars.sizes.size9,
+      5: vars.sizes.size11
     },
     padding: {
       1: vars.sizes.size000,
       2: vars.sizes.size2,
       3: vars.sizes.size6,
-      4: vars.sizes.size11
+      4: vars.sizes.size9,
+      5: vars.sizes.size11
     }
   }
 })

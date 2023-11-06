@@ -42,7 +42,7 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
     <>
       <header className={styles.header}>
         <Flex className={styles.content} align="center" justify="space-between">
-          <Flex align="center">
+          <Flex align="center" gap={4}>
             <Icon name="logo" />
             <Nav options={config.tabs} value={tab} onChange={onTabChange} />
           </Flex>

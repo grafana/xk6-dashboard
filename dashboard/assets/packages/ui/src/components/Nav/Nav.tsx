@@ -4,7 +4,6 @@
 
 import React from "react"
 
-import { toClassName } from "utils"
 import { Button } from "components/Button"
 import { Flex } from "components/Flex"
 
@@ -24,22 +23,20 @@ interface NavProps {
 
 export function Nav({ isMobile = false, options, value, onChange }: NavProps) {
   return (
-    <Flex
-      as="nav"
-      gap={2}
-      className={toClassName(
-        styles.nav,
-        styles.navVariant({
+    <nav className={styles.nav}>
+      <Flex
+        gap={2}
+        className={styles.listVariant({
           display: {
             desktop: isMobile ? "none" : "flex",
             mobile: isMobile ? "flex" : "none"
           }
-        })
-      )}>
-      {options.map((option, index) => (
-        <Item key={option.id} label={option.title} index={index} value={value} onChange={onChange} />
-      ))}
-    </Flex>
+        })}>
+        {options.map((option, index) => (
+          <Item key={option.id} label={option.title} index={index} value={value} onChange={onChange} />
+        ))}
+      </Flex>
+    </nav>
   )
 }
 
