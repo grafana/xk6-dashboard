@@ -24,8 +24,8 @@ const containerProperties = defineProperties({
     gap: {
       1: vars.sizes.size000,
       2: vars.sizes.size2,
-      3: vars.sizes.size5,
-      4: vars.sizes.size10
+      3: vars.sizes.size6,
+      4: vars.sizes.size11
     }
   }
 })
@@ -41,12 +41,6 @@ const columnProperties = defineProperties({
   },
   defaultCondition: "xs",
   properties: {
-    gap: {
-      1: vars.sizes.size000,
-      2: vars.sizes.size2,
-      3: vars.sizes.size5,
-      4: vars.sizes.size10
-    },
     gridColumn: columnArray.reduce(
       (obj, i) => ({
         ...obj,

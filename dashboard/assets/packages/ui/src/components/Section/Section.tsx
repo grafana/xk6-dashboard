@@ -15,15 +15,16 @@ import Panel from "../Panel"
 import * as styles from "./Section.css"
 
 interface SectionBodyProps {
+  container?: boolean
   section: SectionClass
 }
 
-function SectionBody({ section }: SectionBodyProps) {
+function SectionBody({ container, section }: SectionBodyProps) {
   return (
-    <Grid style={{ width: "100%" }}>
-      {section.panels.map((panel) => {
-        return <Panel key={panel.id} panel={panel} />
-      })}
+    <Grid gap={container ? 4 : 3}>
+      {section.panels.map((panel) => (
+        <Panel key={panel.id} panel={panel} container={container} />
+      ))}
     </Grid>
   )
 }
@@ -38,13 +39,13 @@ export function Section({ section }: SectionProps) {
   const empty = isEmptySection(section, digest)
 
   if (empty) {
-    return <></>
+    return null
   }
 
   if (!section.title) {
     return (
-      <Flex direction="column" width="100%">
-        {section.summary && <p>{section.summary}</p>}
+      <Flex direction="column">
+        {section.summary && <p className={styles.summary}>{section.summary}</p>}
         <SectionBody section={section} />
       </Flex>
     )
@@ -53,8 +54,7 @@ export function Section({ section }: SectionProps) {
   return (
     <Flex direction="column">
       <Collapse title={section.title} isOpen={open} onClick={() => setOpen(!open)}>
-        {section.summary && <p className={styles.summary}>{section.summary}</p>}
-        <SectionBody section={section} />
+        <SectionBody container section={section} />
       </Collapse>
     </Flex>
   )

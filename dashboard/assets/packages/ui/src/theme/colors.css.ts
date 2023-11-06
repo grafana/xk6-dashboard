@@ -2,16 +2,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-export const common = {
-  black: "#000000",
-  white: "#ffffff"
-}
-
-export const brand = {
-  violet: "#7C65FA",
-  darkGrey: "#1C1C1C"
-}
-
 export const red = {
   50: "#ffebee",
   100: "#ffcdd2",
@@ -333,4 +323,35 @@ export const blueGrey = {
   A200: "#b0bec5",
   A400: "#78909c",
   A700: "#455a64"
+}
+
+export const common = {
+  black: "#000000",
+  white: "#ffffff"
+}
+
+export const midnight = {
+  50: "#ffffff",
+  100: "#D6DCFF",
+  200: "#CED4EF",
+  300: "#C2CAEF",
+  400: "#B6C0EF",
+  500: "#AAB6EF",
+  600: "#3f486b",
+  700: "#394160",
+  800: "#2c324b",
+  900: "#1F2537"
+}
+
+export const violet = {
+  50: "#aea2ec",
+  100: "#8e7de5",
+  200: "#6e59de",
+  300: "#604ec2",
+  400: "#5243a6",
+  500: "#44388a",
+  600: "#372c6f",
+  700: "#292153",
+  800: "#1b1637",
+  900: "#0d0b1b"
 }

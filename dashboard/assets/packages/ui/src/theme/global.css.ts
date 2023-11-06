@@ -4,7 +4,6 @@
 
 import { globalStyle } from "@vanilla-extract/css"
 
-import { vars } from "./theme.css"
 import { fontSizes, fonts, letterSpacings } from "./typography.css"
 
 globalStyle("*, *::before, *::after", {
@@ -19,13 +18,13 @@ globalStyle("*", {
 
 globalStyle("html", {
   fontSize: "62.5%",
-  fontSmooth: "antialiased",
+  MozOsxFontSmoothing: "grayscale",
+  WebkitFontSmoothing: "antialiased",
+  WebkitTextSizeAdjust: "100%",
   textSizeAdjust: "100%"
 })
 
 globalStyle("body", {
-  backgroundColor: vars.colors.background.default,
-  color: vars.colors.text.primary,
   letterSpacing: letterSpacings.size3,
   lineHeight: 1.5,
   textRendering: "optimizeLegibility"
@@ -45,7 +44,7 @@ globalStyle("p, h1, h2, h3, h4, h5, h6", {
 })
 
 globalStyle("p", {
-  fontSize: fontSizes.size5
+  fontSize: fontSizes.size4
 })
 
 globalStyle("#root", {

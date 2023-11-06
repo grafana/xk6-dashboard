@@ -10,13 +10,13 @@ import { vars } from "theme"
 const borderSize = 2
 
 export const tabsBase = style({
-  background: vars.colors.background.default,
-  borderBottom: `${borderSize}px solid ${vars.colors.divider}`
+  background: vars.colors.primary.dark,
+  borderBottom: `${borderSize}px solid ${vars.colors.primary.main}`
 })
 
 export const tabBase = style({
-  padding: `${vars.sizes.size3} ${vars.sizes.size5}`,
-  fontSize: vars.fontSizes.size5,
+  padding: `${vars.sizes.size3} ${vars.sizes.size6}`,
+  fontSize: vars.fontSizes.size4,
   cursor: "pointer",
   textTransform: "uppercase",
   marginBottom: `-${borderSize}px`

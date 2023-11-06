@@ -5,18 +5,28 @@
 import { style } from "@vanilla-extract/css"
 
 import { vars } from "theme"
+import { sizes } from "theme/sizes.css"
 
-export const container = style({
-  backgroundColor: vars.colors.background.header,
-  padding: `${vars.sizes.size1} 0`,
-  boxShadow: `0 0 6px ${vars.colors.shadow}`,
-  position: "relative"
+export const header = style({
+  backgroundColor: vars.colors.secondary.main,
+  boxShadow: `0 0 10px ${vars.colors.shadow}`,
+  position: "sticky",
+  top: 0,
+  zIndex: 1
 })
 
-export const title = style({
-  color: vars.colors.text.secondary,
-  fontSize: vars.fontSizes.size6,
-  fontWeight: vars.fontWeights.weight300,
-  textAlign: "center",
-  flex: 1
+export const content = style({
+  padding: `${vars.sizes.size3} ${vars.sizes.size6}`
+})
+
+export const options = style({
+  padding: 0
+})
+
+export const divider = style({
+  "@media": {
+    [`(min-width: ${sizes.md})`]: {
+      display: "none"
+    }
+  }
 })
