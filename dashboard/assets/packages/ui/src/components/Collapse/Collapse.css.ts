@@ -30,7 +30,7 @@ export const title = style({
 })
 
 export const content = style({
-  padding: vars.sizes.size6,
+  padding: vars.sizes.size8,
   backgroundColor: vars.colors.secondary.main
 })
 

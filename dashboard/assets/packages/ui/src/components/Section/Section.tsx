@@ -21,7 +21,7 @@ interface SectionBodyProps {
 
 function SectionBody({ container, section }: SectionBodyProps) {
   return (
-    <Grid>
+    <Grid gap={container ? 4 : 3}>
       {section.panels.map((panel) => (
         <Panel key={panel.id} panel={panel} container={container} />
       ))}
