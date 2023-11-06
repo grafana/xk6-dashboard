@@ -25,13 +25,13 @@ type JustifyContent =
 export interface FlexElementProps {
   align?: AlignItems
   direction?: FlexDirection
-  gap?: 1 | 2 | 3 | 4
+  gap?: 0 | 1 | 2 | 3 | 4 | 5
   justify?: JustifyContent
   wrap?: FlexWrap
   basis?: FlexBasis
   grow?: number
   shrink?: number
-  padding?: 1 | 2 | 3 | 4
+  padding?: 1 | 2 | 3 | 4 | 5
   height?: string | number
   width?: string | number
 }

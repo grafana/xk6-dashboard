@@ -2,17 +2,17 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { createContext, useContext, useState, type Dispatch, type ReactNode, type SetStateAction } from "react"
+import React, { createContext, useContext, type Dispatch, type ReactNode, type SetStateAction } from "react"
 
 import { darkTheme, lightTheme } from "theme"
-import { useMediaQuery } from "usehooks-ts"
+import { useMediaQuery, useSessionStorage } from "usehooks-ts"
 
-type Themes = "light" | "dark"
+export type Theme = "light" | "dark"
 
 interface ThemeContextProps {
-  theme: Themes
+  theme: Theme
   themeClassName: string
-  setTheme: Dispatch<SetStateAction<Themes>>
+  setTheme: Dispatch<SetStateAction<Theme>>
 }
 
 const ThemeContext = createContext<Partial<ThemeContextProps>>({})
@@ -23,7 +23,7 @@ interface ThemeProviderProps {
 
 function ThemeProvider({ children }: ThemeProviderProps) {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-  const [theme, setTheme] = useState<Themes>(isDarkMode ? "dark" : "light")
+  const [theme, setTheme] = useSessionStorage<Theme>("theme", isDarkMode ? "dark" : "light")
 
   const context = {
     theme,

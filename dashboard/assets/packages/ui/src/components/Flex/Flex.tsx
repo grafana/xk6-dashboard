@@ -45,7 +45,7 @@ function FlexBase(
   })
 
   const classNames = toClassName(root, variantClassName, className)
-  const styles = toStyle(theme, { basis, grow, height, shrink, width })
+  const styles = toStyle(theme, { flexBasis: basis, flexGrow: grow, flexShrink: shrink, height, width })
 
   return (
     <Tag ref={ref} className={classNames} style={styles} {...props}>

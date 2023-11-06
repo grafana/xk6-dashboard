@@ -54,7 +54,6 @@ function Column(
   )
 }
 
-// Assign the Column component to the Grid component so that it can be used as a sub-component.
 export const Grid = Object.assign(forwardRef(GridBase), {
   Column: forwardRef(Column)
 })

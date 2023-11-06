@@ -2,20 +2,16 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { style } from "@vanilla-extract/css"
+import { style, styleVariants } from "@vanilla-extract/css"
 
 import { vars } from "theme"
 
-export const root = style({
+const base = style({
   backgroundColor: "transparent",
-  border: "1px solid transparent",
-  borderRadius: "2px",
-  padding: `${vars.sizes.size2} ${vars.sizes.size5}`,
-  fontSize: vars.fontSizes.size3,
+  border: "none",
+  color: vars.colors.text.primary,
+  fontSize: vars.fontSizes.size4,
   fontWeight: vars.fontWeights.weight500,
-  letterSpacing: vars.letterSpacings.size4,
-  textTransform: "uppercase",
-  color: vars.colors.text.secondary,
 
   selectors: {
     "&:is(:disabled)": {
@@ -26,4 +22,28 @@ export const root = style({
       cursor: "pointer"
     }
   }
+})
+
+export const variant = styleVariants({
+  fill: [
+    base,
+    {
+      backgroundColor: vars.colors.primary.main,
+      borderRadius: vars.borderRadius.small,
+      color: vars.colors.common.white,
+      fontWeight: vars.fontWeights.weight600,
+      letterSpacing: vars.letterSpacings.size4,
+      padding: `${vars.sizes.size3} ${vars.sizes.size9}`,
+      textTransform: "uppercase",
+      selectors: {
+        "&:hover:not(:active)": {
+          backgroundColor: vars.colors.primary.light
+        },
+        "&:active": {
+          backgroundColor: vars.colors.primary.dark
+        }
+      }
+    }
+  ],
+  text: [base]
 })

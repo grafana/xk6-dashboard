@@ -8,15 +8,14 @@ import { toClassName } from "utils"
 
 import * as styles from "./Button.css"
 
-type HTMLComboElement = HTMLButtonElement & HTMLAnchorElement
-
 interface CommonProps {
   children: ReactNode
   className?: string
-  onClick?: (event: MouseEvent<HTMLComboElement>) => void
+  variant?: "fill" | "text"
+  onClick?: (event: MouseEvent<Element>) => void
 }
 
-interface ButtonProps extends CommonProps {
+export interface ButtonProps extends CommonProps {
   as?: "button"
   disabled?: boolean
   href?: never
@@ -31,10 +30,11 @@ interface AnchorProps extends CommonProps {
 }
 
 type Props = ButtonProps | AnchorProps
+type Element = HTMLButtonElement & HTMLAnchorElement
 
-const ButtonBase = ({ as: Tag = "button", children, className, ...props }: Props, ref: Ref<HTMLComboElement>) => {
+const ButtonBase = ({ as: Tag = "button", children, className, variant = "fill", ...props }: Props, ref: Ref<Element>) => {
   return (
-    <Tag ref={ref} className={toClassName(styles.root, className)} {...props}>
+    <Tag ref={ref} className={toClassName(styles.variant[variant], className)} {...props}>
       {children}
     </Tag>
   )
