@@ -23,28 +23,30 @@ export default function Summary({ panel, digest }: SummaryProps) {
   }
 
   return (
-    <Table>
-      <caption className={styles.caption}>{panel.title}</caption>
-      <Table.Head>
-        <Table.Row isHead>
-          {table.header.map((name, idx) => (
-            <Table.Header key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"}>
-              {name}
-            </Table.Header>
-          ))}
-        </Table.Row>
-      </Table.Head>
-      <Table.Body>
-        {table.body.map((row, idx) => (
-          <Table.Row key={panel.id + "row" + idx}>
-            {row.map((cell, cidx) => (
-              <Table.Cell key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"}>
-                {cell}
-              </Table.Cell>
+    <div className={styles.container}>
+      <Table>
+        <caption className={styles.caption}>{panel.title}</caption>
+        <Table.Head>
+          <Table.Row isHead>
+            {table.header.map((name, idx) => (
+              <Table.Header key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"}>
+                {name}
+              </Table.Header>
             ))}
           </Table.Row>
-        ))}
-      </Table.Body>
-    </Table>
+        </Table.Head>
+        <Table.Body>
+          {table.body.map((row, idx) => (
+            <Table.Row key={panel.id + "row" + idx}>
+              {row.map((cell, cidx) => (
+                <Table.Cell key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"}>
+                  {cell}
+                </Table.Cell>
+              ))}
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
+    </div>
   )
 }
