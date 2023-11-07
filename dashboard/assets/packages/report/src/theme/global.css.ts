@@ -51,19 +51,23 @@ globalStyle("h1, h2, h3, h4, h5, h6", {
 })
 
 globalStyle("h1", {
-  fontSize: fontSizes.size9
+  fontSize: fontSizes.size10
 })
 
 globalStyle("h2", {
-  fontSize: fontSizes.size8
+  fontSize: fontSizes.size9
 })
 
 globalStyle("h3", {
+  fontSize: fontSizes.size7
+})
+
+globalStyle("h4", {
   fontSize: fontSizes.size6
 })
 
 globalStyle("p", {
-  fontSize: fontSizes.size4
+  fontSize: fontSizes.size5
 })
 
 globalStyle("#root", {

@@ -32,9 +32,7 @@ export function Section({ section, digest }: SectionProps) {
     <section>
       {section.title && (
         <Flex className={styles.header} align="baseline" gap={2}>
-          <div>
-            <CircleIcon color={vars.colors.primary.dark} width="15px" height="15px" />
-          </div>
+          <CircleIcon className={styles.icon} color={vars.colors.primary.dark} width="15px" height="15px" />
           <Flex direction="column">
             <h3>{section.title}</h3>
             <p>{section.summary}</p>
@@ -43,7 +41,7 @@ export function Section({ section, digest }: SectionProps) {
       )}
 
       <div className={styles.panel}>
-        <Grid key={section.id + "row"}>
+        <Grid key={section.id + "row"} gap={4}>
           {panelsExcludingStats.map((panel) => (
             <Grid.Column key={panel.id + "col"} {...getColumnSizes(panel, digest)}>
               <Panel key={panel.id} panel={panel} digest={digest} />

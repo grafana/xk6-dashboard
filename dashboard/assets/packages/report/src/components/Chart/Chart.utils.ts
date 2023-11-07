@@ -1,13 +1,25 @@
 import uPlot, { type Axis, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
-import { dateFormats, format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
+import { format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
 
 import { common, grey } from "theme/colors.css"
+
+import * as styles from "./Chart.css"
 
 const AXIS_SIDE = 1
 const AXIS_SIZE = 70
 
 const sync = uPlot.sync("chart")
+
+const dateFormats = [
+  [3600 * 24 * 365, null, null, null, null, null, null, null, 1],
+  [3600 * 24 * 28, null, null, null, null, null, null, null, 1],
+  [3600 * 24, null, null, null, null, null, null, null, 1],
+  [3600, "{HH}", null, null, null, null, null, null, 1],
+  [60, "{HH}:{mm}", null, null, null, null, null, null, 1],
+  [1, ":{ss}", null, null, null, null, null, null, 1],
+  [0.001, ":{ss}.{fff}", null, null, null, null, null, null, 1]
+]
 
 const getAxisValues = (unit: UnitType, index: number) => {
   if (index === 0) {
@@ -49,6 +61,7 @@ export const createOptions = ({ plot, width }: CreateOptionsProps): Options => {
   const axes = units.map(createAxis(units.length))
 
   return {
+    class: styles.uplot,
     width: width,
     height: 250,
     cursor: { sync: { key: sync.key } },

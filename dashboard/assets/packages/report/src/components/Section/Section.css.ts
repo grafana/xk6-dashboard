@@ -12,6 +12,11 @@ export const header = style({
   marginBottom: vars.sizes.size8
 })
 
+export const icon = style({
+  position: "relative",
+  top: "-1px"
+})
+
 export const panel = style({
   "@media": {
     [`(min-width: ${sizes.lg})`]: {

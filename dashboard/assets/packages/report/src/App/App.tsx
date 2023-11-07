@@ -21,7 +21,7 @@ interface AppProps {
 export default function App({ digest }: AppProps) {
   return (
     <Flex as="main" className={toClassName(theme, styles.main)} direction="column" gap={4}>
-      <Header />
+      <Header digest={digest} />
 
       {digest.config.tabs.map((tab) => (
         <Tab key={tab.id} tab={tab} digest={digest} />

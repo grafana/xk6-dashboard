@@ -34,7 +34,7 @@ export default function Chart({ panel, digest }: ChartProps) {
 
   return (
     <div ref={ref} className={styles.chart}>
-      <h3 className={styles.title}>{panel.title}</h3>
+      <h4 className={styles.title}>{panel.title}</h4>
       <UplotReact options={options} data={plot.data as AlignedData} />
     </div>
   )

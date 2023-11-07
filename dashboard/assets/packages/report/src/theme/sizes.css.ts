@@ -3,8 +3,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 export const sizes = {
-  size000: ".5rem",
-  size00: ".25rem",
   size1: ".25rem",
   size2: ".5rem",
   size3: ".75rem",

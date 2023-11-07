@@ -19,7 +19,7 @@ export const containerBase = style({
 const containerProperties = defineProperties({
   properties: {
     gap: {
-      1: vars.sizes.size000,
+      1: vars.sizes.size1,
       2: vars.sizes.size2,
       3: vars.sizes.size6,
       4: vars.sizes.size11

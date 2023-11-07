@@ -18,7 +18,9 @@ export const fontSizes = {
   size6: "2rem",
   size7: "2.5rem",
   size8: "3rem",
-  size9: "3.5rem"
+  size9: "3.5rem",
+  size10: "4rem",
+  sizeFluid: "clamp(2rem, 4vw, 4rem)"
 }
 
 export const fontWeights = {
