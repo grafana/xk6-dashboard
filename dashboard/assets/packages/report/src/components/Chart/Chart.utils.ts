@@ -40,7 +40,8 @@ const createAxis = (length: number) => {
       grid: { stroke: grey[100] },
       ticks: { stroke: grey[100] },
       values: getAxisValues(unit, index),
-      scale: unit
+      scale: unit,
+      space: unit === "timestamp" ? 60 : 40
     }
 
     if (index === 2 && length > 2) {

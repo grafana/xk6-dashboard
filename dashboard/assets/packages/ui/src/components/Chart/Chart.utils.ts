@@ -47,7 +47,8 @@ const createAxis = (colors: ReturnType<typeof createChartTheme>, length: number)
       grid: { stroke: colors.grid, width: 1 },
       ticks: { stroke: colors.grid },
       values: getAxisValues(unit, index),
-      scale: unit
+      scale: unit,
+      space: unit === "timestamp" ? 60 : 40
     }
 
     if (index === 2 && length > 2) {
