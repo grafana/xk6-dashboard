@@ -4,7 +4,7 @@
 
 import uPlot, { type Axis, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
-import { dateFormats, format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
+import { format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
 
 import { type Theme } from "store/theme"
 import { common, grey, midnight } from "theme/colors.css"
@@ -15,6 +15,16 @@ const AXIS_SIDE = 1
 const AXIS_SIZE = 70
 const CHART_HEIGHT = 250
 const sync = uPlot.sync("chart")
+
+const dateFormats = [
+  [3600 * 24 * 365, "0", null, null, null, null, null, null, 1],
+  [3600 * 24 * 28, "0", null, null, null, null, null, null, 1],
+  [3600 * 24, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [3600, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [60, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [1, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [1e-3, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1]
+]
 
 const createChartTheme = (theme: Theme) => ({
   tooltip: theme === "dark" ? midnight[900] : common.white,

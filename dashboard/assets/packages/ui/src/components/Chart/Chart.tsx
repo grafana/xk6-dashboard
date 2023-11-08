@@ -32,13 +32,11 @@ export default function Chart({ panel, container }: ChartProps) {
   const [ref, { width }] = useElementSize()
 
   const plot = new SeriesPlot(digest, panel, createColorScheme(theme))
-  const Wrapper = container ? Fragment : Paper
-
-  if (plot.empty) {
-    return null
-  }
-
+  const hasData = !plot.empty && plot.data[0].length > 1
+  const plotData = (hasData ? plot.data : []) as AlignedData
   const options = createOptions({ plot, theme, width })
+
+  const Wrapper = container ? Fragment : Paper
 
   function onCreate(chart: uPlot) {
     const color = theme == "dark" ? "#60606080" : "#d0d0d080"
@@ -59,7 +57,10 @@ export default function Chart({ panel, container }: ChartProps) {
               <Icon name="info" width="20px" height="20px" />
             </Tooltip>
           </Flex>
-          <UplotReact options={options} data={plot.data as AlignedData} onCreate={onCreate} />
+          <div className={styles.chartWrapper}>
+            {!hasData && <p className={styles.noData}>no data</p>}
+            <UplotReact options={options} data={plotData} onCreate={onCreate} />
+          </div>
         </div>
       </Wrapper>
     </Grid.Column>

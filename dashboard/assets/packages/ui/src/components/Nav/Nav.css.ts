@@ -11,7 +11,12 @@ import { sizes } from "theme/sizes.css"
 export const nav = style({
   background: vars.colors.secondary.main,
   overflow: "auto",
-  padding: `0 ${vars.sizes.size7}`
+  padding: `${vars.sizes.size2} ${vars.sizes.size6}`,
+  "@media": {
+    [`screen and (min-width: ${sizes.md})`]: {
+      padding: `0 ${vars.sizes.size7}`
+    }
+  }
 })
 
 const listProps = defineProperties({

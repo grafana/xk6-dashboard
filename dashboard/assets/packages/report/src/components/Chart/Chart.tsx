@@ -23,19 +23,20 @@ interface ChartProps {
 }
 
 export default function Chart({ panel, digest }: ChartProps) {
-  const plot = new SeriesPlot(digest, panel, colors)
   const [ref, width] = useElementWidth()
 
-  if (plot.empty) {
-    return null
-  }
-
+  const plot = new SeriesPlot(digest, panel, colors)
+  const hasData = !plot.empty && plot.data[0].length > 1
+  const plotData = (hasData ? plot.data : []) as AlignedData
   const options = createOptions({ plot, width })
 
   return (
     <div ref={ref} className={styles.chart}>
       <h4 className={styles.title}>{panel.title}</h4>
-      <UplotReact options={options} data={plot.data as AlignedData} />
+      <div className={styles.chartWrapper}>
+        {!hasData && <p className={styles.noData}>no data</p>}
+        <UplotReact options={options} data={plotData} />
+      </div>
     </div>
   )
 }
