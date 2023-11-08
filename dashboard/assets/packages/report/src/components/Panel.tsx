@@ -14,10 +14,11 @@ interface PanelProps {
   digest: Digest
 }
 
-export default function Panel({ panel, digest }: PanelProps) {
+export function Panel({ panel, digest }: PanelProps) {
   if (panel.kind == PanelKind.chart) {
     return <Chart panel={panel} digest={digest} />
   }
+
   if (panel.kind == PanelKind.summary) {
     return <Summary panel={panel} digest={digest} />
   }

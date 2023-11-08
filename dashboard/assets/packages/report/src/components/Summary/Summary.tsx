@@ -6,7 +6,9 @@ import React from "react"
 import { Digest } from "@xk6-dashboard/model"
 import { Panel, SummaryTable } from "@xk6-dashboard/view"
 
-import "./Summary.css"
+import { Table } from "components/Table"
+
+import * as styles from "./Summary.css"
 
 interface SummaryProps {
   panel: Panel
@@ -17,34 +19,34 @@ export default function Summary({ panel, digest }: SummaryProps) {
   const table = new SummaryTable(panel, digest)
 
   if (table.empty) {
-    return <div />
+    return null
   }
 
   return (
-    <div className="panel">
-      <table className="table table-hover caption-top">
-        <caption>{panel.title}</caption>
-        <thead>
-          <tr>
+    <div className={styles.container}>
+      <Table>
+        <caption className={styles.caption}>{panel.title}</caption>
+        <Table.Head>
+          <Table.Row isHead>
             {table.header.map((name, idx) => (
-              <th key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"}>
+              <Table.Header key={panel.id + "header" + name} align={idx == 0 ? "left" : "right"}>
                 {name}
-              </th>
+              </Table.Header>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
           {table.body.map((row, idx) => (
-            <tr key={panel.id + "row" + idx}>
+            <Table.Row key={panel.id + "row" + idx}>
               {row.map((cell, cidx) => (
-                <td key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"}>
+                <Table.Cell key={panel.id + "_value_" + idx + "_" + cidx} align={cidx == 0 ? "left" : "right"}>
                   {cell}
-                </td>
+                </Table.Cell>
               ))}
-            </tr>
+            </Table.Row>
           ))}
-        </tbody>
-      </table>
+        </Table.Body>
+      </Table>
     </div>
   )
 }
