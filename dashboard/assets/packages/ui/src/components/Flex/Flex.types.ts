@@ -31,7 +31,7 @@ export interface FlexElementProps {
   basis?: FlexBasis
   grow?: number
   shrink?: number
-  padding?: 1 | 2 | 3 | 4 | 5
+  padding?: 0 | 1 | 2 | 3 | 4 | 5
   height?: string | number
   width?: string | number
 }

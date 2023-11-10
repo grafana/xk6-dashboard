@@ -16,13 +16,13 @@ const AXIS_SIZE = 70
 const sync = uPlot.sync("chart")
 
 const dateFormats = [
-  [3600 * 24 * 365, null, null, null, null, null, null, null, 1],
-  [3600 * 24 * 28, null, null, null, null, null, null, null, 1],
-  [3600 * 24, null, null, null, null, null, null, null, 1],
-  [3600, "{HH}", null, null, null, null, null, null, 1],
-  [60, "{HH}:{mm}", null, null, null, null, null, null, 1],
-  [1, ":{ss}", null, null, null, null, null, null, 1],
-  [0.001, ":{ss}.{fff}", null, null, null, null, null, null, 1]
+  [3600 * 24 * 365, "0", null, null, null, null, null, null, 1],
+  [3600 * 24 * 28, "0", null, null, null, null, null, null, 1],
+  [3600 * 24, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [3600, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [60, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [1, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1],
+  [1e-3, "{HH}:{mm}:{ss}", null, null, null, null, null, null, 1]
 ]
 
 const getAxisValues = (unit: UnitType, index: number) => {
@@ -40,7 +40,8 @@ const createAxis = (length: number) => {
       grid: { stroke: grey[100] },
       ticks: { stroke: grey[100] },
       values: getAxisValues(unit, index),
-      scale: unit
+      scale: unit,
+      space: unit === "timestamp" ? 60 : 40
     }
 
     if (index === 2 && length > 2) {

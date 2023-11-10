@@ -22,10 +22,10 @@ export const containerBase = style({
 const containerProperties = defineProperties({
   properties: {
     gap: {
-      1: vars.sizes.size000,
-      2: vars.sizes.size2,
-      3: vars.sizes.size6,
-      4: vars.sizes.size11
+      1: vars.sizes.size1,
+      2: `clamp(${vars.sizes.size1}, 4vw, ${vars.sizes.size2})`,
+      3: `clamp(${vars.sizes.size1}, 4vw, ${vars.sizes.size6})`,
+      4: `clamp(${vars.sizes.size1}, 4vw, ${vars.sizes.size11})`
     }
   }
 })
