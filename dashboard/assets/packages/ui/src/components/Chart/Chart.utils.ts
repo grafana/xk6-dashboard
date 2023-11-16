@@ -64,7 +64,7 @@ const createAxis = (colors: ReturnType<typeof createChartTheme>, length: number)
 }
 
 export interface CreateOptionsProps {
-  plot: SeriesPlot
+  plot: Omit<SeriesPlot, "series"> & { series: Series[] }
   theme: Theme
   width: number
 }

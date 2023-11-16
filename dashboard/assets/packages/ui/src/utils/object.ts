@@ -8,3 +8,19 @@ export const omitUndefined = <T extends object>(styles: T) => {
     {}
   )
 }
+
+export const keep = (props: string[], obj: object) =>
+  Object.entries(obj).reduce(
+    (acc, [key, value]) => {
+      if (props.includes(key)) {
+        acc[key] = value
+      }
+
+      return acc
+    },
+    {} as { [key: string]: unknown }
+  )
+
+export const mergeRight = (a: object, b: object) => ({ ...a, ...b })
+
+export const mergeRightProps = (props: string[]) => (a: object, b: object) => mergeRight(a, keep(props, b))
