@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import uPlot, { type Axis, type Options, type Series } from "uplot"
+import uPlot, { type Axis, type Hooks, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
 import { format, tooltipPlugin, SeriesPlot } from "@xk6-dashboard/view"
 
@@ -64,12 +64,13 @@ const createAxis = (colors: ReturnType<typeof createChartTheme>, length: number)
 }
 
 export interface CreateOptionsProps {
+  hooks: Hooks.Arrays
   plot: Omit<SeriesPlot, "series"> & { series: Series[] }
   theme: Theme
   width: number
 }
 
-export const createOptions = ({ plot, theme, width }: CreateOptionsProps): Options => {
+export const createOptions = ({ hooks, plot, theme, width }: CreateOptionsProps): Options => {
   const colors = createChartTheme(theme)
   const units = plot.samples.units
   const axes = units.map(createAxis(colors, units.length))
@@ -78,6 +79,7 @@ export const createOptions = ({ plot, theme, width }: CreateOptionsProps): Optio
     class: styles.uplot,
     width: width,
     height: CHART_HEIGHT,
+    hooks,
     cursor: { sync: { key: sync.key } },
     legend: { live: false },
     series: plot.series as Series[],

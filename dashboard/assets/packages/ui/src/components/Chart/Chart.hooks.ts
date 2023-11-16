@@ -14,8 +14,7 @@ const mergeSeries = (plotSeries: Series[] = [], stateSeries: Series[] = []) => {
 export const useOptions = ({ plot, theme, width }: CreateOptionsProps): Options => {
   const [series, setSeries] = useState<Series[]>(plot.series)
   const newPlot = { ...plot, series: mergeSeries(plot.series, series) }
-  const options = createOptions({ plot: newPlot, theme, width })
   const hooks = { setSeries: [(self: uPlot) => setSeries(self.series)] }
 
-  return { ...options, hooks }
+  return createOptions({ hooks, plot: newPlot, theme, width })
 }
