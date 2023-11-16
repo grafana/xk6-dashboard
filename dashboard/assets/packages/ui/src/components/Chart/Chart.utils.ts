@@ -4,7 +4,7 @@
 
 import uPlot, { type Axis, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
-import { format, tooltipPlugin, type SeriesPlot } from "@xk6-dashboard/view"
+import { format, tooltipPlugin, SeriesPlot } from "@xk6-dashboard/view"
 
 import { type Theme } from "store/theme"
 import { common, grey, midnight } from "theme/colors.css"
@@ -63,7 +63,7 @@ const createAxis = (colors: ReturnType<typeof createChartTheme>, length: number)
   }
 }
 
-interface CreateOptionsProps {
+export interface CreateOptionsProps {
   plot: SeriesPlot
   theme: Theme
   width: number

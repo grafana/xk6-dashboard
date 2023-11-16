@@ -18,7 +18,7 @@ import { Icon } from "components/Icon"
 import { Paper } from "components/Paper"
 import { Tooltip } from "components/Tooltip"
 
-import { createOptions } from "./Chart.utils"
+import { useOptions } from "./Chart.hooks"
 import * as styles from "./Chart.css"
 
 interface ChartProps {
@@ -34,7 +34,7 @@ export default function Chart({ panel, container }: ChartProps) {
   const plot = new SeriesPlot(digest, panel, createColorScheme(theme))
   const hasData = !plot.empty && plot.data[0].length > 1
   const plotData = (hasData ? plot.data : []) as AlignedData
-  const options = createOptions({ plot, theme, width })
+  const options = useOptions({ plot, theme, width })
 
   const Wrapper = container ? Fragment : Paper
 
