@@ -25,7 +25,7 @@ export const pick = (props: string[], obj: object) =>
   )
 
 /**
- * This method is used to merge two objects together. It will overwrite the values of the first object with the values
+ * This method is used to merge two objects together. It will overwrite the values of the first object with the values from the second object
  */
 export const mergeRight = (a: object, b: object) => ({ ...a, ...b })
 
