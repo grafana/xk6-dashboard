@@ -11,7 +11,7 @@ export const container = style({
 
 export const title = style({
   backgroundColor: vars.colors.secondary.light,
-  borderRadius: `${vars.borderRadius.medium} ${vars.borderRadius.medium} 0 0`,
+  borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
   color: vars.colors.text.secondary,
   padding: `${vars.sizes.size6} ${vars.sizes.size8}`,
   fontSize: vars.fontSizes.size5,

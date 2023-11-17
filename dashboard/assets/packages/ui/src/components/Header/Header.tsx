@@ -15,8 +15,9 @@ import { Menu } from "components/Menu"
 import { Nav } from "components/Nav"
 import { Progress } from "components/Progress"
 
-import { getTestPercentage } from "./Header.utils"
+import { getDuration, getRefreshRate, getTestPercentage } from "./Header.utils"
 import * as styles from "./Header.css"
+import { Tooltip } from "components/Tooltip"
 
 interface HeaderProps {
   config: UIConfig
@@ -26,17 +27,7 @@ interface HeaderProps {
 
 export function Header({ config, tab, onTabChange }: HeaderProps) {
   const digest = useDigest()
-  const { theme, setTheme } = useTheme()
-
   const percentage = !digest.stop && getTestPercentage(digest, new Date())
-
-  function handleHelpClick() {
-    window.open("https://github.com/grafana/xk6-dashboard", "_blank")
-  }
-
-  function handleThemeChange() {
-    setTheme(theme === "light" ? "dark" : "light")
-  }
 
   return (
     <>
@@ -47,17 +38,9 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
             <Nav options={config.tabs} value={tab} onChange={onTabChange} />
           </Flex>
           <Flex align="center">
+            <Stats />
             <Button onClick={() => window.open("../report", "k6-report")}>Report</Button>
-            <Menu>
-              <Menu.Item onClick={handleHelpClick}>
-                <Icon name="question" />
-                <span>Help</span>
-              </Menu.Item>
-              <Menu.Item onClick={handleThemeChange}>
-                <Icon name={theme === "dark" ? "sun" : "moon"} />
-                <span>{theme === "dark" ? "Light" : "Dark"} mode</span>
-              </Menu.Item>
-            </Menu>
+            <Options />
           </Flex>
         </Flex>
 
@@ -65,5 +48,53 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
         <Nav isMobile options={config.tabs} value={tab} onChange={onTabChange} />
       </header>
     </>
+  )
+}
+
+const Stats = () => {
+  const digest = useDigest()
+
+  return (
+    <div className={styles.stats}>
+      <Flex align="center" gap={3}>
+        <Tooltip placement="bottom" title="Refresh rate">
+          <Flex align="center" gap={2}>
+            <Icon name="stop-watch" width="12px" height="12px" />
+            <span>{getRefreshRate(digest)}</span>
+          </Flex>
+        </Tooltip>
+        <Tooltip placement="bottom" title="Duration">
+          <Flex align="center" gap={2}>
+            <Icon name="hour-glass" width="12px" height="12px" />
+            <span>{getDuration(digest)}</span>
+          </Flex>
+        </Tooltip>
+      </Flex>
+    </div>
+  )
+}
+
+const Options = () => {
+  const { theme, setTheme } = useTheme()
+
+  function handleHelpClick() {
+    window.open("https://github.com/grafana/xk6-dashboard", "_blank")
+  }
+
+  function handleThemeChange() {
+    setTheme(theme === "light" ? "dark" : "light")
+  }
+
+  return (
+    <Menu>
+      <Menu.Item onClick={handleHelpClick}>
+        <Icon name="question" />
+        <span>Help</span>
+      </Menu.Item>
+      <Menu.Item onClick={handleThemeChange}>
+        <Icon name={theme === "dark" ? "sun" : "moon"} />
+        <span>{theme === "dark" ? "Light" : "Dark"} mode</span>
+      </Menu.Item>
+    </Menu>
   )
 }

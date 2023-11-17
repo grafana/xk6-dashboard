@@ -29,7 +29,7 @@ export const variant = styleVariants({
     base,
     {
       backgroundColor: vars.colors.primary.main,
-      borderRadius: vars.borderRadius.small,
+      borderRadius: vars.borderRadius.sm,
       color: vars.colors.common.white,
       fontWeight: vars.fontWeights.weight600,
       letterSpacing: vars.letterSpacings.size4,

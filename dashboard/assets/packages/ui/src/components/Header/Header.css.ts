@@ -5,7 +5,6 @@
 import { style } from "@vanilla-extract/css"
 
 import { vars } from "theme"
-import { sizes } from "theme/sizes.css"
 
 export const header = style({
   backgroundColor: vars.colors.secondary.main,
@@ -25,8 +24,14 @@ export const options = style({
 
 export const divider = style({
   "@media": {
-    [`(min-width: ${sizes.md})`]: {
+    [`(min-width: ${vars.breakpoints.header})`]: {
       display: "none"
     }
   }
+})
+
+export const stats = style({
+  border: `2px solid ${vars.colors.border}`,
+  padding: `${vars.sizes.size3} ${vars.sizes.size5}`,
+  borderRadius: vars.borderRadius.md
 })

@@ -9,12 +9,15 @@ import { sizes } from "./sizes.css"
 import * as animation from "./animation.css"
 import * as typography from "./typography.css"
 
+const borderRadius = {
+  sm: "3px",
+  md: "5px",
+  lg: "10px",
+  xl: "25px"
+}
+
 const root = createGlobalTheme(":root", {
-  borderRadius: {
-    small: "3px",
-    medium: "5px",
-    large: "10px"
-  },
+  borderRadius,
   sizes,
   animation,
   ...typography
@@ -119,4 +122,8 @@ export const darkTheme = createTheme(colorsTheme, {
   }
 })
 
-export const vars = { ...root, colors: colorsTheme }
+const breakpoints = {
+  header: sizes.lg
+}
+
+export const vars = { ...root, breakpoints, colors: colorsTheme }
