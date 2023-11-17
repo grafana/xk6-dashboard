@@ -17,7 +17,6 @@ interface HeaderProps {
 }
 
 export function Header({ digest }: HeaderProps) {
-  console.log(digest.start, typeof digest.start)
   return (
     <Flex as="header" align="center">
       <LogoIcon />
