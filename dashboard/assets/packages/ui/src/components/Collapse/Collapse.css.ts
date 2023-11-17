@@ -10,8 +10,8 @@ import { vars } from "theme"
 const borderProps = defineProperties({
   properties: {
     borderRadius: {
-      true: `${vars.borderRadius.medium} ${vars.borderRadius.medium} 0 0`,
-      false: vars.borderRadius.medium
+      true: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
+      false: vars.borderRadius.md
     }
   }
 })

@@ -8,6 +8,7 @@ import { Button } from "components/Button"
 import { Flex } from "components/Flex"
 
 import * as styles from "./Nav.css"
+import { toClassName } from "utils"
 
 interface Option {
   title?: string
@@ -23,15 +24,17 @@ interface NavProps {
 
 export function Nav({ isMobile = false, options, value, onChange }: NavProps) {
   return (
-    <nav className={styles.nav}>
-      <Flex
-        gap={2}
-        className={styles.listVariant({
+    <nav
+      className={toClassName(
+        styles.nav,
+        styles.listVariant({
           display: {
-            desktop: isMobile ? "none" : "flex",
-            mobile: isMobile ? "flex" : "none"
+            desktop: isMobile ? "none" : "block",
+            mobile: isMobile ? "block" : "none"
           }
-        })}>
+        })
+      )}>
+      <Flex gap={2}>
         {options.map((option, index) => (
           <Item key={option.id} label={option.title} index={index} value={value} onChange={onChange} />
         ))}

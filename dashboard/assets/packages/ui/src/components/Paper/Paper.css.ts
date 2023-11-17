@@ -8,6 +8,6 @@ import { vars } from "theme"
 
 export const styles = style({
   backgroundColor: vars.colors.secondary.main,
-  borderRadius: vars.borderRadius.medium,
+  borderRadius: vars.borderRadius.md,
   padding: vars.sizes.size8
 })

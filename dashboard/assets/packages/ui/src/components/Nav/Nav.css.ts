@@ -6,14 +6,13 @@ import { style, styleVariants } from "@vanilla-extract/css"
 import { defineProperties, createSprinkles } from "@vanilla-extract/sprinkles"
 
 import { vars } from "theme"
-import { sizes } from "theme/sizes.css"
 
 export const nav = style({
   background: vars.colors.secondary.main,
   overflow: "auto",
   padding: `${vars.sizes.size2} ${vars.sizes.size6}`,
   "@media": {
-    [`screen and (min-width: ${sizes.md})`]: {
+    [`screen and (min-width: ${vars.breakpoints.header})`]: {
       padding: `0 ${vars.sizes.size7}`
     }
   }
@@ -22,11 +21,11 @@ export const nav = style({
 const listProps = defineProperties({
   conditions: {
     mobile: {},
-    desktop: { "@media": `(min-width: ${sizes.md})` }
+    desktop: { "@media": `(min-width: ${vars.breakpoints.header})` }
   },
   defaultCondition: "mobile",
   properties: {
-    display: ["none", "flex"]
+    display: ["none", "block"]
   }
 })
 
@@ -48,7 +47,7 @@ const itemBase = style({
     margin: "auto",
     width: "100%",
     height: "80%",
-    borderRadius: vars.borderRadius.medium,
+    borderRadius: vars.borderRadius.md,
     zIndex: -1
   }
 })
