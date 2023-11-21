@@ -11,11 +11,65 @@
                   "query": "iterations[?!tags && rate]"
                 }
               ],
-              "title": "Performance overview",
+              "title": "Iteration Rate",
+              "kind": "stat",
               "id": "tab-0.section-0.panel-0",
-              "summary": "<placeholder panel summary>",
-              "fullWidth": true,
-              "kind": "chart"
+              "summary": "<placeholder panel summary>"
+            },
+            {
+              "series": [
+                {
+                  "query": "vus[?!tags && value]"
+                }
+              ],
+              "title": "VUs",
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-1",
+              "summary": "<placeholder panel summary>"
+            },
+            {
+              "series": [
+                {
+                  "query": "http_reqs[?!tags && rate]"
+                }
+              ],
+              "title": "HTTP Request Rate",
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-2",
+              "summary": "<placeholder panel summary>"
+            },
+            {
+              "series": [
+                {
+                  "query": "http_req_duration[?!tags && avg]"
+                }
+              ],
+              "title": "HTTP Request Duration",
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-3",
+              "summary": "<placeholder panel summary>"
+            },
+            {
+              "series": [
+                {
+                  "query": "data_received[?!tags && rate]"
+                }
+              ],
+              "title": "Received Rate",
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-4",
+              "summary": "<placeholder panel summary>"
+            },
+            {
+              "series": [
+                {
+                  "query": "data_sent[?!tags && rate]"
+                }
+              ],
+              "title": "Sent Rate",
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-5",
+              "summary": "<placeholder panel summary>"
             }
           ],
           "id": "tab-0.section-0"
@@ -28,65 +82,11 @@
                   "query": "iterations[?!tags && rate]"
                 }
               ],
-              "title": "Iteration Rate",
-              "kind": "stat",
+              "title": "Performance overview",
               "id": "tab-0.section-1.panel-0",
-              "summary": "<placeholder panel summary>"
-            },
-            {
-              "series": [
-                {
-                  "query": "vus[?!tags && value]"
-                }
-              ],
-              "title": "VUs",
-              "kind": "stat",
-              "id": "tab-0.section-1.panel-1",
-              "summary": "<placeholder panel summary>"
-            },
-            {
-              "series": [
-                {
-                  "query": "http_reqs[?!tags && rate]"
-                }
-              ],
-              "title": "HTTP Request Rate",
-              "kind": "stat",
-              "id": "tab-0.section-1.panel-2",
-              "summary": "<placeholder panel summary>"
-            },
-            {
-              "series": [
-                {
-                  "query": "http_req_duration[?!tags && avg]"
-                }
-              ],
-              "title": "HTTP Request Duration",
-              "kind": "stat",
-              "id": "tab-0.section-1.panel-3",
-              "summary": "<placeholder panel summary>"
-            },
-            {
-              "series": [
-                {
-                  "query": "data_received[?!tags && rate]"
-                }
-              ],
-              "title": "Received Rate",
-              "kind": "stat",
-              "id": "tab-0.section-1.panel-4",
-              "summary": "<placeholder panel summary>"
-            },
-            {
-              "series": [
-                {
-                  "query": "data_sent[?!tags && rate]"
-                }
-              ],
-              "title": "Sent Rate",
-              "kind": "stat",
-              "id": "tab-0.section-1.panel-5",
-              "summary": "<placeholder panel summary>"
+              "summary": "<placeholder panel summary>",
+              "fullWidth": true,
+              "kind": "chart"
             }
           ],
           "id": "tab-0.section-1"
