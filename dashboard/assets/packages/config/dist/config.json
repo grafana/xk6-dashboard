@@ -79,6 +79,32 @@
             {
               "series": [
                 {
+                  "query": "http_reqs[?!tags && rate]",
+                  "legend": "Request Rate"
+                },
+                {
+                  "query": "http_req_duration[?!tags && p95]",
+                  "legend": "Request Duration p(95)"
+                },
+                {
+                  "query": "http_req_failed[?!tags && rate ]",
+                  "legend": "Request Failed"
+                }
+              ],
+              "title": "HTTP Performance overview",
+              "id": "tab-0.section-1.panel-0",
+              "summary": "<placeholder panel summary>",
+              "fullWidth": true,
+              "kind": "chart"
+            }
+          ],
+          "id": "tab-0.section-1"
+        },
+        {
+          "panels": [
+            {
+              "series": [
+                {
                   "query": "vus[?!tags && value]"
                 },
                 {
@@ -86,7 +112,7 @@
                 }
               ],
               "title": "VUs",
-              "id": "tab-0.section-1.panel-0",
+              "id": "tab-0.section-2.panel-0",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
@@ -100,7 +126,7 @@
                 }
               ],
               "title": "Transfer Rate",
-              "id": "tab-0.section-1.panel-1",
+              "id": "tab-0.section-2.panel-1",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
@@ -111,7 +137,7 @@
                 }
               ],
               "title": "HTTP Request Duration",
-              "id": "tab-0.section-1.panel-2",
+              "id": "tab-0.section-2.panel-2",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
@@ -122,12 +148,12 @@
                 }
               ],
               "title": "Iteration Duration",
-              "id": "tab-0.section-1.panel-3",
+              "id": "tab-0.section-2.panel-3",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
-          "id": "tab-0.section-1"
+          "id": "tab-0.section-2"
         }
       ],
       "title": "Overview",

@@ -23,12 +23,14 @@ export class Panel {
   summary?: string
   kind?: PanelKind
   series: Serie[]
-  constructor({ title, id, summary, kind = PanelKind.chart, series = [] }: Panel = {} as Panel) {
+  fullWidth?: boolean
+  constructor({ title, id, fullWidth, summary, kind = PanelKind.chart, series = [] }: Panel = {} as Panel) {
     this.title = title
     this.id = id
     this.summary = summary
     this.kind = kind
     this.series = series
+    this.fullWidth = fullWidth
   }
 }
 

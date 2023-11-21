@@ -23,12 +23,14 @@ var Panel = class {
   summary;
   kind;
   series;
-  constructor({ title, id, summary, kind = "chart" /* chart */, series = [] } = {}) {
+  fullWidth;
+  constructor({ title, id, fullWidth, summary, kind = "chart" /* chart */, series = [] } = {}) {
     this.title = title;
     this.id = id;
     this.summary = summary;
     this.kind = kind;
     this.series = series;
+    this.fullWidth = fullWidth;
   }
 };
 var Section = class {

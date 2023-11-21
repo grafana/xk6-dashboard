@@ -46,6 +46,17 @@ export default (config, { tab }) => {
       })
     })
 
+    section(({ panel }) => {
+      panel("HTTP Performance overview", ({ panel, serie }) => {
+        panel.summary = "<placeholder panel summary>"
+        panel.fullWidth = true
+
+        serie("http_reqs[?!tags && rate]", "Request Rate")
+        serie("http_req_duration[?!tags && p95]", "Request Duration p(95)")
+        serie("http_req_failed[?!tags && rate ]", "Request Failed")
+      })
+    })
+
     // chart section
     section(({ panel }) => {
       panel("VUs", ({ panel, serie }) => {
