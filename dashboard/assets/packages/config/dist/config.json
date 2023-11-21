@@ -79,10 +79,23 @@
             {
               "series": [
                 {
-                  "query": "iterations[?!tags && rate]"
+                  "query": "vus[?!tags && value]",
+                  "legend": "VUs"
+                },
+                {
+                  "query": "http_reqs[?!tags && rate]",
+                  "legend": "Request Rate"
+                },
+                {
+                  "query": "http_req_duration[?!tags && p95]",
+                  "legend": "Request Duration p(95)"
+                },
+                {
+                  "query": "http_req_failed[?!tags && rate ]",
+                  "legend": "Request Failed"
                 }
               ],
-              "title": "Performance overview",
+              "title": "HTTP Performance overview",
               "id": "tab-0.section-1.panel-0",
               "summary": "<placeholder panel summary>",
               "fullWidth": true,

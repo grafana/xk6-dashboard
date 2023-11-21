@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+//
+// SPDX-License-Identifier: AGPL-3.0-only
+
 // src/UnitType.ts
 var UnitType = /* @__PURE__ */ ((UnitType2) => {
   UnitType2["bytes"] = "bytes";

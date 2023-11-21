@@ -47,12 +47,14 @@ export default (config, { tab }) => {
     })
 
     section(({ panel }) => {
-      panel("Performance overview", ({ panel, serie }) => {
+      panel("HTTP Performance overview", ({ panel, serie }) => {
         panel.summary = "<placeholder panel summary>"
         panel.fullWidth = true
 
-        // TODO: @szkiba will update this to generate performance overview
-        serie("iterations[?!tags && rate]")
+        serie("vus[?!tags && value]", "VUs")
+        serie("http_reqs[?!tags && rate]", "Request Rate")
+        serie("http_req_duration[?!tags && p95]", "Request Duration p(95)")
+        serie("http_req_failed[?!tags && rate ]", "Request Failed")
       })
     })
 
