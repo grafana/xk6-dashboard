@@ -47,8 +47,9 @@ export default function Chart({ panel, container }: ChartProps) {
     }
   }
 
+
   return (
-    <Grid.Column xs={12} lg={6}>
+    <Grid.Column xs={12} lg={panel.fullWidth ? 12 : 6}>
       <Wrapper>
         <div ref={ref}>
           <Flex align="center" gap={1}>

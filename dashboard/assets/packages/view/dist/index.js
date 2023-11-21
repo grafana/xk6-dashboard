@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
-//
-// SPDX-License-Identifier: AGPL-3.0-only
-
 // src/format.ts
 import numeral from "numeral";
 import prettyBytes from "pretty-bytes";
@@ -230,12 +226,14 @@ var Panel = class {
   summary;
   kind;
   series;
-  constructor({ title, id, summary, kind = "chart" /* chart */, series = [] } = {}) {
+  fullWidth;
+  constructor({ title, id, fullWidth, summary, kind = "chart" /* chart */, series = [] } = {}) {
     this.title = title;
     this.id = id;
     this.summary = summary;
     this.kind = kind;
     this.series = series;
+    this.fullWidth = fullWidth;
   }
 };
 var Section = class {

@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
-//
-// SPDX-License-Identifier: AGPL-3.0-only
-
 declare class Serie {
     query: string;
     legend: string;
@@ -18,7 +14,8 @@ declare class Panel {
     summary?: string;
     kind?: PanelKind;
     series: Serie[];
-    constructor({ title, id, summary, kind, series }?: Panel);
+    fullWidth?: boolean;
+    constructor({ title, id, fullWidth, summary, kind, series }?: Panel);
 }
 declare class Section {
     title?: string;

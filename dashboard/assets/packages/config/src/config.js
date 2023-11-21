@@ -12,6 +12,16 @@ export default (config, { tab }) => {
   tab("Overview", ({ tab, section }) => {
     tab.summary = `This chapter provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.`
 
+    section(({ panel }) => {
+      panel("Performance overview", ({ panel, serie }) => {
+        panel.summary = "<placeholder panel summary>"
+        panel.fullWidth = true
+
+        // TODO: @szkiba will update this to generate performance overview
+        serie("iterations[?!tags && rate]")
+      })
+    })
+
     // stat section
     section(({ panel }) => {
       panel("Iteration Rate", "stat", ({ panel, serie }) => {

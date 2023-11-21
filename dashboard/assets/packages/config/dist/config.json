@@ -11,9 +11,26 @@
                   "query": "iterations[?!tags && rate]"
                 }
               ],
+              "title": "Performance overview",
+              "id": "tab-0.section-0.panel-0",
+              "summary": "<placeholder panel summary>",
+              "fullWidth": true,
+              "kind": "chart"
+            }
+          ],
+          "id": "tab-0.section-0"
+        },
+        {
+          "panels": [
+            {
+              "series": [
+                {
+                  "query": "iterations[?!tags && rate]"
+                }
+              ],
               "title": "Iteration Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-0",
+              "id": "tab-0.section-1.panel-0",
               "summary": "<placeholder panel summary>"
             },
             {
@@ -24,7 +41,7 @@
               ],
               "title": "VUs",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-1",
+              "id": "tab-0.section-1.panel-1",
               "summary": "<placeholder panel summary>"
             },
             {
@@ -35,7 +52,7 @@
               ],
               "title": "HTTP Request Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-2",
+              "id": "tab-0.section-1.panel-2",
               "summary": "<placeholder panel summary>"
             },
             {
@@ -46,7 +63,7 @@
               ],
               "title": "HTTP Request Duration",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-3",
+              "id": "tab-0.section-1.panel-3",
               "summary": "<placeholder panel summary>"
             },
             {
@@ -57,7 +74,7 @@
               ],
               "title": "Received Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-4",
+              "id": "tab-0.section-1.panel-4",
               "summary": "<placeholder panel summary>"
             },
             {
@@ -68,11 +85,11 @@
               ],
               "title": "Sent Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-5",
+              "id": "tab-0.section-1.panel-5",
               "summary": "<placeholder panel summary>"
             }
           ],
-          "id": "tab-0.section-0"
+          "id": "tab-0.section-1"
         },
         {
           "panels": [
@@ -86,7 +103,7 @@
                 }
               ],
               "title": "VUs",
-              "id": "tab-0.section-1.panel-0",
+              "id": "tab-0.section-2.panel-0",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
@@ -100,7 +117,7 @@
                 }
               ],
               "title": "Transfer Rate",
-              "id": "tab-0.section-1.panel-1",
+              "id": "tab-0.section-2.panel-1",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
@@ -111,7 +128,7 @@
                 }
               ],
               "title": "HTTP Request Duration",
-              "id": "tab-0.section-1.panel-2",
+              "id": "tab-0.section-2.panel-2",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             },
@@ -122,12 +139,12 @@
                 }
               ],
               "title": "Iteration Duration",
-              "id": "tab-0.section-1.panel-3",
+              "id": "tab-0.section-2.panel-3",
               "summary": "<placeholder panel summary>",
               "kind": "chart"
             }
           ],
-          "id": "tab-0.section-1"
+          "id": "tab-0.section-2"
         }
       ],
       "title": "Overview",
