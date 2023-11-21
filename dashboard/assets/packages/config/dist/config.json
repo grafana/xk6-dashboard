@@ -79,10 +79,6 @@
             {
               "series": [
                 {
-                  "query": "vus[?!tags && value]",
-                  "legend": "VUs"
-                },
-                {
                   "query": "http_reqs[?!tags && rate]",
                   "legend": "Request Rate"
                 },
