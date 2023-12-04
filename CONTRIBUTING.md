@@ -46,7 +46,7 @@ For alternative ways of cloning the k6 repository, please refer to [GitHub's clo
 We make use of the [golangci-lint](https://github.com/golangci/golangci-lint) tool to lint the code in CI. The actual version you can find in our [`.golangci.yml`](https://github.com/grafana/xk6-dashboard/blob/master/.golangci.yml#L1). To run it locally run:
 
 ```bash
-go run mage.go lint
+mage lint
 ```
 
 #### Running the test suite
@@ -54,7 +54,7 @@ go run mage.go lint
 To exercise the entire test suite, please run the following command
 
 ```bash
-go run mage.go test
+mage test
 ```
 
 #### Embedding frontend code
@@ -64,7 +64,7 @@ We make use of the [yarn](https://yarnpkg.com/) tool to build the frontend code.
 To build new frontend code (and generate embeddable assets), please run the following command:
 
 ```bash
-go run mage.go generate
+mage generate
 ```
 
 #### Code style
@@ -74,7 +74,7 @@ As you'd expect, please adhere to good ol' `gofmt` (there are plugins for most e
 Continuous integration will catch all of this if you don't, and it's fine to just fix linter complaints with another commit, but you can also run the linter yourself:
 
 ```bash
-go run mage.go lint
+mage lint
 ```
 
 Comments in the source should wrap at 100 characters, but there's no maximum length or need to be brief here - please include anything one might need to know in order to understand the code, that you could reasonably expect any reader to not already know (you probably don't need to explain what a goroutine is).

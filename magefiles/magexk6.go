@@ -33,8 +33,8 @@ func init() {
 	cwd, err := os.Getwd()
 	must(err)
 
-	bindir = filepath.Join(cwd, ".bin")
 	workdir = filepath.Join(cwd, "build")
+	bindir = filepath.Join(workdir, ".bin")
 
 	os.MkdirAll(bindir, 0o755)
 	os.MkdirAll(workdir, 0o755)
@@ -156,7 +156,7 @@ func tools() error {
 func xk6build() error {
 	mg.Deps(tools)
 
-	return sh.Run("xk6", "build", "--with", module+"=.")
+	return sh.Run("xk6", "build")
 }
 
 func xk6run(args ...string) error {

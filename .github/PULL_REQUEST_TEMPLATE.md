@@ -15,8 +15,8 @@ and code of conduct https://github.com/grafana/xk6-dashboard/blob/master/CODE_OF
 
 - [ ] I have performed a self-review of my code.
 - [ ] I have added tests for my changes.
-- [ ] I have run linter locally (`go run mage.go lint`) and all checks pass.
-- [ ] I have run tests locally (`go run mage.go test`) and all tests pass.
+- [ ] I have run linter locally (`mage lint`) and all checks pass.
+- [ ] I have run tests locally (`mage test`) and all tests pass.
 - [ ] I have commented on my code, particularly in hard-to-understand areas.
 <!-- - [ ] Any other relevant item -->
 

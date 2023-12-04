@@ -11,12 +11,9 @@ import (
 	"math"
 	"net"
 	"net/url"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/gorilla/schema"
 )
 
 const (
@@ -62,35 +59,46 @@ func getopts(query string) (opts *options, err error) { //nolint:nonamedreturns
 		return nil, err
 	}
 
-	decoder := schema.NewDecoder()
-
-	decoder.IgnoreUnknownKeys(true)
-
-	decoder.RegisterConverter(time.Second, func(s string) reflect.Value {
-		v, eerr := time.ParseDuration(s)
-		if eerr != nil {
-			return reflect.ValueOf(err)
+	if v := value.Get("port"); len(v) != 0 {
+		i, e := strconv.Atoi(v)
+		if e != nil {
+			return nil, err
 		}
 
-		return reflect.ValueOf(v)
-	})
+		opts.Port = i
+	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = errInvalidDuration
+	if v := value.Get("host"); len(v) != 0 {
+		opts.Host = v
+	}
+
+	if v := value.Get("report"); len(v) != 0 {
+		opts.Report = v
+	}
+
+	if v := value.Get("record"); len(v) != 0 {
+		opts.Record = v
+	}
+
+	if v := value.Get("period"); len(v) != 0 {
+		d, e := time.ParseDuration(v)
+		if e != nil {
+			return nil, errInvalidDuration
 		}
-	}()
 
-	if e := decoder.Decode(opts, value); e != nil {
-		err = e
+		opts.Period = d
+	}
+
+	if v := value["tag"]; len(v) != 0 {
+		opts.Tags = v
 	}
 
 	if value.Has("open") && len(value.Get("open")) == 0 {
 		opts.Open = true
 	}
 
-	if len(opts.TagsS) != 0 {
-		opts.Tags = append(opts.Tags, strings.Split(opts.TagsS, ",")...)
+	if v := value.Get("tags"); len(v) != 0 {
+		opts.Tags = append(opts.Tags, strings.Split(v, ",")...)
 	}
 
 	return opts, err
