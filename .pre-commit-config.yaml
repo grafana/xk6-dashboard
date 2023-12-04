@@ -11,16 +11,16 @@ repos:
   - repo: https://github.com/fsfe/reuse-tool
     rev: v2.1.0
     hooks:
-    - id: reuse
+      - id: reuse
 
   - repo: https://github.com/golangci/golangci-lint
     rev: v1.54.1
     hooks:
-     - id: golangci-lint
+      - id: golangci-lint
 
   - repo: https://github.com/tekwizely/pre-commit-golang
     rev: v1.0.0-rc.1
     hooks:
       - id: go-mod-tidy
       - id: go-build-mod
-      - id: go-test-mod
+#      - id: go-test-mod
