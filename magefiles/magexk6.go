@@ -156,7 +156,7 @@ func tools() error {
 func xk6build() error {
 	mg.Deps(tools)
 
-	return sh.Run("xk6", "build")
+	return sh.Run("xk6", "build", "--with", module+"=.")
 }
 
 func xk6run(args ...string) error {
