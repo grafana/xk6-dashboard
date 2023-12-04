@@ -19,7 +19,7 @@ import (
 func Test_getopts_defaults(t *testing.T) {
 	t.Parallel()
 
-	opts, err := getopts("")
+	opts, err := getopts("", nil)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, opts)
@@ -41,15 +41,56 @@ func Test_getopts_defaults(t *testing.T) {
 func Test_getopts_error(t *testing.T) {
 	t.Parallel()
 
-	_, err := getopts("period=s")
+	_, err := getopts("period=s", nil)
 
 	assert.Error(t, err)
+}
+
+func Test_getopts_env(t *testing.T) {
+	t.Parallel()
+
+	env := map[string]string{
+		envPort:   "1",
+		envHost:   "example.com",
+		envPeriod: "1h",
+		envRecord: "results.data",
+		envReport: "report.html",
+		envTags:   "foo,bar",
+		envOpen:   "true",
+	}
+
+	opts, err := getopts("", env)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, opts)
+
+	assert.Equal(t, "example.com", opts.Host)
+	assert.Equal(t, 1, opts.Port)
+	assert.Equal(t, time.Hour, opts.Period)
+	assert.Equal(t, true, opts.Open)
+	assert.Equal(t, "report.html", opts.Report)
+	assert.Equal(t, []string{"foo", "bar"}, opts.Tags)
+
+	assert.Equal(t, "http://example.com:1", opts.url())
 }
 
 func Test_getopts(t *testing.T) {
 	t.Parallel()
 
-	opts, err := getopts("period=1s&port=1&host=localhost&open&report=report.html&tag=foo&tag=bar")
+	env := map[string]string{
+		envPort:   "6666",
+		envHost:   "example.net",
+		envPeriod: "2h",
+		envRecord: "results.data",
+		envReport: "final.html",
+		envTags:   "foo,bar",
+		envOpen:   "true",
+	}
+
+	opts, err := getopts(
+		"period=1s&port=1&host=localhost&open&report=report.html&tag=foo&tag=bar",
+		env,
+	)
 
 	assert.NoError(t, err)
 	assert.Equal(t, time.Second, opts.Period)
@@ -61,7 +102,7 @@ func Test_getopts(t *testing.T) {
 	assert.Equal(t, "localhost:1", opts.addr())
 	assert.Equal(t, []string{"foo", "bar"}, opts.Tags)
 
-	opts, err = getopts("tag=foo&tag=bar&tags=apple,orange")
+	opts, err = getopts("tag=foo&tag=bar&tags=apple,orange", nil)
 
 	assert.NoError(t, err)
 	assert.Equal(t, []string{"foo", "bar", "apple", "orange"}, opts.Tags)
@@ -70,7 +111,7 @@ func Test_getopts(t *testing.T) {
 func Test_options_pack_calc(t *testing.T) {
 	t.Parallel()
 
-	opts, _ := getopts("period=1s")
+	opts, _ := getopts("period=1s", nil)
 
 	assert.Equal(t, time.Second, opts.period(0))
 
@@ -78,7 +119,7 @@ func Test_options_pack_calc(t *testing.T) {
 	assert.Equal(t, 2*time.Second, opts.period(2*points*time.Second))
 	assert.Equal(t, 3*time.Second, opts.period(3*points*time.Second))
 
-	opts, _ = getopts("")
+	opts, _ = getopts("", nil)
 
 	assert.Equal(t, 10*time.Second, opts.period(time.Second))
 	assert.Equal(t, 10*time.Second, opts.period(4*time.Hour))

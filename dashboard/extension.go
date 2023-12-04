@@ -54,7 +54,7 @@ func New(params output.Params) (output.Output, error) {
 }
 
 func newWithAssets(params output.Params, assets *assets) (*extension, error) {
-	opts, err := getopts(params.ConfigArgument)
+	opts, err := getopts(params.ConfigArgument, params.Environment)
 	if err != nil {
 		return nil, err
 	}
