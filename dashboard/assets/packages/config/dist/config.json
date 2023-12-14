@@ -19,23 +19,12 @@
             {
               "series": [
                 {
-                  "query": "vus[?!tags && value]"
-                }
-              ],
-              "title": "VUs",
-              "kind": "stat",
-              "id": "tab-0.section-0.panel-1",
-              "summary": "<placeholder panel summary>"
-            },
-            {
-              "series": [
-                {
                   "query": "http_reqs[?!tags && rate]"
                 }
               ],
               "title": "HTTP Request Rate",
               "kind": "stat",
-              "id": "tab-0.section-0.panel-2",
+              "id": "tab-0.section-0.panel-1",
               "summary": "<placeholder panel summary>"
             },
             {
@@ -45,6 +34,17 @@
                 }
               ],
               "title": "HTTP Request Duration",
+              "kind": "stat",
+              "id": "tab-0.section-0.panel-2",
+              "summary": "<placeholder panel summary>"
+            },
+            {
+              "series": [
+                {
+                  "query": "http_req_failed[?!tags && rate ]"
+                }
+              ],
+              "title": "HTTP Request Failed",
               "kind": "stat",
               "id": "tab-0.section-0.panel-3",
               "summary": "<placeholder panel summary>"

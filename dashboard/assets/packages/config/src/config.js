@@ -19,11 +19,6 @@ export default (config, { tab }) => {
 
         serie("iterations[?!tags && rate]")
       })
-      panel("VUs", "stat", ({ panel, serie }) => {
-        panel.summary = "<placeholder panel summary>"
-
-        serie("vus[?!tags && value]")
-      })
       panel("HTTP Request Rate", "stat", ({ panel, serie }) => {
         panel.summary = "<placeholder panel summary>"
 
@@ -33,6 +28,11 @@ export default (config, { tab }) => {
         panel.summary = "<placeholder panel summary>"
 
         serie("http_req_duration[?!tags && avg]")
+      })
+      panel("HTTP Request Failed", "stat", ({ panel, serie }) => {
+        panel.summary = "<placeholder panel summary>"
+
+        serie("http_req_failed[?!tags && rate ]")
       })
       panel("Received Rate", "stat", ({ panel, serie }) => {
         panel.summary = "<placeholder panel summary>"
