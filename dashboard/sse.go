@@ -80,8 +80,9 @@ func (emitter *eventEmitter) ServeHTTP(res http.ResponseWriter, req *http.Reques
 	res.Header().Set("Access-Control-Allow-Origin", "*")
 
 	emitter.wait.Add(1)
+	defer emitter.wait.Done()
+
 	emitter.Server.ServeHTTP(res, req)
-	emitter.wait.Done()
 }
 
 const maxSafeInteger = 9007199254740991
