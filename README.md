@@ -57,6 +57,7 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 - [Usage](#usage)
 - [Exit](#exit)
 - [Parameters](#parameters)
+- [Environment](#environment)
 - [Docker](#docker)
 - [Save report](#save-report)
 - [Events](#events)
@@ -130,9 +131,26 @@ host      | Hostname or IP address for HTTP endpoint (default: "", empty, listen
 port      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no HTTP), example: `8080`
 period    | Event emitting frequency (default: `10s`), example: `1m`
 open      | Set to `true` (or empty) to open the browser window automatically
-report    | File name to save the report (default: "", empty, the report will not be saved)
+export    | File name to save the report (default: "", empty, the report will not be saved)
 record    | File name to save the dashboard events (default: "", empty, the events will not be saved)
 tag       | Precomputed metric tag name(s) (default: "group"), can be specified more than once
+
+*The `export` parameter used to be `report`, for compatibility reasons the name `report` can still be used.*
+
+## Environment
+
+The dashboard parameters can also be specified in environment variables. The name of the environment variable belonging to the given parameter is created by converting the parameter name to uppercase and adding the `K6_WEB_DASHBOARD_` prefix.
+
+environment variable | description
+----------|------------
+K6_WEB_DASHBOARD_HOST      | Hostname or IP address for HTTP endpoint (default: "", empty, listen on all interfaces)
+K6_WEB_DASHBOARD_PORT      | TCP port for HTTP endpoint (default: `5665`; `0` = random, `-1` = no HTTP), example: `8080`
+K6_WEB_DASHBOARD_PERIOD    | Event emitting frequency (default: `10s`), example: `1m`
+K6_WEB_DASHBOARD_OPEN      | Set to `true` (or empty) to open the browser window automatically
+K6_WEB_DASHBOARD_EXPORT    | File name to save the report (default: "", empty, the report will not be saved)
+K6_WEB_DASHBOARD_RECORD    | File name to save the dashboard events (default: "", empty, the events will not be saved)
+K6_WEB_DASHBOARD_TAG       | Precomputed metric tag name(s) (default: "group"), can be specified more than once
+
 
 ## Docker
 
@@ -154,20 +172,20 @@ The dashboard will accessible on port `5665` with any web browser: http://127.0.
 
 ## Save report
 
-The test run report can be exported to a responsive self-contained HTML file. For export, the file name must be specified in the `report` parameter. If the file name ends with `.gz`, the HTML report will automatically be gzip compressed.
+The test run report can be exported to a responsive self-contained HTML file. For export, the file name must be specified in the `export` parameter. If the file name ends with `.gz`, the HTML report will automatically be gzip compressed.
 
 ```plain
-k6 run --out dashboard=report=test-report.html script.js
+k6 run --out dashboard=export=test-report.html script.js
 ```
 
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
 
-By using the `--report` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
+By using the `--export` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
 
 The report can also be viewed and downloaded from the dashboard UI using the buttons on the "Report" tab.
 
 ```plain
-k6 dashboard replay --report test-report.html test-result.json
+k6 dashboard replay --export test-report.html test-result.json
 ```
 
 *Example HTML report*
@@ -229,7 +247,7 @@ Flags:
       --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
       --open            Open browser window automatically
       --port int        TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080 (default 5665)
-      --report string   Report file location (default: '', no report)
+      --export string   Report file location (default: '', no report)
   -h, --help            help for replay
 ```
 

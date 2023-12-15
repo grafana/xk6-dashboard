@@ -28,7 +28,7 @@ func Test_replay(t *testing.T) {
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
-		Report: "",
+		Export: "",
 		Tags:   nil,
 		TagsS:  "",
 	}
@@ -50,7 +50,7 @@ func Test_replay_gz(t *testing.T) {
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
-		Report: "",
+		Export: "",
 		Tags:   nil,
 		TagsS:  "",
 	}
@@ -70,7 +70,7 @@ func Test_replay_open(t *testing.T) { //nolint:paralleltest
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   true,
-		Report: "",
+		Export: "",
 		Tags:   nil,
 		TagsS:  "",
 	}
@@ -90,7 +90,7 @@ func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
 		Host:   "127.0.0.1",
 		Period: time.Second,
 		Open:   false,
-		Report: "",
+		Export: "",
 		Tags:   nil,
 		TagsS:  "",
 	}
@@ -101,17 +101,17 @@ func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
 	assert.Error(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
 }
 
-func Test_replay_report(t *testing.T) {
+func Test_replay_export(t *testing.T) {
 	t.Parallel()
 
-	report := filepath.Join(t.TempDir(), "report.html")
+	export := filepath.Join(t.TempDir(), "report.html")
 
 	opts := &options{
 		Port:   -1,
 		Host:   "",
 		Period: time.Second,
 		Open:   false,
-		Report: report,
+		Export: export,
 		Tags:   nil,
 		TagsS:  "",
 	}
@@ -120,7 +120,7 @@ func Test_replay_report(t *testing.T) {
 
 	assert.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
 
-	st, err := th.proc.fs.Stat(report)
+	st, err := th.proc.fs.Stat(export)
 
 	assert.NoError(t, err)
 

@@ -21,7 +21,7 @@ const (
 	defaultPort   = 5665
 	defaultPeriod = time.Second * 10
 	defaultOpen   = false
-	defaultReport = ""
+	defaultExport = ""
 	defaultRecord = ""
 )
 
@@ -32,7 +32,7 @@ type options struct {
 	Host   string
 	Period time.Duration
 	Open   bool
-	Report string
+	Export string
 	Record string
 	Tags   []string
 	TagsS  string
@@ -44,7 +44,7 @@ func envopts(env map[string]string) (*options, error) {
 		Host:   defaultHost,
 		Period: defaultPeriod,
 		Open:   defaultOpen,
-		Report: defaultReport,
+		Export: defaultExport,
 		Record: defaultRecord,
 		Tags:   defaultTags(),
 		TagsS:  "",
@@ -67,8 +67,10 @@ func envopts(env map[string]string) (*options, error) {
 		opts.Host = v
 	}
 
-	if v, ok := env[envReport]; ok {
-		opts.Report = v
+	if v, ok := env[envExport]; ok {
+		opts.Export = v
+	} else if v, ok := env[envReport]; ok {
+		opts.Export = v
 	}
 
 	if v, ok := env[envRecord]; ok {
@@ -123,8 +125,10 @@ func getopts(query string, env map[string]string) (*options, error) {
 		opts.Host = v
 	}
 
-	if v := value.Get(paramReport); len(v) != 0 {
-		opts.Report = v
+	if v := value.Get(paramExport); len(v) != 0 {
+		opts.Export = v
+	} else if v := value.Get(paramReport); len(v) != 0 {
+		opts.Export = v
 	}
 
 	if v := value.Get(paramRecord); len(v) != 0 {
@@ -211,6 +215,8 @@ const (
 
 	paramReport = "report"
 	envReport   = envPrefix + "REPORT"
+	paramExport = "export"
+	envExport   = envPrefix + "EXPORT"
 
 	paramRecord = "record"
 	envRecord   = envPrefix + "RECORD"
