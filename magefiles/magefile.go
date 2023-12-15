@@ -84,7 +84,7 @@ func out(script string) string {
 	report := filepath.Join(workdir, slug(script)+"-report.html")
 	record := filepath.Join(workdir, slug(script)+"-record.ndjson.gz")
 
-	return "dashboard=report=" + report + "&record=" + record
+	return "dashboard=export=" + report + "&record=" + record
 }
 
 func jsonout(script string) string {

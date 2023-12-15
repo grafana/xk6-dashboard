@@ -28,7 +28,7 @@ func Test_getopts_defaults(t *testing.T) {
 	assert.Equal(t, defaultPort, opts.Port)
 	assert.Equal(t, defaultPeriod, opts.Period)
 	assert.Equal(t, defaultOpen, opts.Open)
-	assert.Equal(t, defaultReport, opts.Report)
+	assert.Equal(t, defaultExport, opts.Export)
 	assert.Equal(t, defaultTags(), opts.Tags)
 
 	assert.Equal(
@@ -54,7 +54,7 @@ func Test_getopts_env(t *testing.T) {
 		envHost:   "example.com",
 		envPeriod: "1h",
 		envRecord: "results.data",
-		envReport: "report.html",
+		envExport: "report.html",
 		envTags:   "foo,bar",
 		envOpen:   "true",
 	}
@@ -68,7 +68,7 @@ func Test_getopts_env(t *testing.T) {
 	assert.Equal(t, 1, opts.Port)
 	assert.Equal(t, time.Hour, opts.Period)
 	assert.Equal(t, true, opts.Open)
-	assert.Equal(t, "report.html", opts.Report)
+	assert.Equal(t, "report.html", opts.Export)
 	assert.Equal(t, []string{"foo", "bar"}, opts.Tags)
 
 	assert.Equal(t, "http://example.com:1", opts.url())
@@ -82,13 +82,13 @@ func Test_getopts(t *testing.T) {
 		envHost:   "example.net",
 		envPeriod: "2h",
 		envRecord: "results.data",
-		envReport: "final.html",
+		envExport: "final.html",
 		envTags:   "foo,bar",
 		envOpen:   "true",
 	}
 
 	opts, err := getopts(
-		"period=1s&port=1&host=localhost&open&report=report.html&tag=foo&tag=bar",
+		"period=1s&port=1&host=localhost&open&export=report.html&tag=foo&tag=bar",
 		env,
 	)
 
@@ -96,7 +96,7 @@ func Test_getopts(t *testing.T) {
 	assert.Equal(t, time.Second, opts.Period)
 	assert.Equal(t, 1, opts.Port)
 	assert.True(t, opts.Open)
-	assert.Equal(t, "report.html", opts.Report)
+	assert.Equal(t, "report.html", opts.Export)
 	assert.Equal(t, "localhost", opts.Host)
 	assert.Equal(t, "http://localhost:1", opts.url())
 	assert.Equal(t, "localhost:1", opts.addr())

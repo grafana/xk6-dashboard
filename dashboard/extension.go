@@ -100,7 +100,7 @@ func (ext *extension) Start() error {
 		ext.addEventListener(newRecorder(ext.options.Record, ext.proc))
 	}
 
-	brf := newReporter(ext.options.Report, ext.assets, ext.proc)
+	brf := newReporter(ext.options.Export, ext.assets, ext.proc)
 
 	ext.addEventListener(brf)
 
