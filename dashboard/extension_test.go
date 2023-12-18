@@ -35,7 +35,7 @@ func TestNewExtension(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, ext)
 
-	assert.Equal(t, "dashboard (localhost:1) http://localhost:1", ext.Description())
+	assert.Equal(t, "dashboard http://localhost:1", ext.Description())
 
 	params.ConfigArgument = "period=2"
 
@@ -179,7 +179,7 @@ func TestExtension_random_port(t *testing.T) {
 
 	assert.Equal(
 		t,
-		fmt.Sprintf("foo (%s) %s", dashboard.options.addr(), dashboard.options.url()),
+		fmt.Sprintf("foo %s", dashboard.options.url()),
 		ext.Description(),
 	)
 
