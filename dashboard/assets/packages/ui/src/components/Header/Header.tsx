@@ -78,7 +78,7 @@ const Options = () => {
   const { theme, setTheme } = useTheme()
 
   function handleHelpClick() {
-    window.open("https://github.com/grafana/xk6-dashboard", "_blank")
+    window.open("https://github.com/grafana/k6/blob/master/SUPPORT.md", "_blank")
   }
 
   function handleThemeChange() {
