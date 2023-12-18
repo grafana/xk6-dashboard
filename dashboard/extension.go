@@ -86,7 +86,7 @@ func (ext *extension) Description() string {
 		return ext.name
 	}
 
-	return fmt.Sprintf("%s (%s) %s", ext.name, ext.options.addr(), ext.options.url())
+	return fmt.Sprintf("%s %s", ext.name, ext.options.url())
 }
 
 // SetThresholds saves thresholds provided by k6 runtime.
