@@ -84,7 +84,7 @@ func out(script string) string {
 	report := filepath.Join(workdir, slug(script)+"-report.html")
 	record := filepath.Join(workdir, slug(script)+"-record.ndjson.gz")
 
-	return "dashboard=export=" + report + "&record=" + record
+	return "web-dashboard=export=" + report + "&record=" + record
 }
 
 func jsonout(script string) string {
@@ -102,7 +102,7 @@ func Replay(script string) error {
 
 	return sh.Run(
 		"xk6",
-		"dashboard",
+		"web-dashboard",
 		"replay",
 		record,
 	)
@@ -120,9 +120,9 @@ func Testdata() error {
 		"json="+gz,
 		filepath.Join("scripts", "test.js"),
 		"--out",
-		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(out, ".json", ".ndjson"),
+		"web-dashboard=port=-1&period=2s&record="+strings.ReplaceAll(out, ".json", ".ndjson"),
 		"--out",
-		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(gz, ".json", ".ndjson"),
+		"web-dashboard=port=-1&period=2s&record="+strings.ReplaceAll(gz, ".json", ".ndjson"),
 	)
 }
 

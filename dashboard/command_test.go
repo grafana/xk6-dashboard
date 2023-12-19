@@ -25,7 +25,7 @@ func Test_buildRootCmd(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"dashboard", "replay"})
+	rep, _, err := cmd.Find([]string{"web-dashboard", "replay"})
 
 	assert.NoError(t, err)
 	assert.NotNil(t, rep)
@@ -49,7 +49,7 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"dashboard", "replay"})
+	rep, _, err := cmd.Find([]string{"web-dashboard", "replay"})
 
 	assert.NoError(t, err)
 
@@ -71,7 +71,7 @@ func Test_buildRootCmd_reply_error(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"dashboard", "replay"})
+	rep, _, err := cmd.Find([]string{"web-dashboard", "replay"})
 
 	assert.NoError(t, err)
 
@@ -93,7 +93,7 @@ func Test_buildRootCmd_report(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"dashboard", "report"})
+	rep, _, err := cmd.Find([]string{"web-dashboard", "report"})
 
 	assert.NoError(t, err)
 
