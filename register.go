@@ -15,12 +15,10 @@ import (
 	"go.k6.io/k6/output"
 )
 
-const name = "dashboard"
-
 func init() {
 	gs := state.NewGlobalState(context.Background())
 
-	if len(gs.CmdArgs) > 1 && gs.CmdArgs[1] == name {
+	if len(gs.CmdArgs) > 1 && gs.CmdArgs[1] == dashboard.OutputName {
 		execute(gs)
 	}
 
@@ -28,7 +26,7 @@ func init() {
 }
 
 func register() {
-	output.RegisterExtension(name, dashboard.New)
+	output.RegisterExtension(dashboard.OutputName, dashboard.New)
 }
 
 func execute(gs *state.GlobalState) {

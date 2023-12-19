@@ -18,6 +18,13 @@ By using the **xk6-dashboard** output extension you can access metrics from [k6]
 
 The test run report can be exported to a responsive self-contained HTML file, which can be displayed even without an Internet connection.
 
+>[!Warning]
+> You are currently looking at the documentation of the next version on the master branch, which does not correspond in all respects to the operation of the last release. Select the tag corresponding to the release for more precise documentation.
+>
+> Major differences:
+> - The output name has changed, in previous versions it was `dashboard`, from the next version it will be `web-dashboard`. The documentation already reflects this.
+> - Screenshots may differ.
+
 **Screenshots**
 
 *Overview*
@@ -92,7 +99,7 @@ Then:
 Without parameters the dashboard will be accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ```plain
-$ ./k6 run --out dashboard script.js
+$ ./k6 run --out web-dashboard script.js
 
           /\      |‾‾| /‾‾/   /‾‾/   
      /\  /  \     |  |/  /   /  /    
@@ -102,10 +109,10 @@ $ ./k6 run --out dashboard script.js
 
   execution: local
      script: script.js
-     output: dashboard (:5665) http://127.0.0.1:5665
+     output: web-dashboard http://127.0.0.1:5665
 ```
 
-> Using `--out dashboard=open` will automatically open a new browser window.
+> Using `--out web-dashboard=open` will automatically open a new browser window.
 
 ## Exit
 
@@ -118,7 +125,7 @@ In certain environments, it is not allowed that the k6 process does not exit aft
 The output extension accepts parameters in a standard query string format:
 
 ```
-k6 run --out 'dashboard=param1=value1&param2=value2&param3=value3'
+k6 run --out 'web-dashboard=param1=value1&param2=value2&param3=value3'
 ```
 
 > Note the apostrophes (`'`) around the `--out` parameter! You should use it to escape `&` characters from the shell (or use backslash before `&`).
@@ -175,17 +182,17 @@ The dashboard will accessible on port `5665` with any web browser: http://127.0.
 The test run report can be exported to a responsive self-contained HTML file. For export, the file name must be specified in the `export` parameter. If the file name ends with `.gz`, the HTML report will automatically be gzip compressed.
 
 ```plain
-k6 run --out dashboard=export=test-report.html script.js
+k6 run --out web-dashboard=export=test-report.html script.js
 ```
 
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
 
-By using the `--export` switch of the `dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
+By using the `--export` switch of the `web-dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
 
 The report can also be viewed and downloaded from the dashboard UI using the buttons on the "Report" tab.
 
 ```plain
-k6 dashboard replay --export test-report.html test-result.json
+k6 web-dashboard replay --export test-report.html test-result.json
 ```
 
 *Example HTML report*
@@ -210,15 +217,15 @@ Two kind of events will be emitted:
 
 ## Command Line
 
-The xk6-dashboard extension adds a `dashboard` command to the k6 command line:
+The xk6-dashboard extension adds a `web-dashboard` command to the k6 command line:
 
 ```sh
-$ ./k6 dashboard --help
+$ ./k6 web-dashboard --help
 
 xk6-dashboard commands
 
 Usage:
-  k6 dashboard [command]
+  k6 web-dashboard [command]
 
 Available Commands:
   aggregate   convert saved json output to recorded dashboard events
@@ -228,20 +235,20 @@ Available Commands:
 Flags:
   -h, --help   help for dashboard
 
-Use "k6 dashboard [command] --help" for more information about a command.
+Use "k6 web-dashboard [command] --help" for more information about a command.
 ```
 
 At the moment, the `dashboard` command has three subcommand, `replay` (which can be used to play back dashboard events previously saved with `record` parameter), `aggregate` (which can be used to convert test run results previously saved in JSON format from k6 to dashboard events format NDJSON) and `report` (which can be used to generate report from dashboard events previously saved with `record` parameter).
 
 
 ```sh
-$ ./k6 dashboard replay --help
+$ ./k6 web-dashboard replay --help
 
 The replay command load the recorded dashboard events (NDJSON format) and replay it for the dashboard UI.
 The compressed file will be automatically decompressed if the file extension is .gz
 
 Usage:
-  k6 dashboard replay file [flags]
+  k6 web-dashboard replay file [flags]
 
 Flags:
       --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
@@ -252,13 +259,13 @@ Flags:
 ```
 
 ```
-$ ./k6 dashboard aggregate --help
+$ ./k6 web-dashboard aggregate --help
 
 The aggregate command converts the file saved by json output to dashboard format events file.
 The files will be automatically compressed/decompressed if the file extension is .gz
 
 Usage:
-  k6 dashboard aggregate input-file output-file [flags]
+  k6 web-dashboard aggregate input-file output-file [flags]
 
 Flags:
       --period 1m      Event emitting frequency, example: 1m (default 10s)
@@ -267,13 +274,13 @@ Flags:
 ```
 
 ```
-$ ./k6 dashboard report --help
+$ ./k6 web-dashboard report --help
 
 The report command loads recorded dashboard events (NDJSON format) and creates a report.
 The compressed events file will be automatically decompressed if the file extension is .gz
 
 Usage:
-  k6 dashboard report events-file report-file [flags]
+  k6 web-dashboard report events-file report-file [flags]
 
 Flags:
       --open   Open browser window with generated report
@@ -284,22 +291,22 @@ To visualize the result of a previous test run (using events file):
 
 ```
 ./k6 run --out dashboard=record=test_result.ndjson script.js
-./k6 dashboard replay test_result.ndjson
+./k6 web-dashboard replay test_result.ndjson
 ```
 
 To visualize the result of a previous test run (using json output):
 
 ```sh
 ./k6 run --out json=test_result.json script.js
-./k6 dashboard aggregate test_result.json test_result.ndjson
-./k6 dashboard replay test_result.ndjson
+./k6 web-dashboard aggregate test_result.json test_result.ndjson
+./k6 web-dashboard replay test_result.ndjson
 ```
 
 To generate report from previous test run (using events file):
 
 ```
-./k6 run --out dashboard=record=test_result.ndjson script.js
-./k6 dashboard report test_result.ndjson test_result_report.html
+./k6 run --out web-dashboard=record=test_result.ndjson script.js
+./k6 web-dashboard report test_result.ndjson test_result_report.html
 ```
 
 ### Docker
@@ -310,14 +317,14 @@ You can also use pre-built k6 image within a Docker container. In order to do th
 
 ```plain
 docker run -v $(pwd):/work -v /tmp:/tmp/work -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
-docker run -v /tmp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
+docker run -v /tmp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest web-dashboard replay /tmp/work/test_result.json.gz
 ```
 
 **Windows**
 
 ```plain
 docker run -v %cd%:/work -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
-docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest dashboard replay /tmp/work/test_result.json.gz
+docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest web-dashboard replay /tmp/work/test_result.json.gz
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
