@@ -109,7 +109,7 @@ $ ./k6 run --out web-dashboard script.js
 
   execution: local
      script: script.js
-     output: dashboard (:5665) http://127.0.0.1:5665
+     output: web-dashboard http://127.0.0.1:5665
 ```
 
 > Using `--out web-dashboard=open` will automatically open a new browser window.
