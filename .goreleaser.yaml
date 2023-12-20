@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+project_name: k6-web-dashboard
+before:
+  hooks:
+    - go mod tidy
+dist: build/dist
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos: ["darwin", "linux", "windows"]
+    goarch: ["amd64"]
+    ldflags:
+      - "-s -w -X {{.ModulePath}}/cmd.version={{.Version}} -X {{.ModulePath}}/cmd.appname={{.ProjectName}}"
+    dir: cmd/k6-web-dashboard
+source:
+  enabled: false
+
+archives:
+  - id: bundle
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+snapshot:
+  name_template: "{{ incpatch .Version }}-next+{{.ShortCommit}}{{if .IsGitDirty}}.dirty{{else}}{{end}}"
+
+changelog:
+  sort: asc
+  abbrev: -1
+  filters:
+    exclude:
+      - "^chore:"
+      - "^docs:"
+      - "^test:"

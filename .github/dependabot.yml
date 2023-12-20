@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
+#
+# SPDX-License-Identifier: AGPL-3.0-only
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

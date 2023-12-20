@@ -9,11 +9,20 @@
 package main
 
 import (
+	"bytes"
+	"errors"
+	"fmt"
+	"os"
 	"path/filepath"
+	"regexp"
+	"runtime"
 	"strings"
 
+	"github.com/grafana/xk6-dashboard/cmd"
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 	"github.com/princjef/mageutil/shellcmd"
+	"github.com/spf13/cobra/doc"
 )
 
 // download required build tools
@@ -130,3 +139,90 @@ func Testdata() error {
 func License() error {
 	return license()
 }
+
+// build the xk6-dashboard CLI.
+func Cli() error {
+	mg.Deps(tools)
+	mg.Deps(cliReadme)
+
+	var ext string
+
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
+
+	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "goreleaser",
+		"build",
+		"-o",
+		filepath.Join(workdir, "k6-web-dashboard"+ext),
+		"--snapshot",
+		"--clean",
+		"--single-target",
+	)
+
+	return err
+}
+
+func cliReadme() error {
+	var buff bytes.Buffer
+
+	root := cmd.NewRootCommand()
+
+	linkHandler := func(name string) string {
+		link := strings.ReplaceAll(strings.TrimSuffix(name, ".md"), "_", "-")
+		return "#" + link
+	}
+
+	if err := doc.GenMarkdownCustom(root, &buff, linkHandler); err != nil {
+		return err
+	}
+
+	for _, cmd := range root.Commands() {
+		if _, err := (&buff).WriteString("---\n"); err != nil {
+			return err
+		}
+
+		if err := doc.GenMarkdownCustom(cmd, &buff, linkHandler); err != nil {
+			return err
+		}
+	}
+
+	readme := filepath.Clean(filepath.Join("cmd", "k6-web-dashboard", "README.md"))
+
+	src, err := os.ReadFile(readme) //nolint:forbidigo
+	if err != nil {
+		return err
+	}
+
+	res, err := inject(src, "cli", buff.Bytes())
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(readme, res, 0o600) //nolint:forbidigo
+}
+
+func inject(target []byte, name string, source []byte) ([]byte, error) {
+	begin := fmt.Sprintf("<!-- begin:%s -->", name)
+	end := fmt.Sprintf("<!-- end:%s -->", name)
+
+	re, err := regexp.Compile("(?sm)^\\s*" + begin + "\\s*$.*" + end)
+	if err != nil {
+		return nil, err
+	}
+
+	tmp := make([]byte, 0, len(source)+len(begin)+1+len(end))
+
+	tmp = append(tmp, []byte(begin)...)
+	tmp = append(tmp, '\n')
+	tmp = append(tmp, source...)
+	tmp = append(tmp, []byte(end)...)
+
+	if !re.Match(target) {
+		return nil, errMissingMarker
+	}
+
+	return re.ReplaceAll(target, tmp), nil
+}
+
+var errMissingMarker = errors.New("missing marker comment")
