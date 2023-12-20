@@ -17,10 +17,3 @@ repos:
     rev: v1.54.1
     hooks:
       - id: golangci-lint
-
-  - repo: https://github.com/tekwizely/pre-commit-golang
-    rev: v1.0.0-rc.1
-    hooks:
-      - id: go-mod-tidy
-      - id: go-build-mod
-#      - id: go-test-mod
