@@ -217,97 +217,10 @@ Two kind of events will be emitted:
 
 ## Command Line
 
-The xk6-dashboard extension adds a `web-dashboard` command to the k6 command line:
+> [!Warning]
+> Previous versions of xk6-dashboard added a `dashboard` subcommand to the k6 command line. Currently k6 does not support adding subcommands, xk6-dashboard used a questionable workaround. This workaround was removed from the xk6-dashboard and the dashboard-related subcommands were moved to a separate executable ([k6-web-dashboard](cmd/k6-web-dashboard/README.md)).
 
-```sh
-$ ./k6 web-dashboard --help
-
-xk6-dashboard commands
-
-Usage:
-  k6 web-dashboard [command]
-
-Available Commands:
-  aggregate   convert saved json output to recorded dashboard events
-  replay      load the recorded dashboard events and replay it for the UI
-  report      create report from a recorded event file  
-
-Flags:
-  -h, --help   help for dashboard
-
-Use "k6 web-dashboard [command] --help" for more information about a command.
-```
-
-At the moment, the `dashboard` command has three subcommand, `replay` (which can be used to play back dashboard events previously saved with `record` parameter), `aggregate` (which can be used to convert test run results previously saved in JSON format from k6 to dashboard events format NDJSON) and `report` (which can be used to generate report from dashboard events previously saved with `record` parameter).
-
-
-```sh
-$ ./k6 web-dashboard replay --help
-
-The replay command load the recorded dashboard events (NDJSON format) and replay it for the dashboard UI.
-The compressed file will be automatically decompressed if the file extension is .gz
-
-Usage:
-  k6 web-dashboard replay file [flags]
-
-Flags:
-      --host string     Hostname or IP address for HTTP endpoint (default: '', empty, listen on all interfaces)
-      --open            Open browser window automatically
-      --port int        TCP port for HTTP endpoint (0=random, -1=no HTTP), example: 8080 (default 5665)
-      --export string   Report file location (default: '', no report)
-  -h, --help            help for replay
-```
-
-```
-$ ./k6 web-dashboard aggregate --help
-
-The aggregate command converts the file saved by json output to dashboard format events file.
-The files will be automatically compressed/decompressed if the file extension is .gz
-
-Usage:
-  k6 web-dashboard aggregate input-file output-file [flags]
-
-Flags:
-      --period 1m      Event emitting frequency, example: 1m (default 10s)
-      --tags strings   Precomputed metric tags, can be specified more than once (default [group])
-  -h, --help           help for aggregate
-```
-
-```
-$ ./k6 web-dashboard report --help
-
-The report command loads recorded dashboard events (NDJSON format) and creates a report.
-The compressed events file will be automatically decompressed if the file extension is .gz
-
-Usage:
-  k6 web-dashboard report events-file report-file [flags]
-
-Flags:
-      --open   Open browser window with generated report
-  -h, --help   help for report
-```
-
-To visualize the result of a previous test run (using events file):
-
-```
-./k6 run --out dashboard=record=test_result.ndjson script.js
-./k6 web-dashboard replay test_result.ndjson
-```
-
-To visualize the result of a previous test run (using json output):
-
-```sh
-./k6 run --out json=test_result.json script.js
-./k6 web-dashboard aggregate test_result.json test_result.ndjson
-./k6 web-dashboard replay test_result.ndjson
-```
-
-To generate report from previous test run (using events file):
-
-```
-./k6 run --out web-dashboard=record=test_result.ndjson script.js
-./k6 web-dashboard report test_result.ndjson test_result_report.html
-```
+The CLI tool called [k6-web-dashboard](cmd/k6-web-dashboard/README.md) enables the use of subcommands related to dashboard management (recording playback, creating a report from a recording, etc.) that do not require running k6.
 
 ### Docker
 

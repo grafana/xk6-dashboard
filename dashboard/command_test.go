@@ -16,7 +16,7 @@ import (
 	"go.k6.io/k6/cmd/state"
 )
 
-func Test_buildRootCmd(t *testing.T) {
+func TestNewCommand(t *testing.T) {
 	t.Parallel()
 
 	gs := state.NewGlobalState(context.Background())
@@ -25,22 +25,22 @@ func Test_buildRootCmd(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"web-dashboard", "replay"})
+	sub, _, err := cmd.Find([]string{"replay"})
 
 	assert.NoError(t, err)
-	assert.NotNil(t, rep)
+	assert.NotNil(t, sub)
 
-	assert.Equal(t, "replay", rep.Name())
+	assert.Equal(t, "replay", sub.Name())
 
-	err = rep.ParseFlags([]string{})
+	err = sub.ParseFlags([]string{})
 
 	assert.NoError(t, err)
 
-	assert.Equal(t, defaultHost, rep.Flag("host").Value.String())
-	assert.Equal(t, strconv.Itoa(defaultPort), rep.Flag("port").Value.String())
+	assert.Equal(t, defaultHost, sub.Flag("host").Value.String())
+	assert.Equal(t, strconv.Itoa(defaultPort), sub.Flag("port").Value.String())
 }
 
-func Test_buildRootCmd_reply(t *testing.T) {
+func TestNewCommand_reply(t *testing.T) {
 	t.Parallel()
 
 	gs := state.NewGlobalState(context.Background())
@@ -49,20 +49,20 @@ func Test_buildRootCmd_reply(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"web-dashboard", "replay"})
+	sub, _, err := cmd.Find([]string{"replay"})
 
 	assert.NoError(t, err)
 
-	err = rep.ParseFlags([]string{"--port", "-1"})
+	err = sub.ParseFlags([]string{"--port", "-1"})
 
 	assert.NoError(t, err)
 
-	err = rep.RunE(rep, []string{"testdata/result.json.gz"})
+	err = sub.RunE(sub, []string{"testdata/result.json.gz"})
 
 	assert.NoError(t, err)
 }
 
-func Test_buildRootCmd_reply_error(t *testing.T) {
+func TestNewCommand_reply_error(t *testing.T) {
 	t.Parallel()
 
 	gs := state.NewGlobalState(context.Background())
@@ -71,20 +71,20 @@ func Test_buildRootCmd_reply_error(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"web-dashboard", "replay"})
+	sub, _, err := cmd.Find([]string{"replay"})
 
 	assert.NoError(t, err)
 
-	err = rep.ParseFlags([]string{"--port", "-1"})
+	err = sub.ParseFlags([]string{"--port", "-1"})
 
 	assert.NoError(t, err)
 
-	err = rep.RunE(rep, []string{"no such file"})
+	err = sub.RunE(sub, []string{"no such file"})
 
 	assert.Error(t, err)
 }
 
-func Test_buildRootCmd_report(t *testing.T) {
+func TestNewCommand_report(t *testing.T) {
 	t.Parallel()
 
 	gs := state.NewGlobalState(context.Background())
@@ -93,13 +93,33 @@ func Test_buildRootCmd_report(t *testing.T) {
 
 	assert.NotNil(t, cmd)
 
-	rep, _, err := cmd.Find([]string{"web-dashboard", "report"})
+	sub, _, err := cmd.Find([]string{"report"})
 
 	assert.NoError(t, err)
 
 	out := filepath.Join(t.TempDir(), "report.html")
 
-	err = rep.RunE(rep, []string{"testdata/result.ndjson.gz", out})
+	err = sub.RunE(sub, []string{"testdata/result.ndjson.gz", out})
+
+	assert.NoError(t, err)
+}
+
+func TestNewCommand_aggregate(t *testing.T) {
+	t.Parallel()
+
+	gs := state.NewGlobalState(context.Background())
+
+	cmd := NewCommand(gs)
+
+	assert.NotNil(t, cmd)
+
+	sub, _, err := cmd.Find([]string{"aggregate"})
+
+	assert.NoError(t, err)
+
+	out := filepath.Join(t.TempDir(), "result.ndjson")
+
+	err = sub.RunE(sub, []string{"testdata/result.json.gz", out})
 
 	assert.NoError(t, err)
 }

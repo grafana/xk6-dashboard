@@ -9,11 +9,15 @@ package dashboard
 import (
 	"testing"
 
+	"github.com/grafana/xk6-dashboard/dashboard"
 	"github.com/stretchr/testify/assert"
+	"go.k6.io/k6/output"
 )
 
 func TestRegister(t *testing.T) {
 	t.Parallel()
 
-	assert.Panics(t, register) // already registered
+	assert.Panics(t, func() {
+		output.RegisterExtension(dashboard.OutputName, dashboard.New)
+	}) // already registered
 }
