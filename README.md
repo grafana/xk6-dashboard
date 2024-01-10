@@ -200,21 +200,6 @@ k6 web-dashboard replay --export test-report.html test-result.json
 
 See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [online version](https://raw.githack.com/grafana/xk6-dashboard/master/screenshot/k6-dashboard-html-report.html)
 
-## Events
-
-The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE source endpoint. Using this event source you can create your own dashboard UI.
-
-Events will be emitted periodically based on the `period` parameter (default: `10s`). The event's `data` is a JSON object with metric names as property names and metric values as property values. The format is similar to the [List Metrics](https://k6.io/docs/misc/k6-rest-api/#list-metrics) response format from the [k6 REST API](https://k6.io/docs/misc/k6-rest-api/).
-
-Two kind of events will be emitted:
-  - `config` contains ui configuration
-  - `param` contains main extension parameters (period, scenarios, thresholds, etc)
-  - `start` contains start timestamp
-  - `stop` contains stop timestamp
-  - `metric` contains new metric definitions
-  - `snapshot` contains metric values from last period
-  - `cumulative` contains cumulative metric values from the test starting point
-
 ## Command Line
 
 > [!Warning]
@@ -241,3 +226,53 @@ docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm g
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
+
+## How it works
+
+```mermaid
+sequenceDiagram
+  participant k6 as k6 core
+  participant extension as extension
+  participant server as web server
+  participant client as browser
+  k6->>extension: Start
+  extension-->>server: start
+  k6->>extension: AddMetricSamples()
+  extension->>extension: buffering
+  extension->>extension: flush
+  extension-->>server: metric,snapshot,cumulative
+  client->>server: GET /ui
+  server->>client: SPA
+  client->>server: GET /events
+  server-->>client: config
+  server-->>client: param
+  server-->>client: start
+  server-->>client: metric,snapshot,cumulative
+  k6->>extension: AddMetricSamples()
+  extension->>extension: buffering
+  extension->>extension: flush
+  extension-->>server: metric,snapshot,cumulative
+  server-->>client: metric,snapshot,cumulative
+  k6->>extension: Stop
+  extension->>extension: flush
+  extension-->>server: metric,snapshot,cumulative
+  server-->>client: metric,snapshot,cumulative
+  extension-->>server: stop
+  server-->>client: stop
+```
+
+### Events
+
+The `/events` endpoint (default: http://127.0.0.1:5665/events) is a standard SSE source endpoint. Using this event source you can create your own dashboard UI.
+
+Events will be emitted periodically based on the `period` parameter (default: `10s`). The event's `data` is a JSON object with metric names as property names and metric values as property values. The format is similar to the [List Metrics](https://k6.io/docs/misc/k6-rest-api/#list-metrics) response format from the [k6 REST API](https://k6.io/docs/misc/k6-rest-api/).
+
+Two kind of events will be emitted:
+  - `config` contains ui configuration
+  - `param` contains main extension parameters (period, scenarios, thresholds, etc)
+  - `start` contains start timestamp
+  - `stop` contains stop timestamp
+  - `metric` contains new metric definitions
+  - `snapshot` contains metric values from last period
+  - `cumulative` contains cumulative metric values from the test starting point
+
