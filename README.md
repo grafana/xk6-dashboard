@@ -244,6 +244,8 @@ The user interface is a single page web application (SPA) embedded in the extens
 
 When the extension starts, it starts a web server that serves the user interface (`/ui`), the report page (`/report`) and SSE events (`/events`).
 
+The events are kept in memory by the event emitter component, so that the client that connects later also receives all events. The memory requirement increases according to O(n) with the number of metrics (an aggregate is created per metric) and with time (aggregates are created every 10 seconds by default)
+
 ```mermaid
 sequenceDiagram
   participant k6 as k6 runtime
