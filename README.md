@@ -6,8 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/grafana/xk6-dashboard)](https://goreportcard.com/report/github.com/grafana/xk6-dashboard)
 [![GitHub Actions](https://github.com/grafana/xk6-dashboard/workflows/Test/badge.svg)](https://github.com/grafana/xk6-dashboard/actions?query=workflow%3ATest+branch%3Amaster)
-[![codecov](https://codecov.io/gh/szkiba/xk6-dashboard/branch/master/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/szkiba/xk6-dashboard)
-[![REUSE status](https://api.reuse.software/badge/github.com/grafana/xk6-dashboard)](https://api.reuse.software/info/github.com/grafana/xk6-dashboard)
+[![codecov](https://codecov.io/gh/grafana/xk6-dashboard/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/grafana/xk6-dashboard)
 
 
 # xk6-dashboard <!-- omit in toc -->
@@ -67,9 +66,10 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 - [Environment](#environment)
 - [Docker](#docker)
 - [Save report](#save-report)
-- [Events](#events)
 - [Command Line](#command-line)
   - [Docker](#docker-1)
+- [How It Works](#how-it-works)
+  - [Events](#events)
 
 ## Download
 
