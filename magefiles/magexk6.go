@@ -74,26 +74,6 @@ func hasAssets() bool {
 	return exists(filepath.Join(assetsdir, "package.json"))
 }
 
-func findPip() (string, bool) {
-	if _, err := exec.LookPath("pipx"); err == nil {
-		return "pipx", true
-	}
-
-	if _, err := exec.LookPath("pip"); err == nil {
-		return "pip", true
-	}
-
-	return "", false
-}
-
-func hasReuse() bool {
-	if _, err := exec.LookPath("reuse"); err != nil {
-		return false
-	}
-
-	return true
-}
-
 // tools downloads k6 golangci-lint configuration, golangci-lint and xk6 binary.
 func tools() error {
 	resp, err := http.Get("https://raw.githubusercontent.com/grafana/k6/master/.golangci.yml")
@@ -144,12 +124,6 @@ func tools() error {
 		return err
 	}
 
-	if pip, ok := findPip(); ok && !hasReuse() {
-		if err := sh.Run(pip, "install", "reuse"); err != nil {
-			return err
-		}
-	}
-
 	return linter.Ensure()
 }
 
@@ -174,12 +148,6 @@ func lint() error {
 		return err
 	}
 
-	if hasReuse() {
-		_, err := sh.Exec(nil, os.Stdout, os.Stderr, "reuse", "lint", "-q")
-
-		return err
-	}
-
 	return nil
 }
 
@@ -198,12 +166,9 @@ func generate() error {
 		if err := sh.Run("yarn", "--silent", "--cwd", assetsdir, "build"); err != nil {
 			return err
 		}
-
-		// workaround begin: reuse tool has trouble with node_modules and can't ignore it
-		sh.Rm(filepath.Join(assetsdir, "node_modules"))
 	}
 
-	return license()
+	return nil
 }
 
 func coverprofile() string {
@@ -263,25 +228,4 @@ func clean() error {
 	return nil
 }
 
-func license() error {
-	mg.Deps(tools)
-
-	if !hasReuse() {
-		fmt.Println("reuse tool missing, you should update license information manually")
-		return nil
-	}
-
-	return sh.Run(
-		"reuse", "annotate",
-		"--copyright", optCopyright,
-		"--merge-copyrights",
-		"--license", optLicense,
-		"--skip-unrecognised", "--recursive", ".",
-	)
-}
-
-var (
-	optCopyright = "Raintank, Inc. dba Grafana Labs"
-	optLicense   = "AGPL-3.0-only"
-	assetsdir    = filepath.Join("dashboard", "assets")
-)
+var assetsdir = filepath.Join("dashboard", "assets")
