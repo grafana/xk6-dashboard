@@ -53,7 +53,7 @@ export default (config, { tab }) => {
 
         serie("http_reqs[?!tags && rate]", "Request Rate")
         serie("http_req_duration[?!tags && p95]", "Request Duration p(95)")
-        serie("http_req_failed[?!tags && rate ]", "Request Failed")
+        serie("http_req_failed[?!tags && rate]", "Request Failed")
       })
     })
 

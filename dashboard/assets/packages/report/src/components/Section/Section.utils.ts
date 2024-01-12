@@ -7,7 +7,7 @@ import { Panel as PanelClass, SummaryTable } from "@xk6-dashboard/view"
 
 export const getColumnSizes = (panel: PanelClass, digest: Digest) => {
   if (panel.kind == "chart") {
-    return { xs: 12, lg: 6 }
+    return { xs: 12, lg: panel.fullWidth ? 12 : 6 }
   }
 
   if (panel.kind == "summary") {
