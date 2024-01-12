@@ -110,8 +110,7 @@ func Replay(script string) error {
 	record := filepath.Join(workdir, slug(script)+"-record.ndjson.gz")
 
 	return sh.Run(
-		"xk6",
-		"web-dashboard",
+		cliBin(),
 		"replay",
 		record,
 	)
@@ -135,9 +134,14 @@ func Testdata() error {
 	)
 }
 
-// update license headers
-func License() error {
-	return license()
+func cliBin() string {
+	var ext string
+
+	if runtime.GOOS == "windows" {
+		ext = ".exe"
+	}
+
+	return filepath.Join(workdir, "k6-web-dashboard"+ext)
 }
 
 // build the xk6-dashboard CLI.
@@ -145,16 +149,10 @@ func Cli() error {
 	mg.Deps(tools)
 	mg.Deps(cliReadme)
 
-	var ext string
-
-	if runtime.GOOS == "windows" {
-		ext = ".exe"
-	}
-
 	_, err := sh.Exec(nil, os.Stdout, os.Stderr, "goreleaser",
 		"build",
 		"-o",
-		filepath.Join(workdir, "k6-web-dashboard"+ext),
+		cliBin(),
 		"--snapshot",
 		"--clean",
 		"--single-target",

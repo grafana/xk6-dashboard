@@ -19,9 +19,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: License Check
-        uses: fsfe/reuse-action@v2
-
       - name: Lint
         uses: magefile/mage-action@v3
         with:
