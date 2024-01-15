@@ -1,6 +1,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/grafana/xk6-dashboard)](https://goreportcard.com/report/github.com/grafana/xk6-dashboard)
 [![GitHub Actions](https://github.com/grafana/xk6-dashboard/workflows/Test/badge.svg)](https://github.com/grafana/xk6-dashboard/actions?query=workflow%3ATest+branch%3Amaster)
 [![codecov](https://codecov.io/gh/grafana/xk6-dashboard/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/grafana/xk6-dashboard)
+![GitHub Downloads](https://img.shields.io/github/downloads/grafana/xk6-dashboard/total)
+[![GitHub Release](https://img.shields.io/github/v/release/grafana/xk6-dashboard)](https://github.com/grafana/xk6-dashboard/releases/)
 
 
 # xk6-dashboard
@@ -169,7 +171,7 @@ You can read more about how the extension works [here](docs/how-it-works.md).
 
 ## Contribute
 
-If you want to contribute or help with the development of xk6-dashboard, start by reading [docs/CONTRIBUTING.md](CONTRIBUTING.md). Before you start coding, it might be a good idea to first discuss your plans and implementation details with the xk6-dashboard maintainers—especially when it comes to big changes and features. You can do this in the [GitHub issue](https://github.com/grafana/k6/issues) for the problem you're solving (create one if it doesn't exist).
+If you want to contribute or help with the development of xk6-dashboard, start by reading [CONTRIBUTING.md](docs/CONTRIBUTING.md). Before you start coding, it might be a good idea to first discuss your plans and implementation details with the xk6-dashboard maintainers—especially when it comes to big changes and features. You can do this in the [GitHub issue](https://github.com/grafana/k6/issues) for the problem you're solving (create one if it doesn't exist).
 
 ## Support
 
