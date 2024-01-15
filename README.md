@@ -17,13 +17,6 @@ By using the **xk6-dashboard** output extension you can access metrics from [k6]
 
 The test run report can be exported to a responsive self-contained HTML file, which can be displayed even without an Internet connection.
 
->[!Warning]
-> You are currently looking at the documentation of the next version on the master branch, which does not correspond in all respects to the operation of the last release. Select the tag corresponding to the release for more precise documentation.
->
-> Major differences:
-> - The output name has changed, in previous versions it was `dashboard`, from the next version it will be `web-dashboard`. The documentation already reflects this.
-> - Screenshots may differ.
-
 **Screenshots**
 
 *Overview*
