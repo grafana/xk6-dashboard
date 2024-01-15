@@ -1,7 +1,3 @@
-// SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
-//
-// SPDX-License-Identifier: AGPL-3.0-only
-
 import { UnitType, SamplesView, Digest, SummaryView, Metrics, SummaryRow, AggregateType } from '@xk6-dashboard/model';
 import { Panel, Serie, Section } from './config.js';
 export { PanelKind } from './config.js';
