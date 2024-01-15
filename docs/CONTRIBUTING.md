@@ -18,7 +18,7 @@ That said, "how do I..."-type questions are often more suited for community foru
 
 If you'd like to contribute code to xk6-dashboard, this is the basic procedure. Make sure to follow the [style guide](#style-guide) described below.
 
-1. Find an issue you'd like to fix. If there is none already, or you'd like to add a feature, please open one, and we can talk about how to do it.  Out of respect for your time, please start a discussion regarding any bigger contributions either in a GitHub Issue, in the community forums **before** you get started on the implementation.
+1. Find an issue you'd like to fix. If there is none already, or you'd like to add a feature, please open one, and we can talk about how to do it.  Out of respect for your time, please start a discussion regarding any bigger contributions either in a [GitHub issue](https://github.com/grafana/k6/issues), in the [community forums](https://community.grafana.com/c/grafana-k6/extensions/) **before** you get started on the implementation.
   
    Remember, there's more to software development than code; if it's not properly planned, stuff gets messy real fast.
 
@@ -34,12 +34,12 @@ If you'd like to contribute code to xk6-dashboard, this is the basic procedure. 
 
 To get a basic development environment for Go and k6 up and running, first make sure you have **[Git](https://git-scm.com/downloads)** and **[Go](https://golang.org/doc/install)** (see our [go.mod](https://github.com/grafana/xk6-dashboard/blob/master/go.mod) for minimum required version) installed and working properly.
 
-We recommend using the Git command-line interface to download the source code for the k6:
+We recommend using the Git command-line interface to download the source code for the xk6-dashboard:
 
 * Open a terminal and run `git clone https://github.com/grafana/xk6-dashboard.git`. This command downloads xk6-dashboard's sources to a new `xk6-dashboard` directory in your current directory.
 * Open the `xk6-dashboard` directory in your favorite code editor.
 
-For alternative ways of cloning the k6 repository, please refer to [GitHub's cloning a repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) documentation.
+For alternative ways of cloning the xk6-dashboard repository, please refer to [GitHub's cloning a repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository) documentation.
 
 #### Running the linter
 
