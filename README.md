@@ -11,9 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 # xk6-dashboard <!-- omit in toc -->
 
-A [k6 extension](https://k6.io/docs/extensions/) that enables creating a web based metrics dashboard for [k6](https://k6.io).
-
-By using the **xk6-dashboard** output extension you can access metrics from [k6](https://k6.io) process via [server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events). All custom [k6](https://k6.io) metrics ([Counter](https://k6.io/docs/javascript-api/k6-metrics/counter/), [Gauge](https://k6.io/docs/javascript-api/k6-metrics/gauge/), [Rate](https://k6.io/docs/javascript-api/k6-metrics/rate/), [Trend](https://k6.io/docs/javascript-api/k6-metrics/trend/)) and [built-in metrics](https://k6.io/docs/using-k6/metrics/#built-in-metrics) are accessible in the event stream.
+A [k6 extension](https://k6.io/docs/extensions/) that that makes [k6](https://k6.io) metrics available on a web-based dashboard. The dashboard is updated continuously during the test run using [server-sent events (SSE)](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events).
 
 The test run report can be exported to a responsive self-contained HTML file, which can be displayed even without an Internet connection.
 
@@ -21,14 +19,14 @@ The test run report can be exported to a responsive self-contained HTML file, wh
 
 *Overview*
 
-The overview tab provides an overview of the most important metrics of the test run. Graphs plot the value of metrics over time.
+The overview tab provides an overview of the most important metrics of the test run.
 
 ![k6 dashboard overview dark](screenshot/k6-dashboard-overview-dark.png#gh-dark-mode-only)
 ![k6 dashboard overview light](screenshot/k6-dashboard-overview-light.png#gh-light-mode-only)
 
 *Timings*
 
-The timings tab provides an overview of test run HTTP timing metrics. Graphs plot the value of metrics over time.
+The timings tab provides an overview of test run timing metrics.
 
 ![k6 dashboard timings dark](screenshot/k6-dashboard-timings-dark.png#gh-dark-mode-only)
 ![k6 dashboard timings light](screenshot/k6-dashboard-timings-light.png#gh-light-mode-only)
@@ -60,7 +58,6 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 - [Docker](#docker)
 - [Save report](#save-report)
 - [Command Line](#command-line)
-  - [Docker](#docker-1)
 - [How It Works](#how-it-works)
   - [Events](#events)
 
@@ -159,13 +156,13 @@ You can also use pre-built k6 image within a Docker container. In order to do th
 **Linux**
 
 ```plain
-docker run -v $(pwd):/scripts -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=dashboard /scripts/script.js
+docker run -v $(pwd):/scripts -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=web-dashboard /scripts/script.js
 ```
 
 **Windows**
 
 ```plain
-docker run -v %cd%:/scripts -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=dashboard /scripts/script.js
+docker run -v %cd%:/scripts -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=web-dashboard /scripts/script.js
 ```
 
 The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
@@ -180,12 +177,12 @@ k6 run --out web-dashboard=export=test-report.html script.js
 
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
 
-By using the `--export` switch of the `web-dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
+By using the `--export` switch of the `k6-web-dashboard replay` command, the report can also be generated afterwards from the previously saved JSON format result (`--out json=test-result.json`).
 
 The report can also be viewed and downloaded from the dashboard UI using the buttons on the "Report" tab.
 
 ```plain
-k6 web-dashboard replay --export test-report.html test-result.json
+k6-web-dashboard replay --export test-report.html test-result.json
 ```
 
 *Example HTML report*
@@ -199,26 +196,6 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 > Previous versions of xk6-dashboard added a `dashboard` subcommand to the k6 command line. Currently k6 does not support adding subcommands, xk6-dashboard used a questionable workaround. This workaround was removed from the xk6-dashboard and the dashboard-related subcommands were moved to a separate executable ([k6-web-dashboard](cmd/k6-web-dashboard/README.md)).
 
 The CLI tool called [k6-web-dashboard](cmd/k6-web-dashboard/README.md) enables the use of subcommands related to dashboard management (recording playback, creating a report from a recording, etc.) that do not require running k6.
-
-### Docker
-
-You can also use pre-built k6 image within a Docker container. In order to do that, you will need to execute something like the following:
-
-**Linux**
-
-```plain
-docker run -v $(pwd):/work -v /tmp:/tmp/work -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
-docker run -v /tmp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest web-dashboard replay /tmp/work/test_result.json.gz
-```
-
-**Windows**
-
-```plain
-docker run -v %cd%:/work -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -it --rm ghcr.io/grafana/xk6-dashboard:latest run --out=json=/tmp/work/test_result.json.gz /work/script.js
-docker run -v %USERPROFILE%\AppData\Local\Temp:/tmp/work -p 5665:5665 -it --rm ghcr.io/grafana/xk6-dashboard:latest web-dashboard replay /tmp/work/test_result.json.gz
-```
-
-The dashboard will accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ## How it works
 
