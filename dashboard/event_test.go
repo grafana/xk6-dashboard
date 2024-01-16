@@ -20,7 +20,7 @@ func (*errorEventListener) onStart() error {
 	return assert.AnError
 }
 
-func (*errorEventListener) onStop() error {
+func (*errorEventListener) onStop(_ error) error {
 	return assert.AnError
 }
 
@@ -32,5 +32,5 @@ func Test_eventSource_error(t *testing.T) {
 	src.addEventListener(new(errorEventListener))
 
 	assert.Error(t, src.fireStart())
-	assert.Error(t, src.fireStop())
+	assert.Error(t, src.fireStop(nil))
 }

@@ -40,7 +40,7 @@ func Test_recorder_onStart(t *testing.T) {
 
 	assert.True(t, exists(th.proc.fs, "foo"))
 
-	assert.NoError(t, rec.onStop())
+	assert.NoError(t, rec.onStop(nil))
 }
 
 func Test_recorder_onStart_error(t *testing.T) {
@@ -66,7 +66,7 @@ func Test_recorder_onEvent_config(t *testing.T) {
 
 	rec.onEvent("config", data)
 
-	assert.NoError(t, rec.onStop())
+	assert.NoError(t, rec.onStop(nil))
 
 	file, err := th.proc.fs.Open("out")
 
@@ -92,7 +92,7 @@ func Test_recorder_onEvent(t *testing.T) {
 
 	rec.onEvent("dummy", data)
 
-	assert.NoError(t, rec.onStop())
+	assert.NoError(t, rec.onStop(nil))
 
 	file, err := th.proc.fs.Open("out.gz")
 
@@ -137,5 +137,5 @@ func Test_recorder_onEvent_error(t *testing.T) {
 	assert.NotNil(t, entry)
 	assert.Equal(t, logrus.WarnLevel, entry.Level)
 
-	assert.NoError(t, rec.onStop())
+	assert.NoError(t, rec.onStop(nil))
 }
