@@ -221,7 +221,15 @@ func (agg *aggregator) processMetric(data []byte) error {
 
 	name := gjson.GetBytes(data, "data.name").String()
 
-	_, err = agg.registry.getOrNew(name, metricType, valueType)
+	tres := gjson.GetBytes(data, "data.thresholds").Array()
+
+	thresholds := make([]string, 0, len(tres))
+
+	for _, res := range tres {
+		thresholds = append(thresholds, res.String())
+	}
+
+	_, err = agg.registry.getOrNew(name, metricType, valueType, thresholds)
 
 	return err
 }

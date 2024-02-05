@@ -185,6 +185,14 @@ func Test_briefer_onEvent(t *testing.T) {
 	envelope := &recorderEnvelope{Name: cumulativeEvent, Data: data}
 
 	assert.Equal(t, envelope, rep.data.cumulative)
+
+	data = map[string]interface{}{"foo": []string{"bar > 0"}}
+
+	rep.onEvent(thresholdEvent, data)
+
+	envelope = &recorderEnvelope{Name: thresholdEvent, Data: data}
+
+	assert.Equal(t, envelope, rep.data.threshold)
 }
 
 const (

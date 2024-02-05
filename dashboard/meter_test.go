@@ -129,8 +129,8 @@ func Test_meter_format(t *testing.T) {
 	now := time.Now()
 	met := newMeter(0, now, nil)
 
-	_, _ = met.registry.getOrNew("foo", metrics.Counter, metrics.Data)
-	_, _ = met.registry.getOrNew("bar", metrics.Counter, metrics.Data)
+	_, _ = met.registry.getOrNew("foo", metrics.Counter, metrics.Data, nil)
+	_, _ = met.registry.getOrNew("bar", metrics.Counter, metrics.Data, nil)
 
 	data := met.format(time.Second)
 
@@ -140,6 +140,41 @@ func Test_meter_format(t *testing.T) {
 	assert.Contains(t, data, "time")
 	assert.Contains(t, data, "foo")
 	assert.Contains(t, data, "bar")
+}
+
+func Test_meter_evaluate(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	met := newMeter(0, now, nil)
+
+	foo, err := met.registry.getOrNew(
+		"foo",
+		metrics.Counter,
+		metrics.Data,
+		[]string{"count < 1", "count < 100"},
+	)
+	assert.NoError(t, err)
+	foo.Sink.Add(metrics.Sample{TimeSeries: metrics.TimeSeries{Metric: foo}, Time: now, Value: 2})
+
+	bar, err := met.registry.getOrNew(
+		"bar",
+		metrics.Counter,
+		metrics.Data,
+		[]string{"count < 1"},
+	)
+	assert.NoError(t, err)
+	bar.Sink.Add(metrics.Sample{TimeSeries: metrics.TimeSeries{Metric: bar}, Time: now, Value: 1})
+
+	data := met.evaluate(now)
+
+	assert.NotNil(t, data)
+
+	assert.Equal(t, 2, len(data))
+	assert.Contains(t, data, "foo")
+	assert.Contains(t, data, "bar")
+	assert.Equal(t, data["foo"], []string{"count < 1"})
+	assert.Equal(t, data["bar"], []string{"count < 1"})
 }
 
 func Test_meter_update_tags(t *testing.T) {
