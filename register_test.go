@@ -18,6 +18,6 @@ func TestRegister(t *testing.T) {
 	t.Parallel()
 
 	assert.Panics(t, func() {
-		output.RegisterExtension(dashboard.OutputName, dashboard.New)
+		output.RegisterExtension(outputName, dashboard.New)
 	}) // already registered
 }
