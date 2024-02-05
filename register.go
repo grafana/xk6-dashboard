@@ -12,6 +12,8 @@ import (
 	"go.k6.io/k6/output"
 )
 
+const outputName = "dashboard"
+
 func init() {
-	output.RegisterExtension(dashboard.OutputName, dashboard.New)
+	output.RegisterExtension(outputName, dashboard.New)
 }

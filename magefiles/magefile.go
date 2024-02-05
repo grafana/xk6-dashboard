@@ -93,7 +93,7 @@ func out(script string) string {
 	report := filepath.Join(workdir, slug(script)+"-report.html")
 	record := filepath.Join(workdir, slug(script)+"-record.ndjson.gz")
 
-	return "web-dashboard=export=" + report + "&record=" + record
+	return "dashboard=export=" + report + "&record=" + record
 }
 
 func jsonout(script string) string {
@@ -128,9 +128,9 @@ func Testdata() error {
 		"json="+gz,
 		filepath.Join("scripts", "test.js"),
 		"--out",
-		"web-dashboard=port=-1&period=2s&record="+strings.ReplaceAll(out, ".json", ".ndjson"),
+		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(out, ".json", ".ndjson"),
 		"--out",
-		"web-dashboard=port=-1&period=2s&record="+strings.ReplaceAll(gz, ".json", ".ndjson"),
+		"dashboard=port=-1&period=2s&record="+strings.ReplaceAll(gz, ".json", ".ndjson"),
 	)
 }
 
