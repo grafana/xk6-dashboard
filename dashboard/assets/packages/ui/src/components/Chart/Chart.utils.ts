@@ -2,10 +2,11 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import uPlot, { type Axis, type Hooks, type Options, type Series } from "uplot"
+import uPlot, { type Axis, type Options, type Series } from "uplot"
 import { type UnitType } from "@xk6-dashboard/model"
 import { format, tooltipPlugin, SeriesPlot } from "@xk6-dashboard/view"
 
+import { mergeRightProps } from "utils"
 import { type Theme } from "store/theme"
 import { common, grey, midnight } from "theme/colors.css"
 
@@ -63,27 +64,39 @@ const createAxis = (colors: ReturnType<typeof createChartTheme>, length: number)
   }
 }
 
-export interface CreateOptionsProps {
-  hooks: Hooks.Arrays
-  plot: Omit<SeriesPlot, "series"> & { series: Series[] }
-  theme: Theme
-  width: number
+interface SelectedUplotOptions extends Pick<Options, "hooks" | "scales" | "width"> {
+  height?: number
 }
 
-export const createOptions = ({ hooks, plot, theme, width }: CreateOptionsProps): Options => {
+export interface CreateOptionsProps extends SelectedUplotOptions {
+  plot: Omit<SeriesPlot, "series"> & { series: Series[] }
+  theme: Theme
+}
+
+export const createOptions = ({ height = CHART_HEIGHT, hooks, plot, scales, theme, width }: CreateOptionsProps): Options => {
   const colors = createChartTheme(theme)
   const units = plot.samples.units
   const axes = units.map(createAxis(colors, units.length))
 
   return {
     class: styles.uplot,
-    width: width,
-    height: CHART_HEIGHT,
+    width,
+    height,
     hooks,
     cursor: { sync: { key: sync.key } },
     legend: { live: false },
+    scales,
     series: plot.series as Series[],
-    axes: axes,
+    axes,
     plugins: [tooltipPlugin(colors.tooltip)]
   }
 }
+
+export const mergeRightShowProp = mergeRightProps(["show"])
+
+export const mergeSeries = (plotSeries: Series[] = [], stateSeries: Series[] = []) => {
+  return plotSeries.map((series, i) => mergeRightShowProp(series, stateSeries[i]))
+}
+
+export const isDblClickEvent = (e?: MouseEvent | null) => e?.type === "dblclick"
+export const isZoomEvent = (e?: MouseEvent | null) => e != null && !e.ctrlKey && !e.metaKey

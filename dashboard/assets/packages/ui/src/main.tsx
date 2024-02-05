@@ -7,6 +7,7 @@ import ReactDOM from "react-dom/client"
 
 import { DigestProvider } from "store/digest"
 import { ThemeProvider } from "store/theme"
+import { TimeRangeProvider } from "store/timeRange"
 
 import App from "App"
 
@@ -16,7 +17,9 @@ const rootElement = document.getElementById("root") as HTMLDivElement
 ReactDOM.createRoot(rootElement).render(
   <DigestProvider endpoint={base + "events"}>
     <ThemeProvider>
-      <App />
+      <TimeRangeProvider>
+        <App />
+      </TimeRangeProvider>
     </ThemeProvider>
   </DigestProvider>
 )

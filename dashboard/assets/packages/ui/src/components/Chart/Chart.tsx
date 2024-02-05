@@ -47,7 +47,6 @@ export default function Chart({ panel, container }: ChartProps) {
     }
   }
 
-
   return (
     <Grid.Column xs={12} lg={panel.fullWidth ? 12 : 6}>
       <Wrapper>
