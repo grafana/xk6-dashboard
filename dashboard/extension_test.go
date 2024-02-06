@@ -8,6 +8,7 @@ package dashboard
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"testing"
@@ -291,12 +292,19 @@ func Test_newParamData(t *testing.T) {
 	param := newParamData(params)
 
 	assert.Len(t, param.Scenarios, 2)
+	assert.Empty(t, param.ScriptPath)
 
 	params.ScriptOptions.Scenarios = nil
+
+	u, err := url.Parse("file:///tmp/script.js")
+	assert.NoError(t, err)
+
+	params.ScriptPath = u
 
 	param = newParamData(params)
 
 	assert.Len(t, param.Scenarios, 0)
+	assert.Equal(t, param.ScriptPath, "file:///tmp/script.js")
 }
 
 func Test_paramData_With(t *testing.T) {
