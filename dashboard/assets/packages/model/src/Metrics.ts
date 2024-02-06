@@ -38,6 +38,7 @@ export type Metric = {
   name: string
   contains?: ValueType
   type?: MetricType
+  thresholds?: Array<string>
 }
 
 export class Query {

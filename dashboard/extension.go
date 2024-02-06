@@ -194,6 +194,7 @@ func (ext *extension) flush() {
 	}
 
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
+	ext.evaluateAndSend(ext.cumulative, now)
 }
 
 func (ext *extension) updateAndSend(
@@ -215,6 +216,13 @@ func (ext *extension) updateAndSend(
 	}
 
 	ext.fireEvent(event, data)
+}
+
+func (ext *extension) evaluateAndSend(met *meter, now time.Time) {
+	failures := met.evaluate(now)
+	if len(failures) > 0 {
+		ext.fireEvent(thresholdEvent, failures)
+	}
 }
 
 type paramData struct {
@@ -249,13 +257,7 @@ func (param *paramData) withThresholds(thresholds map[string]metrics.Thresholds)
 	param.Thresholds = make(map[string][]string, len(thresholds))
 
 	for name, value := range thresholds {
-		tre := make([]string, 0, len(value.Thresholds))
-
-		for _, threshold := range value.Thresholds {
-			tre = append(tre, threshold.Source)
-		}
-
-		param.Thresholds[name] = tre
+		param.Thresholds[name] = thresholdsSources(value)
 	}
 
 	return param

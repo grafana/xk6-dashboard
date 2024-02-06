@@ -24,7 +24,7 @@ type meter struct {
 
 func newMeter(period time.Duration, now time.Time, tags []string) *meter {
 	registry := newRegistry()
-	metric := registry.mustGetOrNew("time", metrics.Gauge, metrics.Time)
+	metric := registry.mustGetOrNew("time", metrics.Gauge, metrics.Time, nil)
 	clock, _ := metric.Sink.(*metrics.GaugeSink)
 
 	start := now
@@ -39,7 +39,10 @@ func newMeter(period time.Duration, now time.Time, tags []string) *meter {
 	}
 }
 
-func (m *meter) update(containers []metrics.SampleContainer, now time.Time) (map[string]sampleData, error) {
+func (m *meter) update(
+	containers []metrics.SampleContainer,
+	now time.Time,
+) (map[string]sampleData, error) {
 	dur := m.period
 	if dur == 0 {
 		dur = now.Sub(m.start)
@@ -59,7 +62,12 @@ func (m *meter) update(containers []metrics.SampleContainer, now time.Time) (map
 }
 
 func (m *meter) add(sample metrics.Sample) error {
-	metric, err := m.registry.getOrNew(sample.Metric.Name, sample.Metric.Type, sample.Metric.Contains)
+	metric, err := m.registry.getOrNew(
+		sample.Metric.Name,
+		sample.Metric.Type,
+		sample.Metric.Contains,
+		thresholdsSources(sample.Metric.Thresholds),
+	)
 	if err != nil {
 		return err
 	}
@@ -120,6 +128,37 @@ func (m *meter) format(dur time.Duration) map[string]sampleData {
 	return out
 }
 
+func (m *meter) evaluate(now time.Time) map[string][]string {
+	failures := make(map[string][]string)
+
+	dur := m.period
+	if dur == 0 {
+		dur = now.Sub(m.start)
+	}
+
+	for _, name := range m.registry.names {
+		metric := m.registry.Get(name)
+		if metric == nil {
+			continue
+		}
+
+		pass, err := metric.Thresholds.Run(metric.Sink, dur)
+		if err != nil || !pass {
+			srcs := make([]string, 0)
+
+			for _, t := range metric.Thresholds.Thresholds {
+				if t.LastFailed {
+					srcs = append(srcs, t.Source)
+				}
+			}
+
+			failures[name] = srcs
+		}
+	}
+
+	return failures
+}
+
 func significant(num float64) float64 {
 	const (
 		ten1 = float64(10)
@@ -177,20 +216,32 @@ func (m *meter) newbies(seen map[string]struct{}) map[string]metricData {
 }
 
 type metricData struct {
-	Type     metrics.MetricType `json:"type"`
-	Contains metrics.ValueType  `json:"contains,omitempty"`
-	Tainted  bool               `json:"tainted,omitempty"`
+	Type       metrics.MetricType `json:"type"`
+	Contains   metrics.ValueType  `json:"contains,omitempty"`
+	Tainted    bool               `json:"tainted,omitempty"`
+	Thresholds []string           `json:"thresholds,omitempty"`
 }
 
 func newMetricData(origin *metrics.Metric) *metricData {
 	return &metricData{
-		Type:     origin.Type,
-		Contains: origin.Contains,
-		Tainted:  origin.Tainted.Bool,
+		Type:       origin.Type,
+		Contains:   origin.Contains,
+		Tainted:    origin.Tainted.Bool,
+		Thresholds: thresholdsSources(origin.Thresholds),
 	}
 }
 
 type sampleData map[string]float64
+
+func thresholdsSources(thresholds metrics.Thresholds) []string {
+	strs := make([]string, 0, len(thresholds.Thresholds))
+
+	for _, t := range thresholds.Thresholds {
+		strs = append(strs, t.Source)
+	}
+
+	return strs
+}
 
 const (
 	pc99     = 0.99

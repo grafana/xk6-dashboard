@@ -28,14 +28,21 @@ func newRegistry() *registry {
 func (reg *registry) getOrNew(
 	name string,
 	typ metrics.MetricType,
-	valTyp ...metrics.ValueType,
+	valTyp metrics.ValueType,
+	thresholds []string,
 ) (*metrics.Metric, error) {
 	if metric := reg.Registry.Get(name); metric != nil {
 		return metric, nil
 	}
 
-	metric, err := reg.Registry.NewMetric(name, typ, valTyp...)
+	metric, err := reg.Registry.NewMetric(name, typ, valTyp)
 	if err != nil {
+		return nil, err
+	}
+
+	metric.Thresholds = metrics.NewThresholds(thresholds)
+
+	if err := metric.Thresholds.Validate(name, reg.Registry); err != nil {
 		return nil, err
 	}
 
@@ -48,9 +55,10 @@ func (reg *registry) getOrNew(
 func (reg *registry) mustGetOrNew(
 	name string,
 	typ metrics.MetricType,
-	valTyp ...metrics.ValueType,
+	valTyp metrics.ValueType,
+	thresholds []string,
 ) *metrics.Metric {
-	metric, err := reg.getOrNew(name, typ, valTyp...)
+	metric, err := reg.getOrNew(name, typ, valTyp, thresholds)
 	if err != nil {
 		panic(err)
 	}

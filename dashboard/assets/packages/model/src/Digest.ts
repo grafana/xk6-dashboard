@@ -20,6 +20,13 @@ export class Param implements Record<string, unknown> {
 
   [x: string]: unknown
 }
+export class Thresholds implements Record<string, Array<string>> {
+  constructor(from = {} as Record<string, Array<string>>) {
+    Object.assign(this, from)
+  }
+
+  [x: string]: Array<string>
+}
 
 export enum EventType {
   config = "config",
@@ -28,7 +35,8 @@ export enum EventType {
   stop = "stop",
   metric = "metric",
   snapshot = "snapshot",
-  cumulative = "cumulative"
+  cumulative = "cumulative",
+  threshold = "threshold"
 }
 
 export class Digest implements EventListenerObject {
@@ -39,6 +47,7 @@ export class Digest implements EventListenerObject {
   metrics: Metrics
   samples: Samples
   summary: Summary
+  thresholds: Thresholds
 
   constructor({
     config = {} as Config,
@@ -47,7 +56,8 @@ export class Digest implements EventListenerObject {
     stop = undefined as Date | undefined,
     metrics = new Metrics(),
     samples = new Samples(),
-    summary = new Summary()
+    summary = new Summary(),
+    thresholds = new Thresholds()
   } = {}) {
     this.config = config
     this.param = param
@@ -56,6 +66,7 @@ export class Digest implements EventListenerObject {
     this.metrics = metrics
     this.samples = samples
     this.summary = summary
+    this.thresholds = thresholds
   }
 
   handleEvent(event: MessageEvent): void {
@@ -99,6 +110,9 @@ export class Digest implements EventListenerObject {
       case EventType.cumulative:
         this.onCumulative(data)
         break
+      case EventType.threshold:
+        this.onThreshold(data)
+        break
     }
   }
 
@@ -136,5 +150,9 @@ export class Digest implements EventListenerObject {
   private onCumulative(data: Record<string, Aggregate>): void {
     this.summary.onEvent(data)
     this.summary.annotate(this.metrics)
+  }
+
+  private onThreshold(data: Record<string, Aggregate>): void {
+    Object.assign(this.thresholds, data)
   }
 }
