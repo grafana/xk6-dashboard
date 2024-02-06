@@ -231,6 +231,7 @@ type paramData struct {
 	EndOffset  time.Duration       `json:"endOffset,omitempty"`
 	Period     time.Duration       `json:"period,omitempty"`
 	Tags       []string            `json:"tags,omitempty"`
+	ScriptPath string              `json:"scriptPath,omitempty"`
 }
 
 func newParamData(params *output.Params) *paramData {
@@ -238,6 +239,10 @@ func newParamData(params *output.Params) *paramData {
 
 	for name := range params.ScriptOptions.Scenarios {
 		param.Scenarios = append(param.Scenarios, name)
+	}
+
+	if params.ScriptPath != nil {
+		param.ScriptPath = params.ScriptPath.String()
 	}
 
 	return param
