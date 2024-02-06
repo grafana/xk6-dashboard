@@ -39,6 +39,7 @@ export type Metric = {
   contains?: ValueType
   type?: MetricType
   thresholds?: Array<string>
+  custom?: boolean
 }
 
 export class Query {

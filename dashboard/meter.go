@@ -220,6 +220,7 @@ type metricData struct {
 	Contains   metrics.ValueType  `json:"contains,omitempty"`
 	Tainted    bool               `json:"tainted,omitempty"`
 	Thresholds []string           `json:"thresholds,omitempty"`
+	Custom     bool               `json:"custom,omitempty"`
 }
 
 func newMetricData(origin *metrics.Metric) *metricData {
@@ -228,6 +229,7 @@ func newMetricData(origin *metrics.Metric) *metricData {
 		Contains:   origin.Contains,
 		Tainted:    origin.Tainted.Bool,
 		Thresholds: thresholdsSources(origin.Thresholds),
+		Custom:     !isBuiltin(origin.Name),
 	}
 }
 
