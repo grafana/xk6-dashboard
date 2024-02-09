@@ -8,7 +8,9 @@ import { vars } from "theme"
 const popperBase = style({
   border: `1px solid ${vars.colors.primary.main}`,
   borderRadius: 0,
-  padding: vars.sizes.size2,
+  fontSize: vars.fontSizes.size4,
+  maxWidth: "600px",
+  padding: vars.sizes.size4,
   zIndex: 10
 })
 

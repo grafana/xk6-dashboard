@@ -114,12 +114,11 @@ function tooltipPlugin(background) {
     const style = {
       display: "none",
       position: "absolute",
-      padding: "0.2rem",
+      padding: "1rem",
       border: "1px solid #7b65fa",
       zIndex: "10",
       pointerEvents: "none",
-      margin: "0.5rem",
-      fontSize: "smaller"
+      fontSize: "1.25rem"
     };
     Object.assign(tooltip.style, style);
     u.over.appendChild(tooltip);
