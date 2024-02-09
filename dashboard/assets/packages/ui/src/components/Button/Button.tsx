@@ -11,7 +11,7 @@ import * as styles from "./Button.css"
 interface CommonProps {
   children: ReactNode
   className?: string
-  variant?: "fill" | "text"
+  variant?: "fill" | "outline" | "text"
   onClick?: (event: MouseEvent<Element>) => void
 }
 

@@ -48,6 +48,13 @@ const colorsTheme = createThemeContract({
   shadow: null,
   border: null,
   components: {
+    button: {
+      outline: {
+        border: null,
+        text: null,
+        background: null
+      }
+    },
     table: {
       row: {
         hover: null
@@ -81,6 +88,13 @@ export const lightTheme = createTheme(colorsTheme, {
   shadow: grey[300],
   border: grey[300],
   components: {
+    button: {
+      outline: {
+        border: violet[200],
+        text: violet[200],
+        background: violet[50]
+      }
+    },
     table: {
       row: {
         hover: grey[200]
@@ -114,6 +128,13 @@ export const darkTheme = createTheme(colorsTheme, {
   shadow: midnight[900],
   border: midnight[700],
   components: {
+    button: {
+      outline: {
+        border: violet[100],
+        text: violet[100],
+        background: violet[600]
+      }
+    },
     table: {
       row: {
         hover: midnight[600]

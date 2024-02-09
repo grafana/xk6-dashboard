@@ -13,6 +13,7 @@ import { ReactComponent as LightModeIcon } from "assets/icons/light_mode.svg"
 import { ReactComponent as LogoIcon } from "assets/icons/logo.svg"
 import { ReactComponent as OptionsIcon } from "assets/icons/options.svg"
 import { ReactComponent as QuestionIcon } from "assets/icons/question.svg"
+import { ReactComponent as RewindTimeIcon } from "assets/icons/rewind_time.svg"
 import { ReactComponent as SpinnerIcon } from "assets/icons/spinner.svg"
 import { ReactComponent as StopWatchIcon } from "assets/icons/stop_watch.svg"
 
@@ -46,6 +47,7 @@ export const IconMap = {
   logo: LogoIcon as SVGComponent,
   moon: DarkModeIcon as SVGComponent,
   question: QuestionIcon as SVGComponent,
+  "rewind-time": RewindTimeIcon as SVGComponent,
   spinner: SpinnerIcon as SVGComponent,
   "stop-watch": StopWatchIcon as SVGComponent,
   sun: LightModeIcon as SVGComponent
