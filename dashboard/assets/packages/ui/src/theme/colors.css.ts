@@ -344,7 +344,7 @@ export const midnight = {
 }
 
 export const violet = {
-  50: "#aea2ec",
+  50: "#edeafb",
   100: "#8e7de5",
   200: "#6e59de",
   300: "#604ec2",

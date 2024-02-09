@@ -24,23 +24,42 @@ const base = style({
   }
 })
 
+const baseButton = style([
+  base,
+  {
+    borderRadius: vars.borderRadius.sm,
+    fontWeight: vars.fontWeights.weight600,
+    letterSpacing: vars.letterSpacings.size4,
+    padding: `${vars.sizes.size3} ${vars.sizes.size8}`,
+    textTransform: "uppercase"
+  }
+])
+
 export const variant = styleVariants({
   fill: [
-    base,
+    baseButton,
     {
       backgroundColor: vars.colors.primary.main,
-      borderRadius: vars.borderRadius.sm,
       color: vars.colors.common.white,
-      fontWeight: vars.fontWeights.weight600,
-      letterSpacing: vars.letterSpacings.size4,
-      padding: `${vars.sizes.size3} ${vars.sizes.size9}`,
-      textTransform: "uppercase",
       selectors: {
         "&:hover:not(:active)": {
           backgroundColor: vars.colors.primary.light
         },
         "&:active": {
           backgroundColor: vars.colors.primary.dark
+        }
+      }
+    }
+  ],
+  outline: [
+    baseButton,
+    {
+      outline: `2px solid ${vars.colors.components.button.outline.border}`,
+      outlineOffset: "-2px",
+      color: vars.colors.components.button.outline.text,
+      selectors: {
+        "&:hover": {
+          backgroundColor: vars.colors.components.button.outline.background
         }
       }
     }

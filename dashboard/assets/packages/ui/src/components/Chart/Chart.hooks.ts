@@ -5,20 +5,50 @@
 import { useState } from "react"
 import uPlot, { type Options, type Series } from "uplot"
 
-import { mergeRightProps } from "utils"
+import { useTimeRange } from "store/timeRange"
+import { createOptions, isDblClickEvent, isZoomEvent, mergeSeries, CreateOptionsProps } from "./Chart.utils"
 
-import { createOptions, CreateOptionsProps } from "./Chart.utils"
+const useSeries = (series: Series[]) => {
+  const [value, setValue] = useState(series)
+  const newSeries = mergeSeries(series, value)
 
-const mergeRightShowProp = mergeRightProps(["show"])
+  const onChange = (uplot: uPlot) => {
+    setValue(uplot.series)
+  }
 
-const mergeSeries = (plotSeries: Series[] = [], stateSeries: Series[] = []) => {
-  return plotSeries.map((series, i) => mergeRightShowProp(series, stateSeries[i]))
+  return [newSeries, onChange] as const
 }
 
 export const useOptions = ({ plot, theme, width }: CreateOptionsProps): Options => {
-  const [series, setSeries] = useState<Series[]>(plot.series)
-  const newPlot = { ...plot, series: mergeSeries(plot.series, series) }
-  const hooks = { setSeries: [(self: uPlot) => setSeries(self.series)] }
+  const { timeRange, setTimeRange } = useTimeRange()
+  const [series, setSeries] = useSeries(plot.series)
+  const newPlot = { ...plot, series }
+  const scales = { timestamp: { min: timeRange?.from, max: timeRange?.to } }
 
-  return createOptions({ hooks, plot: newPlot, theme, width })
+  const handleSelectEvent = (uplot: uPlot) => {
+    if (!isZoomEvent(uplot.cursor.event)) {
+      return
+    }
+
+    const minX = uplot.posToVal(uplot.select.left, "timestamp")
+    const maxX = uplot.posToVal(uplot.select.left + uplot.select.width, "timestamp")
+    setTimeRange({ from: minX, to: maxX })
+  }
+
+  const handleCursorEvent = (uplot: uPlot) => {
+    if (isDblClickEvent(uplot.cursor.event)) {
+      setTimeRange(undefined)
+    }
+  }
+
+  const hooks = {
+    setCursor: [handleCursorEvent],
+    // setData: [(x) => console.log("setData", x)],
+    // setScale: [(x) => console.log("setScale", x)],
+    setSelect: [handleSelectEvent],
+    setSeries: [setSeries]
+    // setSize: [(x) => console.log("setSize", x)]
+  }
+
+  return createOptions({ hooks, plot: newPlot, scales, theme, width })
 }
