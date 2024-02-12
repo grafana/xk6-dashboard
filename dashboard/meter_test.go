@@ -7,6 +7,7 @@
 package dashboard
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -79,25 +80,23 @@ func Test_meter_update(t *testing.T) {
 	now := time.Now()
 	met := newMeter(time.Second, now, nil)
 
-	foo := testSample(t, "foo", metrics.Counter, 1)
-	bar := testSample(t, "bar", metrics.Counter, 1)
+	const (
+		fooVal = 2.0
+		barVal = 1.0
+	)
+
+	foo := testSample(t, "foo", metrics.Counter, fooVal)
+	bar := testSample(t, "bar", metrics.Counter, barVal)
 	data, err := met.update(testSampleContainer(t, foo, bar).toArray(), now)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, data)
 
 	assert.Equal(t, 3, len(data))
-	assert.Contains(t, data, "foo")
-	assert.Contains(t, data, "bar")
-	assert.Contains(t, data, "time")
-
-	sample, ok := data["foo"]
-
-	assert.True(t, ok)
-	assert.Contains(t, sample, "count")
-	assert.Contains(t, sample, "rate")
-	assert.Equal(t, 1.0, sample["count"])
-	assert.Equal(t, 1.0, sample["rate"])
+	assert.Equal(t, barVal, data[0][0])
+	assert.Equal(t, barVal, data[0][1])
+	assert.Equal(t, fooVal, data[1][0])
+	assert.Equal(t, fooVal, data[1][1])
 }
 
 func Test_meter_update_no_period(t *testing.T) {
@@ -106,21 +105,17 @@ func Test_meter_update_no_period(t *testing.T) {
 	now := time.Now()
 	met := newMeter(0, now, nil)
 
-	aSample := testSample(t, "foo", metrics.Counter, 1)
+	const fooVal = 1.0
+
+	aSample := testSample(t, "foo", metrics.Counter, fooVal)
 	data, err := met.update(testSampleContainer(t, aSample).toArray(), now)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, data)
 
 	assert.Equal(t, 2, len(data))
-	assert.Contains(t, data, "foo")
-	assert.Contains(t, data, "time")
-
-	sample, ok := data["foo"]
-
-	assert.True(t, ok)
-	assert.Contains(t, sample, "count")
-	assert.Contains(t, sample, "rate")
+	assert.Equal(t, fooVal, data[0][0])
+	assert.Equal(t, math.Inf(1), data[0][1])
 }
 
 func Test_meter_format(t *testing.T) {
@@ -137,9 +132,12 @@ func Test_meter_format(t *testing.T) {
 	assert.NotNil(t, data)
 
 	assert.Equal(t, 3, len(data))
-	assert.Contains(t, data, "time")
-	assert.Contains(t, data, "foo")
-	assert.Contains(t, data, "bar")
+
+	assert.Equal(t, []sampleData{
+		[]float64{0, 0},
+		[]float64{0, 0},
+		[]float64{float64(now.UnixMilli())},
+	}, data)
 }
 
 func Test_meter_evaluate(t *testing.T) {
@@ -183,8 +181,13 @@ func Test_meter_update_tags(t *testing.T) {
 	now := time.Now()
 	met := newMeter(time.Second, now, nil)
 
-	foo := testSample(t, "foo", metrics.Counter, 1)
-	bar := testSample(t, "bar", metrics.Counter, 1)
+	const (
+		fooVal = 2.0
+		barVal = 1.0
+	)
+
+	foo := testSample(t, "foo", metrics.Counter, fooVal)
+	bar := testSample(t, "bar", metrics.Counter, barVal)
 
 	met.tags = []string{"answer"}
 
@@ -197,18 +200,9 @@ func Test_meter_update_tags(t *testing.T) {
 	assert.NotNil(t, data)
 
 	assert.Equal(t, 4, len(data))
-	assert.Contains(t, data, "foo")
-	assert.Contains(t, data, "bar")
-	assert.Contains(t, data, "bar{answer:42}")
-	assert.Contains(t, data, "time")
-
-	sample, ok := data["foo"]
-
-	assert.True(t, ok)
-	assert.Contains(t, sample, "count")
-	assert.Contains(t, sample, "rate")
-	assert.Equal(t, 1.0, sample["count"])
-	assert.Equal(t, 1.0, sample["rate"])
+	assert.Equal(t, fooVal, data[2][0])
+	assert.Equal(t, barVal, data[0][0])
+	assert.Equal(t, barVal, data[1][0])
 }
 
 func Test_significant(t *testing.T) {

@@ -89,8 +89,11 @@ func TestExtension(t *testing.T) {
 
 	lines := testReadSSE(t, 28)
 
-	dataPrefix := `data: {"`
-	idPrefix := `id: `
+	const (
+		dataPrefix          = `data: {"`
+		aggregateDataPrefix = `data: [[`
+		idPrefix            = `id: `
+	)
 
 	assert.True(t, strings.HasPrefix(lines[0], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
@@ -108,7 +111,7 @@ func TestExtension(t *testing.T) {
 	assert.Empty(t, lines[11])
 
 	assert.True(t, strings.HasPrefix(lines[12], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[13], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[13], aggregateDataPrefix))
 	assert.Equal(t, "event: start", lines[14])
 	assert.Empty(t, lines[15])
 
@@ -118,12 +121,12 @@ func TestExtension(t *testing.T) {
 	assert.Empty(t, lines[19])
 
 	assert.True(t, strings.HasPrefix(lines[20], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[21], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[21], aggregateDataPrefix))
 	assert.Equal(t, "event: snapshot", lines[22])
 	assert.Empty(t, lines[23])
 
 	assert.True(t, strings.HasPrefix(lines[24], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[25], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[25], aggregateDataPrefix))
 	assert.Equal(t, "event: cumulative", lines[26])
 	assert.Empty(t, lines[27])
 }

@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import grpc from "k6/experimental/grpc";
+import grpc from "k6/net/grpc";
 import { check, sleep } from "k6";
 import smurfs from "./smurfs.js";
 
@@ -23,7 +23,7 @@ export let options = {
     },
   },
   thresholds: {
-    grpc_req_duration: ["p(90) < 1000"],
+    grpc_req_duration: ["p(90) < 1200", "avg <= 1000"],
   },
 };
 

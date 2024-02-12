@@ -35,7 +35,7 @@ type extension struct {
 
 	cumulative *meter
 
-	seenMetrics map[string]struct{}
+	seenMetrics []string
 
 	period time.Duration
 
@@ -126,7 +126,7 @@ func (ext *extension) Start() error {
 	}
 
 	ext.cumulative = newMeter(0, time.Now(), ext.options.Tags)
-	ext.seenMetrics = make(map[string]struct{})
+	ext.seenMetrics = make([]string, 0)
 
 	if err := ext.fireStart(); err != nil {
 		return err
@@ -210,8 +210,9 @@ func (ext *extension) updateAndSend(
 		return
 	}
 
-	newbies := met.newbies(ext.seenMetrics)
+	newbies, updated := met.newbies(ext.seenMetrics)
 	if len(newbies) != 0 {
+		ext.seenMetrics = updated
 		ext.fireEvent(metricEvent, newbies)
 	}
 
@@ -232,6 +233,7 @@ type paramData struct {
 	Period     time.Duration       `json:"period,omitempty"`
 	Tags       []string            `json:"tags,omitempty"`
 	ScriptPath string              `json:"scriptPath,omitempty"`
+	Aggregates map[string][]string `json:"aggregates,omitempty"`
 }
 
 func newParamData(params *output.Params) *paramData {
@@ -243,6 +245,13 @@ func newParamData(params *output.Params) *paramData {
 
 	if params.ScriptPath != nil {
 		param.ScriptPath = params.ScriptPath.String()
+	}
+
+	param.Aggregates = map[string][]string{
+		metrics.Counter.String(): counterAggregateNames,
+		metrics.Gauge.String():   gaugeAggregateNames,
+		metrics.Rate.String():    rateAggregateNames,
+		metrics.Trend.String():   trendAggregateNames,
 	}
 
 	return param

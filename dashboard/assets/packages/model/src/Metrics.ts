@@ -38,43 +38,18 @@ export type Metric = {
   name: string
   contains?: ValueType
   type?: MetricType
-  thresholds?: Array<string>
   custom?: boolean
 }
 
 export class Query {
   name: string
   aggregate?: AggregateType
-  tags?: Record<string, string>
-  group?: string
-  scenario?: string
 
   constructor(query: string) {
     const [name, aggregate] = query.split(".", 2)
 
     this.aggregate = aggregate as AggregateType
     this.name = name
-
-    let sub = ""
-
-    const idx = name.indexOf("{")
-    if (idx && idx > 0) {
-      sub = name.substring(idx)
-      sub = sub.substring(1, sub.length - 1)
-
-      const cidx = sub.indexOf(":")
-
-      const tname = sub.substring(0, cidx)
-      const tvalue = sub.substring(cidx + 1)
-
-      this.tags = { [tname]: tvalue }
-
-      if (tname == "group") {
-        this.group = tvalue.substring(2)
-      }
-
-      this.name = name.substring(0, idx)
-    }
   }
 }
 
@@ -82,14 +57,49 @@ const propTime = "time"
 
 export class Metrics {
   values: Record<string, Metric>
-  constructor({ values = {} } = {}) {
+  names: Array<string>
+  _aggregates: Record<MetricType, Array<AggregateType>>
+  constructor({ values = {}, names = [] } = {}) {
     this.values = values
+    this.names = names
+    this._aggregates = {} as Record<MetricType, Array<AggregateType>>
+  }
+
+  set aggregates(value: Record<MetricType, Array<string>>) {
+    for (const mname in value) {
+      const mtype = mname as MetricType
+      this._aggregates[mtype] = value[mtype].map((atype) => atype.replaceAll("(", "").replaceAll(")", "") as AggregateType)
+    }
   }
 
   onEvent(data: Record<string, object>): void {
     for (const name in data) {
       this.values[name] = { ...data[name], name }
     }
+
+    this.names = Object.keys(this.values)
+    this.names.sort()
+  }
+
+  toAggregate(data: Array<Array<number>>): Record<string, Aggregate> {
+    const out = {} as Record<string, Aggregate>
+
+    for (let i = 0; i < data.length && i < this.names.length; i++) {
+      const metric = this.values[this.names[i]]
+      if (!metric) {
+        continue
+      }
+      const agg = {} as Aggregate
+      const names = metric.type ? this._aggregates[metric.type] : []
+
+      for (let j = 0; j < data[i].length && j < names.length; j++) {
+        agg[names[j]] = data[i][j]
+      }
+
+      out[metric.name] = agg
+    }
+
+    return out
   }
 
   find(query: string): Metric | undefined {

@@ -38,24 +38,71 @@ type Metric = {
     name: string;
     contains?: ValueType;
     type?: MetricType;
+    custom?: boolean;
 };
 declare class Query {
     name: string;
     aggregate?: AggregateType;
-    tags?: Record<string, string>;
-    group?: string;
-    scenario?: string;
     constructor(query: string);
 }
 declare class Metrics {
     values: Record<string, Metric>;
-    constructor({ values }?: {
+    names: Array<string>;
+    _aggregates: Record<MetricType, Array<AggregateType>>;
+    constructor({ values, names }?: {
         values?: {} | undefined;
+        names?: never[] | undefined;
     });
+    set aggregates(value: Record<MetricType, Array<string>>);
     onEvent(data: Record<string, object>): void;
+    toAggregate(data: Array<Array<number>>): Record<string, Aggregate>;
     find(query: string): Metric | undefined;
     unit(name: string, aggregate?: AggregateType): UnitType;
 }
+
+declare enum EventType {
+    config = "config",
+    param = "param",
+    start = "start",
+    stop = "stop",
+    metric = "metric",
+    snapshot = "snapshot",
+    cumulative = "cumulative",
+    threshold = "threshold"
+}
+type ConfigEvent = {
+    type: EventType.config;
+    data: Record<string, unknown>;
+};
+type ParamEvent = {
+    type: EventType.param;
+    data: Record<string, unknown>;
+};
+type StartEvent = {
+    type: EventType.start;
+    data: Array<Array<number>>;
+};
+type StopEvent = {
+    type: EventType.stop;
+    data: Array<Array<number>>;
+};
+type MetricEvent = {
+    type: EventType.metric;
+    data: Record<string, Record<string, object>>;
+};
+type SnapshotEvent = {
+    type: EventType.snapshot;
+    data: Array<Array<number>>;
+};
+type CumulativeEvent = {
+    type: EventType.cumulative;
+    data: Array<Array<number>>;
+};
+type ThresholdEvent = {
+    type: EventType.threshold;
+    data: Record<string, Array<string>>;
+};
+type DashboardEvent = ConfigEvent | ParamEvent | StartEvent | StopEvent | MetricEvent | SnapshotEvent | CumulativeEvent | ThresholdEvent;
 
 type SampleVectorInit = {
     length: number;
@@ -155,14 +202,9 @@ declare class Param implements Record<string, unknown> {
     constructor(from?: Record<string, unknown>);
     [x: string]: unknown;
 }
-declare enum EventType {
-    config = "config",
-    param = "param",
-    start = "start",
-    stop = "stop",
-    metric = "metric",
-    snapshot = "snapshot",
-    cumulative = "cumulative"
+declare class Thresholds implements Record<string, Array<string>> {
+    constructor(from?: Record<string, string[]>);
+    [x: string]: Array<string>;
 }
 declare class Digest implements EventListenerObject {
     config: Config;
@@ -172,7 +214,8 @@ declare class Digest implements EventListenerObject {
     metrics: Metrics;
     samples: Samples;
     summary: Summary;
-    constructor({ config, param, start, stop, metrics, samples, summary }?: {
+    thresholds: Thresholds;
+    constructor({ config, param, start, stop, metrics, samples, summary, thresholds }?: {
         config?: Config | undefined;
         param?: Param | undefined;
         start?: Date | undefined;
@@ -180,9 +223,10 @@ declare class Digest implements EventListenerObject {
         metrics?: Metrics | undefined;
         samples?: Samples | undefined;
         summary?: Summary | undefined;
+        thresholds?: Thresholds | undefined;
     });
     handleEvent(event: MessageEvent): void;
-    onEvent(type: EventType, data: Record<string, Aggregate>): void;
+    onEvent(event: DashboardEvent): void;
     private onConfig;
     private onParam;
     private onStart;
@@ -190,6 +234,7 @@ declare class Digest implements EventListenerObject {
     private onMetric;
     private onSnapshot;
     private onCumulative;
+    private onThreshold;
 }
 
-export { Aggregate, AggregateType, Config, Digest, EventType, Metric, MetricType, Metrics, Param, Query, SampleVector, SampleVectorInit, Samples, SamplesView, Summary, SummaryRow, SummaryView, UnitType, ValueType };
+export { Aggregate, AggregateType, Config, DashboardEvent, Digest, EventType, Metric, MetricType, Metrics, Param, Query, SampleVector, SampleVectorInit, Samples, SamplesView, Summary, SummaryRow, SummaryView, UnitType, ValueType };

@@ -11,18 +11,18 @@ var UnitType = /* @__PURE__ */ ((UnitType2) => {
 })(UnitType || {});
 
 // src/Metrics.ts
-var AggregateType = /* @__PURE__ */ ((AggregateType4) => {
-  AggregateType4["value"] = "value";
-  AggregateType4["count"] = "count";
-  AggregateType4["rate"] = "rate";
-  AggregateType4["avg"] = "avg";
-  AggregateType4["min"] = "min";
-  AggregateType4["max"] = "max";
-  AggregateType4["med"] = "med";
-  AggregateType4["p90"] = "p90";
-  AggregateType4["p95"] = "p95";
-  AggregateType4["p99"] = "p99";
-  return AggregateType4;
+var AggregateType = /* @__PURE__ */ ((AggregateType3) => {
+  AggregateType3["value"] = "value";
+  AggregateType3["count"] = "count";
+  AggregateType3["rate"] = "rate";
+  AggregateType3["avg"] = "avg";
+  AggregateType3["min"] = "min";
+  AggregateType3["max"] = "max";
+  AggregateType3["med"] = "med";
+  AggregateType3["p90"] = "p90";
+  AggregateType3["p95"] = "p95";
+  AggregateType3["p99"] = "p99";
+  return AggregateType3;
 })(AggregateType || {});
 var ValueType = /* @__PURE__ */ ((ValueType2) => {
   ValueType2["time"] = "time";
@@ -30,49 +30,60 @@ var ValueType = /* @__PURE__ */ ((ValueType2) => {
   ValueType2["default"] = "default";
   return ValueType2;
 })(ValueType || {});
-var MetricType = /* @__PURE__ */ ((MetricType2) => {
-  MetricType2["gauge"] = "gauge";
-  MetricType2["counter"] = "counter";
-  MetricType2["rate"] = "rate";
-  MetricType2["trend"] = "trend";
-  return MetricType2;
+var MetricType = /* @__PURE__ */ ((MetricType3) => {
+  MetricType3["gauge"] = "gauge";
+  MetricType3["counter"] = "counter";
+  MetricType3["rate"] = "rate";
+  MetricType3["trend"] = "trend";
+  return MetricType3;
 })(MetricType || {});
 var Query = class {
   name;
   aggregate;
-  tags;
-  group;
-  scenario;
   constructor(query) {
     const [name, aggregate] = query.split(".", 2);
     this.aggregate = aggregate;
     this.name = name;
-    let sub = "";
-    const idx = name.indexOf("{");
-    if (idx && idx > 0) {
-      sub = name.substring(idx);
-      sub = sub.substring(1, sub.length - 1);
-      const cidx = sub.indexOf(":");
-      const tname = sub.substring(0, cidx);
-      const tvalue = sub.substring(cidx + 1);
-      this.tags = { [tname]: tvalue };
-      if (tname == "group") {
-        this.group = tvalue.substring(2);
-      }
-      this.name = name.substring(0, idx);
-    }
   }
 };
 var propTime = "time";
 var Metrics = class {
   values;
-  constructor({ values = {} } = {}) {
+  names;
+  _aggregates;
+  constructor({ values = {}, names = [] } = {}) {
     this.values = values;
+    this.names = names;
+    this._aggregates = {};
+  }
+  set aggregates(value) {
+    for (const mname in value) {
+      const mtype = mname;
+      this._aggregates[mtype] = value[mtype].map((atype) => atype.replaceAll("(", "").replaceAll(")", ""));
+    }
   }
   onEvent(data) {
     for (const name in data) {
       this.values[name] = { ...data[name], name };
     }
+    this.names = Object.keys(this.values);
+    this.names.sort();
+  }
+  toAggregate(data) {
+    const out = {};
+    for (let i = 0; i < data.length && i < this.names.length; i++) {
+      const metric = this.values[this.names[i]];
+      if (!metric) {
+        continue;
+      }
+      const agg = {};
+      const names = metric.type ? this._aggregates[metric.type] : [];
+      for (let j = 0; j < data[i].length && j < names.length; j++) {
+        agg[names[j]] = data[i][j];
+      }
+      out[metric.name] = agg;
+    }
+    return out;
   }
   find(query) {
     const q = new Query(query);
@@ -124,6 +135,19 @@ var Metrics = class {
     }
   }
 };
+
+// src/Event.ts
+var EventType = /* @__PURE__ */ ((EventType2) => {
+  EventType2["config"] = "config";
+  EventType2["param"] = "param";
+  EventType2["start"] = "start";
+  EventType2["stop"] = "stop";
+  EventType2["metric"] = "metric";
+  EventType2["snapshot"] = "snapshot";
+  EventType2["cumulative"] = "cumulative";
+  EventType2["threshold"] = "threshold";
+  return EventType2;
+})(EventType || {});
 
 // src/Samples.ts
 import jmesspath from "jmespath";
@@ -476,16 +500,11 @@ var Param = class {
     Object.assign(this, from);
   }
 };
-var EventType = /* @__PURE__ */ ((EventType2) => {
-  EventType2["config"] = "config";
-  EventType2["param"] = "param";
-  EventType2["start"] = "start";
-  EventType2["stop"] = "stop";
-  EventType2["metric"] = "metric";
-  EventType2["snapshot"] = "snapshot";
-  EventType2["cumulative"] = "cumulative";
-  return EventType2;
-})(EventType || {});
+var Thresholds = class {
+  constructor(from = {}) {
+    Object.assign(this, from);
+  }
+};
 var Digest = class {
   config;
   param;
@@ -494,6 +513,7 @@ var Digest = class {
   metrics;
   samples;
   summary;
+  thresholds;
   constructor({
     config = {},
     param = {},
@@ -501,7 +521,8 @@ var Digest = class {
     stop = void 0,
     metrics = new Metrics(),
     samples = new Samples(),
-    summary = new Summary()
+    summary = new Summary(),
+    thresholds = new Thresholds()
   } = {}) {
     this.config = config;
     this.param = param;
@@ -510,43 +531,38 @@ var Digest = class {
     this.metrics = metrics;
     this.samples = samples;
     this.summary = summary;
+    this.thresholds = thresholds;
   }
   handleEvent(event) {
     const type = event.type;
     const data = JSON.parse(event.data);
-    this.onEvent(type, data);
+    this.onEvent({ type, data });
   }
-  onEvent(type, data) {
-    for (const name in data) {
-      for (const prop in data[name]) {
-        if (prop.indexOf("(") >= 0) {
-          const pname = prop.replaceAll("(", "").replaceAll(")", "");
-          data[name][pname] = data[name][prop];
-          delete data[name][prop];
-        }
-      }
-    }
-    switch (type) {
+  onEvent(event) {
+    switch (event.type) {
       case "config" /* config */:
-        this.onConfig(data);
+        this.onConfig(event.data);
         break;
       case "param" /* param */:
-        this.onParam(data);
+        this.onParam(event.data);
         break;
       case "start" /* start */:
-        this.onStart(data);
+        this.onStart(this.metrics.toAggregate(event.data));
         break;
       case "stop" /* stop */:
-        this.onStop(data);
+        this.onStop(this.metrics.toAggregate(event.data));
         break;
       case "metric" /* metric */:
-        this.onMetric(data);
+        this.onMetric(event.data);
         break;
       case "snapshot" /* snapshot */:
-        this.onSnapshot(data);
+        this.onSnapshot(this.metrics.toAggregate(event.data));
         break;
       case "cumulative" /* cumulative */:
-        this.onCumulative(data);
+        this.onCumulative(this.metrics.toAggregate(event.data));
+        break;
+      case "threshold" /* threshold */:
+        this.onThreshold(event.data);
         break;
     }
   }
@@ -555,6 +571,7 @@ var Digest = class {
   }
   onParam(data) {
     Object.assign(this.param, data);
+    this.metrics.aggregates = data["aggregates"];
   }
   onStart(data) {
     if (data["time"] && data["time"].value) {
@@ -578,6 +595,9 @@ var Digest = class {
   onCumulative(data) {
     this.summary.onEvent(data);
     this.summary.annotate(this.metrics);
+  }
+  onThreshold(data) {
+    Object.assign(this.thresholds, data);
   }
 };
 export {
