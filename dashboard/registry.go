@@ -7,6 +7,8 @@
 package dashboard
 
 import (
+	"sort"
+
 	"go.k6.io/k6/metrics"
 )
 
@@ -67,15 +69,37 @@ func (reg *registry) mustGetOrNew(
 }
 
 // newbies return newly registered names since last seen.
-func (reg *registry) newbies(seen map[string]struct{}) []string {
+func (reg *registry) newbies(seen []string) ([]string, []string) {
 	var names []string
 
-	for _, name := range reg.names {
-		if _, ok := seen[name]; !ok {
+	process := func(name string) {
+		idx := sort.SearchStrings(seen, name)
+		if idx == len(seen) {
+			seen = append(seen, name)
 			names = append(names, name)
-			seen[name] = struct{}{}
+		}
+
+		if seen[idx] == name {
+			return
+		}
+
+		names = append(names, name)
+
+		old := seen
+		seen = make([]string, len(old)+1)
+
+		copy(seen[:idx], old[:idx])
+		seen[idx] = name
+		copy(seen[idx+1:], old[idx:])
+	}
+
+	for _, metric := range reg.All() {
+		process(metric.Name)
+
+		for _, sub := range metric.Submetrics {
+			process(sub.Name)
 		}
 	}
 
-	return names
+	return names, seen
 }

@@ -42,7 +42,7 @@ type aggregator struct {
 
 	once sync.Once
 
-	seenMetrics map[string]struct{}
+	seenMetrics []string
 }
 
 func closer(what io.Closer, logger logrus.FieldLogger) {
@@ -57,7 +57,7 @@ func aggregate(input, output string, opts *options, proc *process) error {
 	agg.registry = newRegistry()
 	agg.options = opts
 	agg.logger = proc.logger
-	agg.seenMetrics = make(map[string]struct{})
+	agg.seenMetrics = make([]string, 0)
 
 	var inputFile, outputFile afero.File
 	var err error
@@ -176,8 +176,9 @@ func (agg *aggregator) updateAndSend(
 		return
 	}
 
-	newbies := met.newbies(agg.seenMetrics)
+	newbies, updated := met.newbies(agg.seenMetrics)
 	if len(newbies) != 0 {
+		agg.seenMetrics = updated
 		agg.fireEvent(metricEvent, newbies)
 	}
 
