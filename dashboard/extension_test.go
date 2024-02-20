@@ -271,6 +271,8 @@ func TestExtension_report(t *testing.T) {
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
 	}()
 
+	time.Sleep(100 * time.Millisecond)
+
 	assert.NoError(t, ext.Stop())
 
 	st, err := osFS.Stat(file.Name() + ".gz")
@@ -280,6 +282,46 @@ func TestExtension_report(t *testing.T) {
 	assert.Greater(t, st.Size(), int64(1024))
 
 	assert.NoError(t, osFS.Remove(file.Name()+".gz"))
+}
+
+func TestExtension_skip_report(t *testing.T) {
+	t.Parallel()
+
+	osFS := fsext.NewMemMapFs()
+
+	file, err := osFS.Create("temp")
+
+	assert.NoError(t, err)
+	assert.NoError(t, file.Close())
+
+	var params output.Params
+
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
+	params.FS = osFS
+
+	ext, err := New(params)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.NoError(t, ext.Start())
+
+	time.Sleep(time.Millisecond)
+
+	go func() {
+		sample := testSample(t, "foo", metrics.Counter, 1)
+
+		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
+	}()
+
+	time.Sleep(time.Millisecond)
+
+	assert.NoError(t, ext.Stop())
+
+	_, err = osFS.Stat(file.Name() + ".gz")
+
+	assert.Error(t, err)
 }
 
 func Test_newParamData(t *testing.T) {
