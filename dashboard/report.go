@@ -24,6 +24,8 @@ type reporter struct {
 	data   *reportData
 	output string
 	mu     sync.RWMutex
+
+	snapshotCount int
 }
 
 var (
@@ -48,6 +50,13 @@ func (rep *reporter) onStart() error {
 
 func (rep *reporter) onStop(_ error) error {
 	if len(rep.output) == 0 {
+		return nil
+	}
+
+	if rep.snapshotCount < 2 {
+		rep.proc.logger.Warn(
+			"The test run was short, report generation was skipped (not enough data)",
+		)
 		return nil
 	}
 
@@ -105,6 +114,12 @@ func (rep *reporter) onEvent(name string, data interface{}) {
 		}
 
 		rep.proc.logger.Error(err)
+
+		return
+	}
+
+	if name == snapshotEvent {
+		rep.snapshotCount++
 	}
 }
 
