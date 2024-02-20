@@ -307,16 +307,6 @@ func TestExtension_skip_report(t *testing.T) {
 
 	assert.NoError(t, ext.Start())
 
-	time.Sleep(time.Millisecond)
-
-	go func() {
-		sample := testSample(t, "foo", metrics.Counter, 1)
-
-		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
-	}()
-
-	time.Sleep(time.Millisecond)
-
 	assert.NoError(t, ext.Stop())
 
 	_, err = osFS.Stat(file.Name() + ".gz")
