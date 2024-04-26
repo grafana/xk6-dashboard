@@ -23,7 +23,7 @@ export let options = {
     },
   },
   thresholds: {
-    ws_ping: ["p(90) < 1000"],
+    ws_ping: ["p(90) < 1000", "avg < 500"],
   },
 };
 

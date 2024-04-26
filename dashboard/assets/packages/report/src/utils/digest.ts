@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // SPDX-License-Identifier: MIT
 
-import { Digest } from "@xk6-dashboard/model"
+import { Digest, DashboardEvent } from "@xk6-dashboard/model"
 
 export default async function () {
   const dataElement = document.getElementById("data")!
@@ -23,7 +23,7 @@ export default async function () {
   for await (const line of makeTextFileLineIterator(resp.body.getReader())) {
     if (!line || line.length == 0) continue
     const envelope = JSON.parse(line)
-    digest.onEvent(envelope.event, envelope.data)
+    digest.onEvent({ type: envelope.event, data: envelope.data } as DashboardEvent)
   }
 
   return digest

@@ -34,7 +34,7 @@ jobs:
           with: github.com/grafana/xk6-dashboard=/github/workspace
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: dist/*.tar.gz
 

@@ -42,7 +42,7 @@ export let options = {
     },
   },
   thresholds: {
-    http_req_duration: ["p(90) < 400"],
+    http_req_duration: ["p(90) < 400", "avg <= 300"],
     iteration_duration: ["avg < 10000"],
   },
 };

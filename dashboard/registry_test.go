@@ -28,28 +28,28 @@ func Test_registry_getOrNew(t *testing.T) {
 
 	reg := newRegistry()
 
-	met, err := reg.getOrNew("foo", metrics.Counter, metrics.Data)
+	met, err := reg.getOrNew("foo", metrics.Counter, metrics.Data, nil)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, met)
 	assert.Equal(t, []string{"foo"}, reg.names)
 
-	met2, err := reg.getOrNew("foo", metrics.Counter, metrics.Data)
+	met2, err := reg.getOrNew("foo", metrics.Counter, metrics.Data, nil)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, met)
 	assert.Same(t, met, met2)
 	assert.Equal(t, []string{"foo"}, reg.names)
 
-	met3, err := reg.getOrNew("bar", metrics.Counter, metrics.Data)
+	met3, err := reg.getOrNew("bar", metrics.Counter, metrics.Data, nil)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, met3)
 	assert.Equal(t, []string{"foo", "bar"}, reg.names)
 
-	_, err = reg.getOrNew("", metrics.Counter, metrics.Data)
+	_, err = reg.getOrNew("", metrics.Counter, metrics.Data, nil)
 
 	assert.Error(t, err)
 
-	assert.Panics(t, func() { reg.mustGetOrNew("", metrics.Counter, metrics.Data) })
+	assert.Panics(t, func() { reg.mustGetOrNew("", metrics.Counter, metrics.Data, nil) })
 }

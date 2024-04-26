@@ -8,6 +8,7 @@ package dashboard
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"testing"
@@ -88,8 +89,11 @@ func TestExtension(t *testing.T) {
 
 	lines := testReadSSE(t, 28)
 
-	dataPrefix := `data: {"`
-	idPrefix := `id: `
+	const (
+		dataPrefix          = `data: {"`
+		aggregateDataPrefix = `data: [[`
+		idPrefix            = `id: `
+	)
 
 	assert.True(t, strings.HasPrefix(lines[0], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
@@ -107,7 +111,7 @@ func TestExtension(t *testing.T) {
 	assert.Empty(t, lines[11])
 
 	assert.True(t, strings.HasPrefix(lines[12], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[13], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[13], aggregateDataPrefix))
 	assert.Equal(t, "event: start", lines[14])
 	assert.Empty(t, lines[15])
 
@@ -117,12 +121,12 @@ func TestExtension(t *testing.T) {
 	assert.Empty(t, lines[19])
 
 	assert.True(t, strings.HasPrefix(lines[20], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[21], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[21], aggregateDataPrefix))
 	assert.Equal(t, "event: snapshot", lines[22])
 	assert.Empty(t, lines[23])
 
 	assert.True(t, strings.HasPrefix(lines[24], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[25], dataPrefix))
+	assert.True(t, strings.HasPrefix(lines[25], aggregateDataPrefix))
 	assert.Equal(t, "event: cumulative", lines[26])
 	assert.Empty(t, lines[27])
 }
@@ -267,6 +271,8 @@ func TestExtension_report(t *testing.T) {
 		ext.AddMetricSamples(testSampleContainer(t, sample).toArray())
 	}()
 
+	time.Sleep(100 * time.Millisecond)
+
 	assert.NoError(t, ext.Stop())
 
 	st, err := osFS.Stat(file.Name() + ".gz")
@@ -276,6 +282,36 @@ func TestExtension_report(t *testing.T) {
 	assert.Greater(t, st.Size(), int64(1024))
 
 	assert.NoError(t, osFS.Remove(file.Name()+".gz"))
+}
+
+func TestExtension_skip_report(t *testing.T) {
+	t.Parallel()
+
+	osFS := fsext.NewMemMapFs()
+
+	file, err := osFS.Create("temp")
+
+	assert.NoError(t, err)
+	assert.NoError(t, file.Close())
+
+	var params output.Params
+
+	params.Logger = logrus.StandardLogger()
+	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
+	params.FS = osFS
+
+	ext, err := New(params)
+
+	assert.NoError(t, err)
+	assert.NotNil(t, ext)
+
+	assert.NoError(t, ext.Start())
+
+	assert.NoError(t, ext.Stop())
+
+	_, err = osFS.Stat(file.Name() + ".gz")
+
+	assert.Error(t, err)
 }
 
 func Test_newParamData(t *testing.T) {
@@ -291,12 +327,19 @@ func Test_newParamData(t *testing.T) {
 	param := newParamData(params)
 
 	assert.Len(t, param.Scenarios, 2)
+	assert.Empty(t, param.ScriptPath)
 
 	params.ScriptOptions.Scenarios = nil
+
+	u, err := url.Parse("file:///tmp/script.js")
+	assert.NoError(t, err)
+
+	params.ScriptPath = u
 
 	param = newParamData(params)
 
 	assert.Len(t, param.Scenarios, 0)
+	assert.Equal(t, param.ScriptPath, "file:///tmp/script.js")
 }
 
 func Test_paramData_With(t *testing.T) {

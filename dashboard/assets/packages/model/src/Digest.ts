@@ -2,9 +2,10 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { Metrics, Aggregate, AggregateType } from "./Metrics.ts"
+import { Metrics, Aggregate, MetricType } from "./Metrics.ts"
 import { Samples } from "./Samples.ts"
 import { Summary } from "./Summary.ts"
+import { EventType, DashboardEvent } from "./Event.ts"
 
 export class Config implements Record<string, unknown> {
   constructor(from = {} as Record<string, unknown>) {
@@ -20,15 +21,12 @@ export class Param implements Record<string, unknown> {
 
   [x: string]: unknown
 }
+export class Thresholds implements Record<string, Array<string>> {
+  constructor(from = {} as Record<string, Array<string>>) {
+    Object.assign(this, from)
+  }
 
-export enum EventType {
-  config = "config",
-  param = "param",
-  start = "start",
-  stop = "stop",
-  metric = "metric",
-  snapshot = "snapshot",
-  cumulative = "cumulative"
+  [x: string]: Array<string>
 }
 
 export class Digest implements EventListenerObject {
@@ -39,6 +37,7 @@ export class Digest implements EventListenerObject {
   metrics: Metrics
   samples: Samples
   summary: Summary
+  thresholds: Thresholds
 
   constructor({
     config = {} as Config,
@@ -47,7 +46,8 @@ export class Digest implements EventListenerObject {
     stop = undefined as Date | undefined,
     metrics = new Metrics(),
     samples = new Samples(),
-    summary = new Summary()
+    summary = new Summary(),
+    thresholds = new Thresholds()
   } = {}) {
     this.config = config
     this.param = param
@@ -56,58 +56,52 @@ export class Digest implements EventListenerObject {
     this.metrics = metrics
     this.samples = samples
     this.summary = summary
+    this.thresholds = thresholds
   }
 
   handleEvent(event: MessageEvent): void {
     const type = event.type as EventType
     const data = JSON.parse(event.data)
 
-    this.onEvent(type, data)
+    this.onEvent({ type, data } as DashboardEvent)
   }
 
-  onEvent(type: EventType, data: Record<string, Aggregate>): void {
-    // rename p(XX) to pXX
-    for (const name in data) {
-      for (const prop in data[name]) {
-        if (prop.indexOf("(") >= 0) {
-          const pname = prop.replaceAll("(", "").replaceAll(")", "") as AggregateType
-          data[name][pname] = data[name][prop as AggregateType]
-          delete data[name][prop as AggregateType]
-        }
-      }
-    }
-
-    switch (type) {
+  onEvent(event: DashboardEvent): void {
+    switch (event.type) {
       case EventType.config:
-        this.onConfig(data)
+        this.onConfig(event.data)
         break
       case EventType.param:
-        this.onParam(data)
+        this.onParam(event.data)
         break
       case EventType.start:
-        this.onStart(data)
+        this.onStart(this.metrics.toAggregate(event.data))
         break
       case EventType.stop:
-        this.onStop(data)
+        this.onStop(this.metrics.toAggregate(event.data))
         break
       case EventType.metric:
-        this.onMetric(data)
+        this.onMetric(event.data)
         break
       case EventType.snapshot:
-        this.onSnapshot(data)
+        this.onSnapshot(this.metrics.toAggregate(event.data))
         break
       case EventType.cumulative:
-        this.onCumulative(data)
+        this.onCumulative(this.metrics.toAggregate(event.data))
+        break
+      case EventType.threshold:
+        this.onThreshold(event.data)
         break
     }
   }
 
-  private onConfig(data: Record<string, Aggregate>): void {
+  private onConfig(data: Record<string, unknown>): void {
     Object.assign(this.config, data)
   }
 
-  private onParam(data: Record<string, Aggregate>): void {
+  private onParam(data: Record<string, unknown>): void {
     Object.assign(this.param, data)
+    this.metrics.aggregates = data["aggregates"] as Record<MetricType, Array<string>>
   }
 
   private onStart(data: Record<string, Aggregate>): void {
@@ -122,7 +116,7 @@ export class Digest implements EventListenerObject {
     }
   }
 
-  private onMetric(data: Record<string, Aggregate>): void {
+  private onMetric(data: Record<string, Record<string, object>>): void {
     this.metrics.onEvent(data)
     this.samples.annotate(this.metrics)
     this.summary.annotate(this.metrics)
@@ -136,5 +130,9 @@ export class Digest implements EventListenerObject {
   private onCumulative(data: Record<string, Aggregate>): void {
     this.summary.onEvent(data)
     this.summary.annotate(this.metrics)
+  }
+
+  private onThreshold(data: Record<string, Array<string>>): void {
+    Object.assign(this.thresholds, data)
   }
 }
