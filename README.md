@@ -139,7 +139,7 @@ K6_WEB_DASHBOARD_TAG       | Precomputed metric tag name(s) (default: "group"), 
 The test run report can be exported to a responsive self-contained HTML file. For export, the file name must be specified in the `export` parameter. If the file name ends with `.gz`, the HTML report will automatically be gzip compressed.
 
 ```plain
-k6 run --out dashboard=export=test-report.html script.js
+k6 run --out web-dashboard=export=test-report.html script.js
 ```
 
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
