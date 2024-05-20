@@ -16,7 +16,7 @@ export const TimeRangeResetButton = () => {
     <Button variant="outline" onClick={() => setTimeRange(undefined)}>
       <Flex align="center" gap={2}>
         <Icon name="rewind-time" />
-        <span>Reset time range</span>
+        <span>Reset</span>
       </Flex>
     </Button>
   )

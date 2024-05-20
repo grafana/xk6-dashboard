@@ -43,15 +43,19 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
             <Nav options={config.tabs} value={tab} onChange={onTabChange} />
           </Flex>
           <Flex align="center">
-            <Stats />
-            {!isTablet && <TimeRangeResetButton />}
-            <Button onClick={() => window.open("../report", "k6-report")}>Report</Button>
+            {!isTablet && <Actions tab={tab} />}
+
             <Options />
           </Flex>
         </Flex>
 
         {percentage ? <Progress value={percentage} /> : <Divider className={styles.divider} />}
-        <Nav isMobile options={config.tabs} value={tab} onChange={onTabChange} />
+
+        {isTablet && (
+          <Flex align="center" gap={3} justify="end" padding={3}>
+            <Actions tab={tab} />
+          </Flex>
+        )}
       </header>
     </>
   )
@@ -77,6 +81,22 @@ const Stats = () => {
         </Tooltip>
       </Flex>
     </div>
+  )
+}
+
+interface ActionsProps {
+  tab: number
+}
+
+const Actions = ({ tab }: ActionsProps) => {
+  const isSummary = tab === 2
+
+  return (
+    <>
+      {!isSummary && <TimeRangeResetButton />}
+      <Button onClick={() => window.open("../report", "k6-report")}>Report</Button>
+      <Stats />
+    </>
   )
 }
 
