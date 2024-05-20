@@ -18,6 +18,7 @@ import { Icon } from "components/Icon"
 import { Paper } from "components/Paper"
 import { Tooltip } from "components/Tooltip"
 
+import { SeriesPlotWithDefinedSeries } from "./Chart.utils"
 import { useOptions } from "./Chart.hooks"
 import * as styles from "./Chart.css"
 
@@ -31,7 +32,7 @@ export default function Chart({ panel, container }: ChartProps) {
   const { theme } = useTheme()
   const [ref, { width }] = useElementSize()
 
-  const plot = new SeriesPlot(digest, panel, createColorScheme(theme))
+  const plot = new SeriesPlot(digest, panel, createColorScheme(theme)) as SeriesPlotWithDefinedSeries
   const hasData = !plot.empty && plot.data[0].length > 1
   const plotData = (hasData ? plot.data : []) as AlignedData
   const options = useOptions({ plot, theme, width })

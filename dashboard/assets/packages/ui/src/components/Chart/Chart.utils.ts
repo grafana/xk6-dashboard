@@ -68,8 +68,10 @@ interface SelectedUplotOptions extends Pick<Options, "hooks" | "scales" | "width
   height?: number
 }
 
+export type SeriesPlotWithDefinedSeries = Omit<SeriesPlot, "series"> & { series: Series[] }
+
 export interface CreateOptionsProps extends SelectedUplotOptions {
-  plot: Omit<SeriesPlot, "series"> & { series: Series[] }
+  plot: SeriesPlotWithDefinedSeries
   theme: Theme
 }
 
