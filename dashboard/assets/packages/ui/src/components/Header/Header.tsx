@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 import React from "react"
+import { useMediaQuery } from "usehooks-ts"
 
 import type { UIConfig } from "types/config"
 import { useDigest } from "store/digest"
@@ -14,10 +15,12 @@ import { Icon } from "components/Icon"
 import { Menu } from "components/Menu"
 import { Nav } from "components/Nav"
 import { Progress } from "components/Progress"
+import { TimeRangeResetButton } from "components/TimeRangeResetButton"
+import { Tooltip } from "components/Tooltip"
+import { vars } from "theme"
 
 import { getDuration, getRefreshRate, getTestPercentage } from "./Header.utils"
 import * as styles from "./Header.css"
-import { Tooltip } from "components/Tooltip"
 
 interface HeaderProps {
   config: UIConfig
@@ -27,6 +30,8 @@ interface HeaderProps {
 
 export function Header({ config, tab, onTabChange }: HeaderProps) {
   const digest = useDigest()
+  const isTablet = useMediaQuery(`(max-width: ${vars.breakpoints.header})`)
+
   const percentage = !digest.stop && getTestPercentage(digest, new Date())
 
   return (
@@ -38,14 +43,19 @@ export function Header({ config, tab, onTabChange }: HeaderProps) {
             <Nav options={config.tabs} value={tab} onChange={onTabChange} />
           </Flex>
           <Flex align="center">
-            <Stats />
-            <Button onClick={() => window.open("../report", "k6-report")}>Report</Button>
+            {!isTablet && <Actions tab={tab} />}
+
             <Options />
           </Flex>
         </Flex>
 
         {percentage ? <Progress value={percentage} /> : <Divider className={styles.divider} />}
-        <Nav isMobile options={config.tabs} value={tab} onChange={onTabChange} />
+
+        {isTablet && (
+          <Flex align="center" gap={3} justify="end" padding={3}>
+            <Actions tab={tab} />
+          </Flex>
+        )}
       </header>
     </>
   )
@@ -71,6 +81,22 @@ const Stats = () => {
         </Tooltip>
       </Flex>
     </div>
+  )
+}
+
+interface ActionsProps {
+  tab: number
+}
+
+const Actions = ({ tab }: ActionsProps) => {
+  const isSummary = tab === 2
+
+  return (
+    <>
+      {!isSummary && <TimeRangeResetButton />}
+      <Button onClick={() => window.open("../report", "k6-report")}>Report</Button>
+      <Stats />
+    </>
   )
 }
 

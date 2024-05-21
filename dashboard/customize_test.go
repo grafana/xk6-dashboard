@@ -47,7 +47,7 @@ func Test_customize(t *testing.T) {
 	assert.False(t, gjson.GetBytes(conf, `tabs.#(id="custom")`).Exists())
 }
 
-func Test_customize_env_found(t *testing.T) { //nolint:paralleltest
+func Test_customize_env_found(t *testing.T) {
 	t.Setenv("XK6_DASHBOARD_CONFIG", "testdata/customize/config-custom.js")
 
 	th := helper(t).osFs()

@@ -58,7 +58,7 @@ func Test_meter_add(t *testing.T) {
 	metric := met.registry.Get("foo")
 
 	assert.NotNil(t, metric)
-	assert.Equal(t, 1.0, metric.Sink.(*metrics.CounterSink).Value) //nolint:forcetypeassert
+	assert.Equal(t, 1.0, metric.Sink.(*metrics.CounterSink).Value)
 }
 
 func Test_meter_update_error(t *testing.T) {

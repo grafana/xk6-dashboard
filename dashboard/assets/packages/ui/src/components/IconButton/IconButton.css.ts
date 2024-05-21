@@ -33,5 +33,6 @@ export const button = style({
 
 export const icon = styleVariants({
   fill: [],
+  outline: [],
   text: [{ color: vars.colors.text.primary }]
 })

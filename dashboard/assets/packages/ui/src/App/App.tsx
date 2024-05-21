@@ -8,6 +8,7 @@ import "theme/global.css"
 import { useDigest } from "store/digest"
 import { useTheme } from "store/theme"
 import { Flex } from "components/Flex"
+import { Footer } from "components/Footer/Footer"
 import { Header } from "components/Header"
 import { LoadingContainer } from "components/LoadingContainer"
 import { Section } from "components/Section/Section"
@@ -35,6 +36,7 @@ export default function App() {
           ))}
         </LoadingContainer>
       </Flex>
+      <Footer />
     </Flex>
   )
 }

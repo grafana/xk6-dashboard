@@ -222,7 +222,7 @@ func TestExtension_error_used_port(t *testing.T) {
 	assert.NoError(t, ext.Stop())
 }
 
-func TestExtension_open(t *testing.T) { //nolint:paralleltest
+func TestExtension_open(t *testing.T) {
 	var params output.Params
 
 	params.Logger = logrus.StandardLogger()

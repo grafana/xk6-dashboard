@@ -16,24 +16,14 @@ interface Option {
 }
 
 interface NavProps {
-  isMobile?: boolean
   options: Option[]
   value: number
   onChange: (idx: number) => void
 }
 
-export function Nav({ isMobile = false, options, value, onChange }: NavProps) {
+export function Nav({ options, value, onChange }: NavProps) {
   return (
-    <nav
-      className={toClassName(
-        styles.nav,
-        styles.listVariant({
-          display: {
-            desktop: isMobile ? "none" : "block",
-            mobile: isMobile ? "block" : "none"
-          }
-        })
-      )}>
+    <nav className={toClassName(styles.nav)}>
       <Flex gap={2}>
         {options.map((option, index) => (
           <Item key={option.id} label={option.title} index={index} value={value} onChange={onChange} />

@@ -64,7 +64,7 @@ func Test_replay_gz(t *testing.T) {
 	assert.Equal(t, testdataEventLines, len(lines))
 }
 
-func Test_replay_open(t *testing.T) { //nolint:paralleltest
+func Test_replay_open(t *testing.T) {
 	opts := &options{
 		Port:   0,
 		Host:   "127.0.0.1",
