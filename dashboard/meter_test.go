@@ -134,8 +134,8 @@ func Test_meter_format(t *testing.T) {
 	assert.Equal(t, 3, len(data))
 
 	assert.Equal(t, []sampleData{
-		[]float64{0, 0},
-		[]float64{0, 0},
+		[]float64{},
+		[]float64{},
 		[]float64{float64(now.UnixMilli())},
 	}, data)
 }
