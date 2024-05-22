@@ -26,6 +26,8 @@ export let options = {
   },
 };
 
+export function setup() {} // to have "setup" group, which only has metric value at the begining of the test run
+
 export default function () {
   let crocodiles, ok;
 
@@ -47,9 +49,7 @@ export default function () {
 
   group("get crocodile", () => {
     for (var i = 0; i < crocodiles.length; i++) {
-      let response = http.get(
-        http.url`https://test-api.k6.io/public/crocodiles/${crocodiles[i].id}`
-      );
+      let response = http.get(http.url`https://test-api.k6.io/public/crocodiles/${crocodiles[i].id}`);
 
       check(response, {
         "status is OK": (r) => r && r.status == 200,

@@ -189,12 +189,12 @@ func (ext *extension) flush() {
 	samples := ext.buffer.GetBufferedSamples()
 	now := time.Now()
 
-	if !ext.noFlush.Load() { // skip the last fraction period for sanpshot (called when flusher stops)
-		ext.updateAndSend(samples, newMeter(ext.period, now, ext.options.Tags), snapshotEvent, now)
-	}
-
 	ext.updateAndSend(samples, ext.cumulative, cumulativeEvent, now)
 	ext.evaluateAndSend(ext.cumulative, now)
+
+	if !ext.noFlush.Load() { // skip the last fraction period for sanpshot (called when flusher stops)
+		ext.updateAndSend(samples, ext.cumulative.toSnapshot(ext.period, now), snapshotEvent, now)
+	}
 }
 
 func (ext *extension) updateAndSend(

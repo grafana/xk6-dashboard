@@ -122,12 +122,12 @@ func TestExtension(t *testing.T) {
 
 	assert.True(t, strings.HasPrefix(lines[20], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[21], aggregateDataPrefix))
-	assert.Equal(t, "event: snapshot", lines[22])
+	assert.Equal(t, "event: cumulative", lines[22])
 	assert.Empty(t, lines[23])
 
 	assert.True(t, strings.HasPrefix(lines[24], idPrefix))
 	assert.True(t, strings.HasPrefix(lines[25], aggregateDataPrefix))
-	assert.Equal(t, "event: cumulative", lines[26])
+	assert.Equal(t, "event: snapshot", lines[26])
 	assert.Empty(t, lines[27])
 }
 

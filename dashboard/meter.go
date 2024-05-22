@@ -30,7 +30,7 @@ func newMeter(period time.Duration, now time.Time, tags []string) *meter {
 	clock, _ := metric.Sink.(*metrics.GaugeSink)
 
 	start := now
-	clock.Value = float64(start.UnixMilli())
+	clock.Add(metrics.Sample{Time: now, Value: float64(start.UnixMilli())})
 
 	return &meter{
 		registry: registry,
@@ -39,6 +39,29 @@ func newMeter(period time.Duration, now time.Time, tags []string) *meter {
 		period:   period,
 		tags:     tags,
 	}
+}
+
+func (m *meter) toSnapshot(period time.Duration, now time.Time) *meter {
+	meter := newMeter(period, now, m.tags)
+
+	for _, met := range m.registry.All() {
+		if meter.registry.Get(met.Name) != nil {
+			continue
+		}
+
+		clone, _ := meter.registry.getOrNew(
+			met.Name,
+			met.Type,
+			met.Contains,
+			thresholdsSources(met.Thresholds),
+		)
+
+		for _, sub := range met.Submetrics {
+			clone.AddSubmetric(sub.Suffix) //nolint:errcheck,gosec
+		}
+	}
+
+	return meter
 }
 
 func (m *meter) update(containers []metrics.SampleContainer, now time.Time) ([]sampleData, error) {
@@ -96,6 +119,10 @@ func (m *meter) add(sample metrics.Sample) error {
 
 func (m *meter) format(dur time.Duration) []sampleData {
 	fmt := func(met *metrics.Metric) sampleData {
+		if met.Sink.IsEmpty() {
+			return sampleData{}
+		}
+
 		sample := met.Sink.Format(dur)
 
 		if sink, ok := met.Sink.(*metrics.TrendSink); ok {
