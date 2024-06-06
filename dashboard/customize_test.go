@@ -8,7 +8,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/dop251/goja"
+	"github.com/grafana/sobek"
 	"github.com/sirupsen/logrus"
 	logtest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
@@ -89,9 +89,9 @@ func TestConfigInReadme(t *testing.T) {
 func assertMessageAndLevel(t *testing.T, expr string, message string, level logrus.Level) {
 	t.Helper()
 
-	runtime := goja.New()
+	runtime := sobek.New()
 
-	runtime.SetFieldNameMapper(goja.UncapFieldNameMapper())
+	runtime.SetFieldNameMapper(sobek.UncapFieldNameMapper())
 
 	logger, hook := logtest.NewNullLogger()
 	_ = runtime.Set("console", newConfigConsole(logger))
