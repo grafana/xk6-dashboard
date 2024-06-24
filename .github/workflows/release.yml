@@ -56,7 +56,7 @@ jobs:
             type=semver,pattern={{major}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           push: true
           context: ./${{ steps.build.outputs.dockerdir }}
