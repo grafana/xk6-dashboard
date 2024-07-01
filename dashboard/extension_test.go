@@ -30,6 +30,7 @@ func TestNewExtension(t *testing.T) {
 	params.ConfigArgument = "port=1&host=localhost"
 	params.OutputType = "dashboard"
 	params.FS = fsext.NewMemMapFs()
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -53,6 +54,7 @@ func testReadSSE(t *testing.T, nlines int) []string {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=0"
 	params.FS = fsext.NewMemMapFs()
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -140,6 +142,7 @@ func TestExtension_no_http(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=-1"
 	params.FS = fsext.NewMemMapFs()
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -167,6 +170,7 @@ func TestExtension_random_port(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0"
 	params.FS = fsext.NewMemMapFs()
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -198,6 +202,7 @@ func TestExtension_error_used_port(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0"
 	params.FS = fsext.NewMemMapFs()
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -228,6 +233,7 @@ func TestExtension_open(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "port=0&open"
 	params.FS = fsext.NewMemMapFs()
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -255,6 +261,7 @@ func TestExtension_report(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
 	params.FS = osFS
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 
@@ -299,6 +306,7 @@ func TestExtension_skip_report(t *testing.T) {
 	params.Logger = logrus.StandardLogger()
 	params.ConfigArgument = "period=10ms&port=-1&report=" + file.Name() + ".gz"
 	params.FS = osFS
+	params.ScriptPath = &url.URL{}
 
 	ext, err := New(params)
 

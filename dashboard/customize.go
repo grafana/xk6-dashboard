@@ -5,17 +5,21 @@
 package dashboard
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"path/filepath"
 	"reflect"
 	"strings"
 
 	"github.com/grafana/sobek"
 	"github.com/sirupsen/logrus"
+	"go.k6.io/k6/js/common"
 	"go.k6.io/k6/js/compiler"
+	"go.k6.io/k6/js/modules"
 	"go.k6.io/k6/lib"
 	"go.k6.io/k6/lib/fsext"
 )
@@ -83,9 +87,39 @@ func exists(fs fsext.Fs, filename string) bool {
 
 type configLoader struct {
 	runtime       *sobek.Runtime
-	compiler      *compiler.Compiler
+	modSys        *modules.ModuleSystem
 	defaultConfig *sobek.Object
 	proc          *process
+	cwd           *url.URL
+}
+
+type vu struct {
+	initEnv *common.InitEnvironment
+	rt      *sobek.Runtime
+}
+
+func (v *vu) InitEnv() *common.InitEnvironment {
+	return v.initEnv
+}
+
+func (v *vu) Runtime() *sobek.Runtime {
+	return v.rt
+}
+
+func (v *vu) Events() common.Events {
+	panic("Events() isn't implemented in dashboard VU")
+}
+
+func (v *vu) Context() context.Context {
+	panic("Context() isn't implemented in dashboard VU")
+}
+
+func (v *vu) RegisterCallback() func(func() error) {
+	panic("RegisterCallback() isn't implemented in dashboard VU")
+}
+
+func (v *vu) State() *lib.State {
+	panic("State() isn't implemented in dashboard VU")
 }
 
 func newConfigLoader(defaultConfig json.RawMessage, proc *process) (*configLoader, error) {
@@ -93,10 +127,27 @@ func newConfigLoader(defaultConfig json.RawMessage, proc *process) (*configLoade
 
 	comp.Options.CompatibilityMode = lib.CompatibilityModeExtended
 	comp.Options.Strict = true
+	mr := modules.NewModuleResolver(nil, func(specifier *url.URL, _ string) ([]byte, error) {
+		file, err := proc.fs.Open(specifier.Path)
+		if err != nil {
+			return nil, err
+		}
+
+		return io.ReadAll(file)
+	}, comp)
+	runtime := sobek.New()
+	cwdURL, err := url.Parse("file:///" + proc.wd)
+	if err != nil {
+		return nil, err
+	}
+	ms := modules.NewModuleSystem(mr, &vu{
+		rt: runtime,
+		initEnv: &common.InitEnvironment{
+			CWD: cwdURL,
+		},
+	})
 
 	con := newConfigConsole(proc.logger)
-
-	runtime := sobek.New()
 
 	runtime.SetFieldNameMapper(sobek.UncapFieldNameMapper())
 
@@ -111,26 +162,24 @@ func newConfigLoader(defaultConfig json.RawMessage, proc *process) (*configLoade
 
 	loader := &configLoader{
 		runtime:       runtime,
-		compiler:      comp,
 		defaultConfig: def,
 		proc:          proc,
+		modSys:        ms,
+		cwd:           cwdURL,
 	}
 
 	return loader, nil
 }
 
 func (loader *configLoader) load(filename string) (json.RawMessage, error) {
-	file, err := loader.proc.fs.Open(filename)
-	if err != nil {
-		return nil, err
+	if !strings.HasPrefix(filename, "./") &&
+		!strings.HasPrefix(filename, "/") &&
+		!strings.HasPrefix(filename, "../") &&
+		!strings.HasPrefix(filename, "file://") {
+		filename = "./" + filename
 	}
 
-	src, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
-	val, err := loader.eval(src, filename)
+	val, err := loader.eval(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -144,40 +193,18 @@ func isObject(val sobek.Value) bool {
 	return val != nil && val.ExportType() != nil && val.ExportType().Kind() == reflect.Map
 }
 
-func (loader *configLoader) eval(src []byte, filename string) (*sobek.Object, error) {
-	prog, _, err := loader.compiler.Compile(string(src), filename, false)
+func (loader *configLoader) eval(filename string) (*sobek.Object, error) {
+	exports, err := loader.modSys.Require(loader.cwd, filename)
+	fmt.Println(exports, err)
 	if err != nil {
 		return nil, err
 	}
-
-	exports := loader.runtime.NewObject()
-	module := loader.runtime.NewObject()
-
-	if err = module.Set("exports", exports); err != nil {
-		return nil, err
-	}
-
-	val, err := loader.runtime.RunProgram(prog)
-	if err != nil {
-		return nil, err
-	}
-
-	call, isCallable := sobek.AssertFunction(val)
-	if !isCallable {
-		return nil, fmt.Errorf("%w, file: %s", errNotFunction, filename)
-	}
-
-	_, err = call(exports, module, exports)
-	if err != nil {
-		return nil, err
-	}
-
 	def := exports.Get("default")
 	if def == nil {
 		return nil, fmt.Errorf("%w, file: %s", errNoExport, filename)
 	}
 
-	if call, isCallable = sobek.AssertFunction(def); isCallable {
+	if call, isCallable := sobek.AssertFunction(def); isCallable {
 		def, err = call(exports, loader.defaultConfig)
 		if err != nil {
 			return nil, err

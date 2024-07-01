@@ -6,13 +6,17 @@ package dashboard
 
 import (
 	_ "embed"
+	"fmt"
+	"os"
 	"testing"
 
 	"github.com/grafana/sobek"
 	"github.com/sirupsen/logrus"
 	logtest "github.com/sirupsen/logrus/hooks/test"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
+	"go.k6.io/k6/lib/fsext"
 )
 
 func Test_loadConfigJSON(t *testing.T) {
@@ -52,9 +56,13 @@ func Test_customize_env_found(t *testing.T) {
 
 	th := helper(t).osFs()
 
-	conf, err := customize(testconfig, th.proc)
-
+	var err error
+	th.proc.wd, err = os.Getwd()
 	assert.NoError(t, err)
+
+	conf, err := customize(testconfig, th.proc)
+	assert.NoError(t, err)
+	fmt.Println(string(conf))
 
 	assert.True(t, gjson.GetBytes(conf, `tabs.#(id="custom")`).Exists())
 
@@ -70,6 +78,10 @@ func TestConfigInReadme(t *testing.T) {
 	t.Parallel()
 
 	th := helper(t).osFs()
+
+	var err error
+	th.proc.wd, err = os.Getwd()
+	assert.NoError(t, err)
 
 	conf, err := loadConfigJS("../.dashboard.js", testconfig, th.proc)
 
@@ -164,31 +176,40 @@ func Test_loadConfigJS_error(t *testing.T) {
 func Test_configLoader_eval_error(t *testing.T) {
 	t.Parallel()
 
-	th := helper(t).osFs()
+	evalHelper := func(src string) (*sobek.Object, error) {
+		t.Helper()
 
-	loader, err := newConfigLoader(testconfig, th.proc)
+		th := helper(t)
+		th.proc.fs = fsext.NewMemMapFs()
+		th.proc.wd = "/some/path/"
 
-	assert.NoError(t, err)
+		loader, err := newConfigLoader(testconfig, th.proc)
+		require.NoError(t, err)
 
-	obj, err := loader.eval([]byte("invalid script"), "")
+		err = fsext.WriteFile(th.proc.fs, "/some/path/morestuff/test.js", []byte(src), 0o6)
+		require.NoError(t, err)
+		return loader.eval("./morestuff/test.js")
+	}
+
+	obj, err := evalHelper("invalid script")
 
 	assert.Error(t, err)
 	assert.Nil(t, obj)
 
 	// no default export
-	obj, err = loader.eval([]byte("let answer = 42"), "")
+	obj, err = evalHelper("let answer = 42")
 
 	assert.Error(t, err)
 	assert.Nil(t, obj)
 
 	// no return value from export function
-	obj, err = loader.eval([]byte("export default function() {}"), "")
+	obj, err = evalHelper("export default function() {}")
 
 	assert.Error(t, err)
 	assert.Nil(t, obj)
 
 	// error in default export function
-	obj, err = loader.eval([]byte("export default function() {throw Error()}"), "")
+	obj, err = evalHelper("export default function() {throw Error()}")
 
 	assert.Error(t, err)
 	assert.Nil(t, obj)
