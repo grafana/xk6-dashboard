@@ -3,7 +3,6 @@ module github.com/grafana/xk6-dashboard
 go 1.20
 
 require (
-	github.com/grafana/sobek v0.0.0-20240607083612-4f0cd64f4e78
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/r3labs/sse/v2 v2.10.0
 	github.com/sirupsen/logrus v1.9.3
@@ -17,14 +16,9 @@ require (
 require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dlclark/regexp2 v1.9.0 // indirect
-	github.com/dop251/goja v0.0.0-20240516125602-ccbae20bcec2 // indirect
-	github.com/evanw/esbuild v0.21.2 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
-	github.com/google/pprof v0.0.0-20230728192033-2ba5b33183c6 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
