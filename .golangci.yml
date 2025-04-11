@@ -1,4 +1,4 @@
-# v1.57.2
+# v1.64.6
 # Please don't remove the first line. It uses in CI to determine the golangci version
 run:
   timeout: 5m
@@ -19,12 +19,17 @@ issues:
    # files (due to common repeats and long functions in test code)
    - path: _(test|gen)\.go
      linters:
+       - canonicalheader
        - cyclop
        - dupl
        - gocognit
        - funlen
        - lll
        - forcetypeassert
+   - path: js\/modules\/k6\/browser\/.*\.go
+     linters:
+       - revive
+       - contextcheck
    - path: js\/modules\/k6\/html\/.*\.go
      text: "exported: exported "
      linters:
@@ -60,6 +65,8 @@ linters-settings:
       # Forbid everything in syscall except the uppercase constants
       - '^syscall\.[^A-Z_]+$(# Using anything except constants from the syscall package is forbidden )?'
       - '^logrus\.Logger$'
+  usetesting:
+    os-setenv: true
 
 linters:
   disable-all: true
@@ -68,6 +75,7 @@ linters:
     - asciicheck
     - bidichk
     - bodyclose
+    - canonicalheader
     - contextcheck
     - cyclop
     - dogsled
@@ -78,7 +86,7 @@ linters:
     - errname
     - errorlint
     - exhaustive
-    - exportloopref
+    - fatcontext
     - forbidigo
     - forcetypeassert
     - funlen
@@ -118,13 +126,13 @@ linters:
     - sqlclosecheck
     - staticcheck
     - stylecheck
-    - tenv
     - tparallel
     - typecheck
     - unconvert
     - unparam
     - unused
     - usestdlibvars
+    - usetesting
     - wastedassign
     - whitespace
   fast: false

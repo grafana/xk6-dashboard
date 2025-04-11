@@ -5,6 +5,7 @@ declare const enum UnitType {
     rps = "rps",
     duration = "duration",
     timestamp = "timestamp",
+    percent = "percent",
     unknown = ""
 }
 
