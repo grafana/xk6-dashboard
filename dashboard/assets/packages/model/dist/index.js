@@ -6,6 +6,7 @@ var UnitType = /* @__PURE__ */ ((UnitType2) => {
   UnitType2["rps"] = "rps";
   UnitType2["duration"] = "duration";
   UnitType2["timestamp"] = "timestamp";
+  UnitType2["percent"] = "percent";
   UnitType2["unknown"] = "";
   return UnitType2;
 })(UnitType || {});
@@ -110,7 +111,7 @@ var Metrics = class {
           case "data" /* data */:
             return "bps" /* bps */;
           default:
-            return "rps" /* rps */;
+            return "percent" /* percent */;
         }
       case "gauge" /* gauge */:
         switch (metric.contains) {

@@ -59,6 +59,8 @@ export function format(type: UnitType, value: number, compact: boolean = false):
       return numeral(value).format("0.[00]a") + "/s"
     case UnitType.timestamp:
       return formatDate(new Date(value * 1000))
+    case UnitType.percent:
+      return numeral(value).format("0.0%")
     default:
       return isNaN(value) || value == null ? "0" : value.toFixed(2)
   }

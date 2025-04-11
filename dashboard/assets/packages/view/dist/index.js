@@ -41,6 +41,8 @@ function format(type, value, compact = false) {
       return numeral(value).format("0.[00]a") + "/s";
     case UnitType.timestamp:
       return formatDate(new Date(value * 1e3));
+    case UnitType.percent:
+      return numeral(value).format("0.0%");
     default:
       return isNaN(value) || value == null ? "0" : value.toFixed(2);
   }
