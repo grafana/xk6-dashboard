@@ -7,6 +7,8 @@
 name: Quality
 on: [push, pull_request, workflow_dispatch]
 
+permissions: {}
+
 jobs:
   lint:
     name: Lint
@@ -18,9 +20,11 @@ jobs:
           go-version: "1.21"
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Lint
-        uses: magefile/mage-action@v3
+        uses: magefile/mage-action@6f50bbb8ea47d56e62dee92392788acbc8192d0b # v3.1.0
         with:
           version: latest
           args: tools lint
@@ -39,19 +43,22 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: 1.20.x
+          cache: false
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Test
-        uses: magefile/mage-action@v3
+        uses: magefile/mage-action@6f50bbb8ea47d56e62dee92392788acbc8192d0b # v3.1.0
         with:
           version: v1.14.0
           args: test
 
       - name: Upload Coverage
         if: ${{ matrix.platform == 'ubuntu-latest' && github.ref_name == 'master' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@ad3126e916f78f00edff4ed0317cf185271ccc2d # v5.4.2
 
       - name: Generate Go Report Card
         if: ${{ matrix.platform == 'ubuntu-latest' && github.ref_name == 'master' }}
-        uses: creekorful/goreportcard-action@v1.0
+        uses: creekorful/goreportcard-action@1f35ced8cdac2cba28c9a2f2288a16aacfd507f9 # v1.0
