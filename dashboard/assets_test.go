@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_assetDir(t *testing.T) {
@@ -18,8 +18,8 @@ func Test_assetDir(t *testing.T) {
 
 	fs := assetDir("hu", testdata)
 
-	assert.NotNil(t, fs)
-	assert.Panics(t, func() {
+	require.NotNil(t, fs)
+	require.Panics(t, func() {
 		assetDir("..", testdata)
 	})
 }
@@ -35,27 +35,27 @@ func Test_newAssets(t *testing.T) {
 func assertAssets(t *testing.T, assets *assets) {
 	t.Helper()
 
-	assert.NotNil(t, assets.ui)
+	require.NotNil(t, assets.ui)
 
 	file, err := assets.ui.Open("index.html")
 
-	assert.NoError(t, err)
-	assert.NotNil(t, file)
+	require.NoError(t, err)
+	require.NotNil(t, file)
 
-	assert.NoError(t, file.Close())
+	require.NoError(t, file.Close())
 
-	assert.NotNil(t, assets.report)
+	require.NotNil(t, assets.report)
 
 	file, err = assets.report.Open("index.html")
 
-	assert.NoError(t, err)
-	assert.NotNil(t, file)
+	require.NoError(t, err)
+	require.NotNil(t, file)
 
-	assert.NoError(t, file.Close())
+	require.NoError(t, file.Close())
 
-	assert.NotNil(t, assets.config)
+	require.NotNil(t, assets.config)
 
 	conf := map[string]interface{}{}
 
-	assert.NoError(t, json.Unmarshal(assets.config, &conf))
+	require.NoError(t, json.Unmarshal(assets.config, &conf))
 }

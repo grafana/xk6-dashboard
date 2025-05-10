@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.k6.io/k6/cmd/state"
 )
 
@@ -23,21 +23,21 @@ func TestNewCommand(t *testing.T) {
 
 	cmd := NewCommand(gs)
 
-	assert.NotNil(t, cmd)
+	require.NotNil(t, cmd)
 
 	sub, _, err := cmd.Find([]string{"replay"})
 
-	assert.NoError(t, err)
-	assert.NotNil(t, sub)
+	require.NoError(t, err)
+	require.NotNil(t, sub)
 
-	assert.Equal(t, "replay", sub.Name())
+	require.Equal(t, "replay", sub.Name())
 
 	err = sub.ParseFlags([]string{})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Equal(t, defaultHost, sub.Flag("host").Value.String())
-	assert.Equal(t, strconv.Itoa(defaultPort), sub.Flag("port").Value.String())
+	require.Equal(t, defaultHost, sub.Flag("host").Value.String())
+	require.Equal(t, strconv.Itoa(defaultPort), sub.Flag("port").Value.String())
 }
 
 func TestNewCommand_reply(t *testing.T) {
@@ -47,19 +47,19 @@ func TestNewCommand_reply(t *testing.T) {
 
 	cmd := NewCommand(gs)
 
-	assert.NotNil(t, cmd)
+	require.NotNil(t, cmd)
 
 	sub, _, err := cmd.Find([]string{"replay"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = sub.ParseFlags([]string{"--port", "-1"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = sub.RunE(sub, []string{"testdata/result.json.gz"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestNewCommand_reply_error(t *testing.T) {
@@ -69,19 +69,19 @@ func TestNewCommand_reply_error(t *testing.T) {
 
 	cmd := NewCommand(gs)
 
-	assert.NotNil(t, cmd)
+	require.NotNil(t, cmd)
 
 	sub, _, err := cmd.Find([]string{"replay"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = sub.ParseFlags([]string{"--port", "-1"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = sub.RunE(sub, []string{"no such file"})
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func TestNewCommand_report(t *testing.T) {
@@ -91,17 +91,17 @@ func TestNewCommand_report(t *testing.T) {
 
 	cmd := NewCommand(gs)
 
-	assert.NotNil(t, cmd)
+	require.NotNil(t, cmd)
 
 	sub, _, err := cmd.Find([]string{"report"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	out := filepath.Join(t.TempDir(), "report.html")
 
 	err = sub.RunE(sub, []string{"testdata/result.ndjson.gz", out})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestNewCommand_aggregate(t *testing.T) {
@@ -111,15 +111,15 @@ func TestNewCommand_aggregate(t *testing.T) {
 
 	cmd := NewCommand(gs)
 
-	assert.NotNil(t, cmd)
+	require.NotNil(t, cmd)
 
 	sub, _, err := cmd.Find([]string{"aggregate"})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	out := filepath.Join(t.TempDir(), "result.ndjson")
 
 	err = sub.RunE(sub, []string{"testdata/result.json.gz", out})
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

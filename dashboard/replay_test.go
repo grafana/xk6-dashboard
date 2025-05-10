@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -35,11 +35,11 @@ func Test_replay(t *testing.T) {
 
 	th := helper(t).osFs()
 
-	assert.NoError(t, replay("testdata/result.ndjson", opts, th.assets, th.proc))
+	require.NoError(t, replay("testdata/result.ndjson", opts, th.assets, th.proc))
 
 	lines := readSSE(t, testdataEventLines, "http://"+opts.addr()+"/events")
 
-	assert.Equal(t, testdataEventLines, len(lines))
+	require.Len(t, lines, testdataEventLines)
 }
 
 func Test_replay_gz(t *testing.T) {
@@ -57,11 +57,11 @@ func Test_replay_gz(t *testing.T) {
 
 	th := helper(t).osFs()
 
-	assert.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
+	require.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
 
 	lines := readSSE(t, testdataEventLines, "http://"+opts.addr()+"/events")
 
-	assert.Equal(t, testdataEventLines, len(lines))
+	require.Len(t, lines, testdataEventLines)
 }
 
 func Test_replay_open(t *testing.T) {
@@ -79,9 +79,9 @@ func Test_replay_open(t *testing.T) {
 
 	th := helper(t).osFs()
 
-	assert.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
+	require.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
 
-	assert.Greater(t, opts.Port, 0) // side effect, but no better way currently...
+	require.Positive(t, opts.Port) // side effect, but no better way currently...
 }
 
 func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
@@ -97,8 +97,8 @@ func Test_replay_error_port_used(t *testing.T) { //nolint:paralleltest
 
 	th := helper(t).osFs()
 
-	assert.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
-	assert.Error(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
+	require.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
+	require.Error(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
 }
 
 func Test_replay_export(t *testing.T) {
@@ -118,11 +118,11 @@ func Test_replay_export(t *testing.T) {
 
 	th := helper(t).osFs()
 
-	assert.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
+	require.NoError(t, replay("testdata/result.ndjson.gz", opts, th.assets, th.proc))
 
 	st, err := th.proc.fs.Stat(export)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Greater(t, st.Size(), int64(1024))
+	require.Greater(t, st.Size(), int64(1024))
 }

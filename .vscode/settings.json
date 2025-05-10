@@ -1,14 +1,3 @@
 {
-  "go.lintTool": "golangci-lint",
-  "go.lintFlags": ["--fast"],
-  "go.formatTool": "golines",
-  "conventionalCommits.scopes": ["module", "ui", "report"],
-  "go.buildTags": "mage",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[xml]": {
-    "editor.defaultFormatter": "redhat.vscode-xml"
-  },
-  "[go]": {
-    "editor.defaultFormatter": "golang.go"
-  }
+  "recommendations": ["ms-vscode-remote.remote-containers"]
 }

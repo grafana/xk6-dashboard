@@ -14,7 +14,7 @@ import (
 	"testing"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_sendEvent(t *testing.T) {
@@ -27,7 +27,7 @@ func Test_sendEvent(t *testing.T) {
 
 	req = req.WithContext(ctx)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Connection", "keep-alive")
@@ -45,15 +45,15 @@ func Test_sendEvent(t *testing.T) {
 
 	<-done
 
-	res := rec.Result() //nolint:bodyclose
+	res := rec.Result()
 
-	assert.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
+	require.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
 
 	data, err := io.ReadAll(res.Body)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Equal(t, "id: 0\ndata: {\"answer\":42}\nevent: foo\n\n", string(data))
+	require.Equal(t, "id: 0\ndata: {\"answer\":42}\nevent: foo\n\n", string(data))
 
 	cancel()
 }
@@ -71,7 +71,7 @@ func Test_send_earlier_events(t *testing.T) {
 
 	req = req.WithContext(ctx)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Connection", "keep-alive")
@@ -87,13 +87,13 @@ func Test_send_earlier_events(t *testing.T) {
 
 	<-done
 
-	res := rec.Result() //nolint:bodyclose
+	res := rec.Result()
 
-	assert.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
+	require.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
 
 	data, err := io.ReadAll(res.Body)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Equal(t, "id: 0\ndata: {\"answer\":42}\nevent: foo\n\n", string(data))
+	require.Equal(t, "id: 0\ndata: {\"answer\":42}\nevent: foo\n\n", string(data))
 }
