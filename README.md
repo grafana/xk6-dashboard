@@ -61,7 +61,7 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 
 **Download**
 
-You can download pre-built k6 binaries from the [Releases](https://github.com/grafana/xk6-dashboard/releases/) page. Check the [Packages](https://github.com/grafana/xk6-dashboard/pkgs/container/xk6-dashboard) page for pre-built k6 Docker images.
+You can download pre-built k6 binaries from the [Releases](https://github.com/grafana/xk6-dashboard/releases/) page.
 
 <details>
 <summary><strong>Build</strong></summary>
