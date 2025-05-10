@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.k6.io/k6/cmd/state"
 	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
@@ -106,12 +106,12 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	req, err := http.NewRequest(http.MethodGet, loc, nil)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Connection", "keep-alive")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	ctx, cancel := context.WithCancel(context.TODO())
 	defer cancel()
@@ -120,9 +120,9 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	res, err := http.DefaultClient.Do(req) //nolint:bodyclose
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
-	assert.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, "text/event-stream", res.Header.Get("Content-Type"))
 
 	scanner := bufio.NewScanner(res.Body)
 
@@ -130,7 +130,7 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	lines := make([]string, 0, nlines)
 
-	for idx := 0; idx < nlines; idx++ {
+	for range nlines {
 		if !scanner.Scan() {
 			break
 		}
@@ -138,7 +138,7 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 		lines = append(lines, scanner.Text())
 	}
 
-	assert.Equal(t, nlines, len(lines))
+	require.Len(t, lines, nlines)
 
 	cancel()
 

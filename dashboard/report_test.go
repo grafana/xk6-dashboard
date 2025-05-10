@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type errorWriter struct {
@@ -43,6 +44,12 @@ func (writer *errorWriter) Close() error {
 	return assert.AnError
 }
 
+func (writer *errorWriter) String() string {
+	writer.testingT.Helper()
+
+	return writer.buff.String()
+}
+
 func (writer *errorWriter) reset(maxWrite int) *errorWriter {
 	writer.testingT.Helper()
 
@@ -50,12 +57,6 @@ func (writer *errorWriter) reset(maxWrite int) *errorWriter {
 	writer.buff.Reset()
 
 	return writer
-}
-
-func (writer *errorWriter) String() string {
-	writer.testingT.Helper()
-
-	return writer.buff.String()
 }
 
 func recursiveJSON(t *testing.T) interface{} {
@@ -83,7 +84,7 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 
 	rep.data.cumulative = &recorderEnvelope{Name: "dummy", Data: recursiveJSON(t)}
 
-	assert.Error(t, rep.exportJSON(io.Discard))
+	require.Error(t, rep.exportJSON(io.Discard))
 
 	rep.data.cumulative = nil
 
@@ -93,12 +94,12 @@ func Test_briefer_exportJSON_error(t *testing.T) {
 
 	out := newErrorWriter(t)
 
-	assert.Error(t, rep.exportJSON(out))
-	assert.NoError(t, rep.exportJSON(out.reset(2)))
+	require.Error(t, rep.exportJSON(out))
+	require.NoError(t, rep.exportJSON(out.reset(2)))
 
 	exp := `{"event":"snapshot","data":{}}` + "\n"
 
-	assert.Equal(t, exp, out.String())
+	require.Equal(t, exp, out.String())
 }
 
 func Test_briefer_exportBase64_error(t *testing.T) {
@@ -112,15 +113,15 @@ func Test_briefer_exportBase64_error(t *testing.T) {
 
 	rep.data.cumulative = &recorderEnvelope{Name: "dummy", Data: recursiveJSON(t)}
 
-	assert.Error(t, rep.exportBase64(io.Discard))
+	require.Error(t, rep.exportBase64(io.Discard))
 
 	rep.data.cumulative = nil
 
 	out := newErrorWriter(t)
 
-	assert.Error(t, rep.exportBase64(out))
-	assert.NoError(t, rep.exportBase64(out.reset(math.MaxInt)))
-	assert.Equal(t, emptyDataBase64, out.String())
+	require.Error(t, rep.exportBase64(out))
+	require.NoError(t, rep.exportBase64(out.reset(math.MaxInt)))
+	require.Equal(t, emptyDataBase64, out.String())
 }
 
 func Test_briefer_inject_error(t *testing.T) {
@@ -132,15 +133,15 @@ func Test_briefer_inject_error(t *testing.T) {
 
 	file, err := th.assets.report.Open("index.html")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	html, err := io.ReadAll(file)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	out := newErrorWriter(t)
 
-	assert.Panics(t, func() {
+	require.Panics(t, func() {
 		_, _ = rep.inject(out, []byte{}, []byte(dataTag), nil)
 	})
 
@@ -150,7 +151,7 @@ func Test_briefer_inject_error(t *testing.T) {
 		return err
 	})
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func Test_briefer_onEvent(t *testing.T) {
@@ -166,17 +167,17 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	exp := `{"event":"snapshot","data":{}}` + "\n"
 
-	assert.Equal(t, exp, rep.data.buff.String())
+	require.Equal(t, exp, rep.data.buff.String())
 
 	rep.onEvent(snapshotEvent, data)
 
-	assert.Equal(t, exp+exp, rep.data.buff.String())
+	require.Equal(t, exp+exp, rep.data.buff.String())
 
 	data["bad"] = recursiveJSON(t)
 
 	rep.onEvent(snapshotEvent, data) // error while marshalling JSON, null will be write
 
-	assert.Equal(t, exp+exp+"null\n", rep.data.buff.String())
+	require.Equal(t, exp+exp+"null\n", rep.data.buff.String())
 
 	data["foo"] = "bar"
 
@@ -184,7 +185,7 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	envelope := &recorderEnvelope{Name: cumulativeEvent, Data: data}
 
-	assert.Equal(t, envelope, rep.data.cumulative)
+	require.Equal(t, envelope, rep.data.cumulative)
 
 	data = map[string]interface{}{"foo": []string{"bar > 0"}}
 
@@ -192,7 +193,7 @@ func Test_briefer_onEvent(t *testing.T) {
 
 	envelope = &recorderEnvelope{Name: thresholdEvent, Data: data}
 
-	assert.Equal(t, envelope, rep.data.threshold)
+	require.Equal(t, envelope, rep.data.threshold)
 }
 
 const (

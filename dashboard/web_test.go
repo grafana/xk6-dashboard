@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_newWebServer(t *testing.T) {
@@ -20,21 +20,21 @@ func Test_newWebServer(t *testing.T) {
 
 	srv := newWebServer(th.assets.ui, http.NotFoundHandler(), th.proc.logger)
 
-	assert.NotNil(t, srv)
-	assert.NotNil(t, srv.ServeMux)
-	assert.NotNil(t, srv.eventEmitter)
+	require.NotNil(t, srv)
+	require.NotNil(t, srv.ServeMux)
+	require.NotNil(t, srv.eventEmitter)
 
 	addr, err := srv.listenAndServe("127.0.0.1:0")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	base := "http://" + addr.String()
 
 	testLoc := func(loc string) {
 		res, eerr := http.Get(base + loc) //nolint:bodyclose,noctx
 
-		assert.NoError(t, eerr)
-		assert.Equal(t, http.StatusOK, res.StatusCode)
+		require.NoError(t, eerr)
+		require.Equal(t, http.StatusOK, res.StatusCode)
 	}
 
 	testLoc("/ui/index.html")
@@ -43,8 +43,8 @@ func Test_newWebServer(t *testing.T) {
 
 	res, err := http.Get(base + "/no_such_path") //nolint:bodyclose,noctx
 
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusNotFound, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusNotFound, res.StatusCode)
 }
 
 func Test_webServer_used_addr(t *testing.T) {
@@ -56,9 +56,9 @@ func Test_webServer_used_addr(t *testing.T) {
 
 	addr, err := srv.listenAndServe("127.0.0.1:0")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = srv.listenAndServe(addr.String())
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }

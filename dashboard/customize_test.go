@@ -8,7 +8,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/tidwall/gjson"
 )
 
@@ -19,17 +19,17 @@ func Test_loadConfigJSON(t *testing.T) {
 
 	conf, err := loadConfigJSON("testdata/customize/config.json", th.proc)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
+	require.NotNil(t, gjson.GetBytes(conf, "tabs.custom"))
 
 	_, err = loadConfigJSON("testdata/customize/config-bad.json", th.proc)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 
 	_, err = loadConfigJSON("testdata/customize/config-not-exists.json", th.proc)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func Test_customize(t *testing.T) {
@@ -39,9 +39,9 @@ func Test_customize(t *testing.T) {
 
 	conf, err := customize(testconfig, th.proc)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.False(t, gjson.GetBytes(conf, `tabs.#(id="custom")`).Exists())
+	require.False(t, gjson.GetBytes(conf, `tabs.#(id="custom")`).Exists())
 }
 
 //go:embed testdata/customize/config/config.json
