@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: xk6-dashboard
+  title: xk6-dashboard
+  description: |
+    A k6 extension that makes k6 metrics available on a web-based dashboard.
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    github.com/project-slug: grafana/xk6-dashboard
+spec:
+  type: library
+  owner: group:default/k6-extensions
+  lifecycle: production
