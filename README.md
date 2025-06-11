@@ -1,6 +1,5 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/grafana/xk6-dashboard)](https://goreportcard.com/report/github.com/grafana/xk6-dashboard)
 [![GitHub Actions](https://github.com/grafana/xk6-dashboard/actions/workflows/validate.yml/badge.svg)](https://github.com/grafana/xk6-dashboard/actions/workflows/validate.yml)
-[![codecov](https://codecov.io/gh/grafana/xk6-dashboard/graph/badge.svg?token=ORDNEEZIV3)](https://codecov.io/gh/grafana/xk6-dashboard)
 ![GitHub Downloads](https://img.shields.io/github/downloads/grafana/xk6-dashboard/total)
 [![GitHub Release](https://img.shields.io/github/v/release/grafana/xk6-dashboard)](https://github.com/grafana/xk6-dashboard/releases/)
 
