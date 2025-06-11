@@ -38,6 +38,7 @@ linters:
             - github.com/pkg/browser
             - github.com/tidwall/gjson
             - github.com/spf13/cobra
+            - github.com/szkiba/docsme
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
