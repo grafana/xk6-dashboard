@@ -116,7 +116,7 @@ make makefile
 The [gosec] tool is used for security checks. The [govulncheck] tool is used to check the vulnerability of dependencies.
 
 ```bash
-gosec -quiet ./...
+gosec ./...
 govulncheck ./...
 ```
 
@@ -129,7 +129,7 @@ govulncheck ./...
 The [golangci-lint] tool is used for static analysis of the source code. It is advisable to run it before committing the changes.
 
 ```bash
-golangci-lint run
+golangci-lint run ./...
 ```
 
 [lint]: <#lint---run-the-linter>

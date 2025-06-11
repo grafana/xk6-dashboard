@@ -97,7 +97,7 @@ gen:
 .PHONY: lint
 lint: 
 	@(\
-		golangci-lint run;\
+		golangci-lint run ./...;\
 	)
 
 # Generate the Makefile
@@ -134,7 +134,7 @@ run:
 .PHONY: security
 security: 
 	@(\
-		gosec -quiet ./...;\
+		gosec ./...;\
 		govulncheck ./...;\
 	)
 
