@@ -1,3 +1,5 @@
+//go:build docsme
+
 // Package main contains a build-time documentation generation tool.
 // This tool generates the README.md file based on the CLI help.
 package main

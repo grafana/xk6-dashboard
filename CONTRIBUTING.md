@@ -183,7 +183,7 @@ Documentation and examples are getting a refresh. This involves updating existin
 
 ```bash
 mdcode update
-cd ./tools/docsme && go run . -r cli -o ../../cmd/k6-web-dashboard/README.md
+go run -tags docsme ./tools/docsme -r cli -o cmd/k6-web-dashboard/README.md
 ```
 
 [doc]: #doc---update-documentation
