@@ -1,0 +1,7 @@
+go 1.23.0
+
+// The go.work workaround is needed to avoid having to upgrade the cobra dependency version in k6.
+use (
+	.
+	./../..
+)
