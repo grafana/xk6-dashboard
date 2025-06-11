@@ -116,7 +116,7 @@ make makefile
 The [gosec] tool is used for security checks. The [govulncheck] tool is used to check the vulnerability of dependencies.
 
 ```bash
-gosec -quiet ./...
+gosec ./...
 govulncheck ./...
 ```
 
@@ -129,7 +129,7 @@ govulncheck ./...
 The [golangci-lint] tool is used for static analysis of the source code. It is advisable to run it before committing the changes.
 
 ```bash
-golangci-lint run
+golangci-lint run ./...
 ```
 
 [lint]: <#lint---run-the-linter>
@@ -140,7 +140,7 @@ golangci-lint run
 The `go test` command is used to run the tests and generate the coverage report.
 
 ```bash
-go test -count 1 -race -coverprofile=coverage.txt -timeout 60s ./...
+go test -count 1 -p 4 -race -coverprofile=coverage.txt -timeout 60s ./...
 ```
 
 [test]: <#test---run-the-tests>
@@ -167,23 +167,102 @@ xk6 build --with github.com/grafana/xk6-dashboard=.
 [xk6]: https://github.com/grafana/xk6
 [build]: <#build---build-custom-k6-with-extension>
 
-### readme - Update README.md
+### cli - Build the k6-web-dashboard CLI
 
-Update the example code and its output in `README.md` using [mdcode] tool.
+Build the k6-web-dashboard CLI tool.
+
+```bash
+goreleaser build --snapshot --clean --single-target
+```
+
+[cli]: #cli---build-k6-web-dashboard-cli
+
+### doc - Update documentation
+
+Documentation and examples are getting a refresh. This involves updating existing documentation files, refining example code in README.md files, and ensuring the CLI tool's README.md reflects the latest source code.
 
 ```bash
 mdcode update
+go run -tags docsme ./tools/docsme -r cli -o cmd/k6-web-dashboard/README.md
 ```
 
-[mdcode]: <https://github.com/szkiba/mdcode>
-[readme]: #readme---update-readmemd
+[doc]: #doc---update-documentation
+
+### exif - Update image metadata
+
+Update metadata (title, description, etc.) in screenshots and example PDF reports.
+
+```bash
+exiftool -all= -overwrite_original -ext png screenshot
+exiftool -ext png -overwrite_original -XMP:Subject="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" screenshot
+exiftool -all= -overwrite_original -ext png .github
+exiftool -ext png -overwrite_original -XMP:Subject+="k6 dashboard xk6" -Title="k6 dashboard screenshot" -Description="Screenshot of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" .github
+exiftool -all= -overwrite_original -ext pdf screenshot
+exiftool -ext pdf -overwrite_original -Subject="k6 dashboard report" -Title="k6 dashboard report" -Description="Example report of xk6-dashboard extension that enables creating web based metrics dashboard for k6." -Author="Raintank, Inc. dba Grafana Labs" screenshot
+```
+
+### testdata - Record test results for testing
+
+Execute `scripts/test.js` and capture metrics in multiple formats for subsequent testing.
+
+```bash
+JSON=dashboard/testdata/result.json
+JSON_GZ="${JSON}.gz"
+NDJSON=dashboard/testdata/result.ndjson
+NDJSON_GZ="${NDJSON}.gz"
+
+xk6 run -- scripts/test.js \
+--quiet --no-summary --no-usage-report \
+--out json=$JSON --out json=$JSON_GZ \
+--out "dashboard=port=-1&period=2s&record=${NDJSON}" \
+--out "dashboard=port=-1&period=2s&record=${NDJSON_GZ}" \
+```
+
+### run - Run test script
+
+Execute the given script, then save its metrics for future replay.
+
+```bash
+SLUG=${1//\//-}
+REPORT="build/${SLUG}-report.html"
+RECORD="build/${SLUG}-record.ndjson.gz"
+RESULT="build/${SLUG}-result.json.gz"
+
+xk6 run -- ${1:-} \
+--quiet --no-summary --no-usage-report \
+--out "dashboard=export=${REPORT}&record=${RECORD}" \
+--out json="${RESULT}"
+```
+
+### replay - Replay test from recorded JSON file
+
+Replay and display metrics from a previously recorded test run. 
+
+```bash
+SLUG=${1//\//-}
+RECORD="build/${SLUG}-record.ndjson.gz"
+
+go run ./cmd/k6-web-dashboard replay $RECORD
+```
+
+### gen - Generate code
+
+Generate go source code and HTML UI.
+
+```bash
+go generate ./...
+yarn --silent --cwd dashboard/assets install
+yarn --silent --cwd dashboard/assets build
+```
+
+[gen]: #gen---generate-code
 
 ### clean - Clean the working directory
 
 Delete the work files created in the work directory (also included in .gitignore).
 
 ```bash
-rm -rf ./k6 ./coverage.txt ./build ./node_modules ./bun.lockb
+rm -rf ./k6 ./coverage.txt ./build ./dashboard/assets/node_modules ./bun.lockb
 ```
 
 [clean]: #clean---clean-the-working-directory
@@ -193,7 +272,7 @@ rm -rf ./k6 ./coverage.txt ./build ./node_modules ./bun.lockb
 Performs the most important tasks. It can be used to check whether the CI workflow will run successfully.
 
 Requires
-: [clean], [lint], [security], [test], [build], [readme], [makefile]
+: [clean], [lint], [security], [test], [build], [cli], [doc], [makefile]
 
 ### format - Format the go source codes
 
@@ -204,6 +283,8 @@ go fmt ./...
 [format]: #format---format-the-go-source-codes
 
 ### makefile - Generate the Makefile
+
+Generate a Makefile for common task execution.
 
 ```bash
 cdo --makefile Makefile
