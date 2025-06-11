@@ -1,6 +1,7 @@
 {
   "name": "xk6-dashboard",
   "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
+  "forwardPorts": [5665],
   "customizations": {
     "vscode": {
       "settings": {
@@ -26,6 +27,9 @@
       "golangciLintVersion": "2.1.6"
     },
     "ghcr.io/devcontainers/features/node:1": { "version": "22" },
+    "ghcr.io/devcontainers-extra/features/apt-packages:1": {
+      "packages": "libimage-exiftool-perl"
+    },
     "ghcr.io/guiyomh/features/goreleaser:0": { "version": "2.9.0" },
     "ghcr.io/michidk/devcontainers-features/bun:1": { "version": "1.2.12" },
     "ghcr.io/szkiba/devcontainer-features/gosec:1": { "version": "2.22.4" },
@@ -35,12 +39,11 @@
     "ghcr.io/szkiba/devcontainer-features/cdo:1": { "version": "0.1.2" },
     "ghcr.io/szkiba/devcontainer-features/mdcode:1": { "version": "0.2.0" },
     "ghcr.io/szkiba/devcontainer-features/bats:1": { "version": "1.11.1" },
-    "ghcr.io/grafana/devcontainer-features/xk6:1": { "version": "0.19.2" }
+    "ghcr.io/grafana/devcontainer-features/xk6:1": { "version": "1.0.0" }
   },
 
   "remoteEnv": {
     "GH_TOKEN": "${localEnv:GH_TOKEN}",
-    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
-    "XK6_EARLY_ACCESS": "true"
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
   }
 }
