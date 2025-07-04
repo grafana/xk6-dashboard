@@ -132,7 +132,7 @@ export class Metrics {
           case ValueType.data:
             return UnitType.bps
           default:
-            return UnitType.rps
+            return UnitType.percent
         }
 
       case MetricType.gauge:
