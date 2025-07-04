@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_aggregate(t *testing.T) {
@@ -29,11 +29,11 @@ func Test_aggregate(t *testing.T) {
 
 	err := aggregate("testdata/result.json", out, opts, th.proc)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	file, err := th.proc.fs.Open(out)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	scanner := bufio.NewScanner(file)
 	scanner.Split(bufio.ScanLines)
@@ -44,11 +44,11 @@ func Test_aggregate(t *testing.T) {
 		lines = append(lines, scanner.Text())
 	}
 
-	assert.NoError(t, file.Close())
+	require.NoError(t, file.Close())
 
 	// last 2 event (snapshot, cumulative) depends on time relations...
-	assert.LessOrEqual(t, testdataEvents-2, len(lines))
-	assert.GreaterOrEqual(t, testdataEvents, len(lines))
+	require.LessOrEqual(t, testdataEvents-2, len(lines))
+	require.GreaterOrEqual(t, testdataEvents, len(lines))
 }
 
 func Test_aggregate_gzip(t *testing.T) {
@@ -64,15 +64,15 @@ func Test_aggregate_gzip(t *testing.T) {
 
 	err := aggregate("testdata/result.json.gz", out, opts, th.proc)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	file, err := th.proc.fs.Open(out)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	reader, err := gzip.NewReader(file)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	scanner := bufio.NewScanner(reader)
 	scanner.Split(bufio.ScanLines)
@@ -83,10 +83,10 @@ func Test_aggregate_gzip(t *testing.T) {
 		lines = append(lines, scanner.Text())
 	}
 
-	assert.NoError(t, reader.Close())
-	assert.NoError(t, file.Close())
+	require.NoError(t, reader.Close())
+	require.NoError(t, file.Close())
 
 	// last 2 event (snapshot, cumulative) depends on time relations...
-	assert.LessOrEqual(t, testdataEvents-2, len(lines))
-	assert.GreaterOrEqual(t, testdataEvents, len(lines))
+	require.LessOrEqual(t, testdataEvents-2, len(lines))
+	require.GreaterOrEqual(t, testdataEvents, len(lines))
 }

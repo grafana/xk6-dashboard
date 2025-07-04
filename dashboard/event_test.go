@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type errorEventListener struct{}
@@ -31,6 +32,6 @@ func Test_eventSource_error(t *testing.T) {
 
 	src.addEventListener(new(errorEventListener))
 
-	assert.Error(t, src.fireStart())
-	assert.Error(t, src.fireStop(nil))
+	require.Error(t, src.fireStart())
+	require.Error(t, src.fireStop(nil))
 }

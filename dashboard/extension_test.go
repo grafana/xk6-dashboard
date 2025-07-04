@@ -7,7 +7,6 @@
 package dashboard
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
@@ -15,7 +14,7 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.k6.io/k6/lib"
 	"go.k6.io/k6/lib/fsext"
 	"go.k6.io/k6/metrics"
@@ -33,16 +32,16 @@ func TestNewExtension(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
-	assert.Equal(t, "dashboard http://localhost:1", ext.Description())
+	require.Equal(t, "dashboard http://localhost:1", ext.Description())
 
 	params.ConfigArgument = "period=2"
 
 	_, err = New(params)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func testReadSSE(t *testing.T, nlines int) []string {
@@ -56,8 +55,8 @@ func testReadSSE(t *testing.T, nlines int) []string {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NoError(t, ext.Start())
+	require.NoError(t, err)
+	require.NoError(t, ext.Start())
 
 	done := make(chan struct{})
 
@@ -73,13 +72,13 @@ func testReadSSE(t *testing.T, nlines int) []string {
 
 	dashboard, ok := ext.(*extension)
 
-	assert.True(t, ok)
+	require.True(t, ok)
 
 	lines := readSSE(t, nlines, "http://"+dashboard.options.addr()+"/events")
 
-	assert.NotNil(t, lines)
+	require.NotNil(t, lines)
 
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Stop())
 
 	return lines
 }
@@ -95,40 +94,40 @@ func TestExtension(t *testing.T) {
 		idPrefix            = `id: `
 	)
 
-	assert.True(t, strings.HasPrefix(lines[0], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[1], dataPrefix))
-	assert.Equal(t, "event: config", lines[2])
-	assert.Empty(t, lines[3])
+	require.True(t, strings.HasPrefix(lines[0], idPrefix))
+	require.True(t, strings.HasPrefix(lines[1], dataPrefix))
+	require.Equal(t, "event: config", lines[2])
+	require.Empty(t, lines[3])
 
-	assert.True(t, strings.HasPrefix(lines[4], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[5], dataPrefix))
-	assert.Equal(t, "event: param", lines[6])
-	assert.Empty(t, lines[7])
+	require.True(t, strings.HasPrefix(lines[4], idPrefix))
+	require.True(t, strings.HasPrefix(lines[5], dataPrefix))
+	require.Equal(t, "event: param", lines[6])
+	require.Empty(t, lines[7])
 
-	assert.True(t, strings.HasPrefix(lines[8], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[9], dataPrefix))
-	assert.Equal(t, "event: metric", lines[10])
-	assert.Empty(t, lines[11])
+	require.True(t, strings.HasPrefix(lines[8], idPrefix))
+	require.True(t, strings.HasPrefix(lines[9], dataPrefix))
+	require.Equal(t, "event: metric", lines[10])
+	require.Empty(t, lines[11])
 
-	assert.True(t, strings.HasPrefix(lines[12], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[13], aggregateDataPrefix))
-	assert.Equal(t, "event: start", lines[14])
-	assert.Empty(t, lines[15])
+	require.True(t, strings.HasPrefix(lines[12], idPrefix))
+	require.True(t, strings.HasPrefix(lines[13], aggregateDataPrefix))
+	require.Equal(t, "event: start", lines[14])
+	require.Empty(t, lines[15])
 
-	assert.True(t, strings.HasPrefix(lines[16], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[17], dataPrefix))
-	assert.Equal(t, "event: metric", lines[18])
-	assert.Empty(t, lines[19])
+	require.True(t, strings.HasPrefix(lines[16], idPrefix))
+	require.True(t, strings.HasPrefix(lines[17], dataPrefix))
+	require.Equal(t, "event: metric", lines[18])
+	require.Empty(t, lines[19])
 
-	assert.True(t, strings.HasPrefix(lines[20], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[21], aggregateDataPrefix))
-	assert.Equal(t, "event: cumulative", lines[22])
-	assert.Empty(t, lines[23])
+	require.True(t, strings.HasPrefix(lines[20], idPrefix))
+	require.True(t, strings.HasPrefix(lines[21], aggregateDataPrefix))
+	require.Equal(t, "event: cumulative", lines[22])
+	require.Empty(t, lines[23])
 
-	assert.True(t, strings.HasPrefix(lines[24], idPrefix))
-	assert.True(t, strings.HasPrefix(lines[25], aggregateDataPrefix))
-	assert.Equal(t, "event: snapshot", lines[26])
-	assert.Empty(t, lines[27])
+	require.True(t, strings.HasPrefix(lines[24], idPrefix))
+	require.True(t, strings.HasPrefix(lines[25], aggregateDataPrefix))
+	require.Equal(t, "event: snapshot", lines[26])
+	require.Empty(t, lines[27])
 }
 
 func TestExtension_no_http(t *testing.T) {
@@ -143,19 +142,19 @@ func TestExtension_no_http(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
-	assert.NoError(t, ext.Start())
+	require.NoError(t, ext.Start())
 
 	dashboard, ok := ext.(*extension)
 
-	assert.True(t, ok)
+	require.True(t, ok)
 
-	assert.Equal(t, -1, dashboard.options.Port)
-	assert.Equal(t, "bar", ext.Description())
+	require.Equal(t, -1, dashboard.options.Port)
+	require.Equal(t, "bar", ext.Description())
 
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Stop())
 }
 
 func TestExtension_random_port(t *testing.T) {
@@ -170,24 +169,24 @@ func TestExtension_random_port(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
-	assert.NoError(t, ext.Start())
+	require.NoError(t, ext.Start())
 
 	dashboard, ok := ext.(*extension)
 
-	assert.True(t, ok)
+	require.True(t, ok)
 
-	assert.Greater(t, dashboard.options.Port, 0)
+	require.Positive(t, dashboard.options.Port)
 
-	assert.Equal(
+	require.Equal(
 		t,
-		fmt.Sprintf("foo %s", dashboard.options.url()),
+		"foo "+dashboard.options.url(),
 		ext.Description(),
 	)
 
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Stop())
 }
 
 func TestExtension_error_used_port(t *testing.T) {
@@ -201,25 +200,25 @@ func TestExtension_error_used_port(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
-	assert.NoError(t, ext.Start())
+	require.NoError(t, ext.Start())
 
 	dashboard, ok := ext.(*extension)
 
-	assert.True(t, ok)
+	require.True(t, ok)
 
 	params.ConfigArgument = "port=" + strconv.Itoa(dashboard.options.Port)
 
 	ext2, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext2)
+	require.NoError(t, err)
+	require.NotNil(t, ext2)
 
-	assert.Error(t, ext2.Start())
+	require.Error(t, ext2.Start())
 
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Stop())
 }
 
 func TestExtension_open(t *testing.T) {
@@ -231,13 +230,13 @@ func TestExtension_open(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
 	t.Setenv("PATH", "")
 
-	assert.NoError(t, ext.Start())
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Start())
+	require.NoError(t, ext.Stop())
 }
 
 func TestExtension_report(t *testing.T) {
@@ -247,8 +246,8 @@ func TestExtension_report(t *testing.T) {
 
 	file, err := osFS.Create("temp")
 
-	assert.NoError(t, err)
-	assert.NoError(t, file.Close())
+	require.NoError(t, err)
+	require.NoError(t, file.Close())
 
 	var params output.Params
 
@@ -258,10 +257,10 @@ func TestExtension_report(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
-	assert.NoError(t, ext.Start())
+	require.NoError(t, ext.Start())
 
 	time.Sleep(time.Millisecond)
 
@@ -273,15 +272,15 @@ func TestExtension_report(t *testing.T) {
 
 	time.Sleep(100 * time.Millisecond)
 
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Stop())
 
 	st, err := osFS.Stat(file.Name() + ".gz")
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Greater(t, st.Size(), int64(1024))
+	require.Greater(t, st.Size(), int64(1024))
 
-	assert.NoError(t, osFS.Remove(file.Name()+".gz"))
+	require.NoError(t, osFS.Remove(file.Name()+".gz"))
 }
 
 func TestExtension_skip_report(t *testing.T) {
@@ -291,8 +290,8 @@ func TestExtension_skip_report(t *testing.T) {
 
 	file, err := osFS.Create("temp")
 
-	assert.NoError(t, err)
-	assert.NoError(t, file.Close())
+	require.NoError(t, err)
+	require.NoError(t, file.Close())
 
 	var params output.Params
 
@@ -302,16 +301,16 @@ func TestExtension_skip_report(t *testing.T) {
 
 	ext, err := New(params)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, ext)
+	require.NoError(t, err)
+	require.NotNil(t, ext)
 
-	assert.NoError(t, ext.Start())
+	require.NoError(t, ext.Start())
 
-	assert.NoError(t, ext.Stop())
+	require.NoError(t, ext.Stop())
 
 	_, err = osFS.Stat(file.Name() + ".gz")
 
-	assert.Error(t, err)
+	require.Error(t, err)
 }
 
 func Test_newParamData(t *testing.T) {
@@ -326,20 +325,20 @@ func Test_newParamData(t *testing.T) {
 
 	param := newParamData(params)
 
-	assert.Len(t, param.Scenarios, 2)
-	assert.Empty(t, param.ScriptPath)
+	require.Len(t, param.Scenarios, 2)
+	require.Empty(t, param.ScriptPath)
 
 	params.ScriptOptions.Scenarios = nil
 
 	u, err := url.Parse("file:///tmp/script.js")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	params.ScriptPath = u
 
 	param = newParamData(params)
 
-	assert.Len(t, param.Scenarios, 0)
-	assert.Equal(t, param.ScriptPath, "file:///tmp/script.js")
+	require.Empty(t, param.Scenarios)
+	require.Equal(t, "file:///tmp/script.js", param.ScriptPath)
 }
 
 func Test_paramData_With(t *testing.T) {
@@ -349,23 +348,23 @@ func Test_paramData_With(t *testing.T) {
 
 	period := time.Hour
 
-	assert.Same(t, param, param.withPeriod(period))
+	require.Same(t, param, param.withPeriod(period))
 
-	assert.Equal(t, time.Duration(period.Milliseconds()), param.Period)
-	assert.Empty(t, param.EndOffset)
+	require.Equal(t, time.Duration(period.Milliseconds()), param.Period)
+	require.Empty(t, param.EndOffset)
 
 	param = new(paramData)
 
-	assert.Same(t, param, param.withEndOffest(period))
-	assert.Equal(t, time.Duration(period.Milliseconds()), param.EndOffset)
-	assert.Empty(t, param.Period)
+	require.Same(t, param, param.withEndOffest(period))
+	require.Equal(t, time.Duration(period.Milliseconds()), param.EndOffset)
+	require.Empty(t, param.Period)
 
 	param = new(paramData)
 
 	thresholds := map[string]metrics.Thresholds{}
 
-	assert.Same(t, param, param.withThresholds(thresholds))
-	assert.Nil(t, param.Thresholds)
+	require.Same(t, param, param.withThresholds(thresholds))
+	require.Nil(t, param.Thresholds)
 
 	thresholds["foo"] = metrics.Thresholds{ //nolint:exhaustruct
 		Thresholds: []*metrics.Threshold{ //nolint:exhaustruct
@@ -381,10 +380,10 @@ func Test_paramData_With(t *testing.T) {
 		},
 	}
 
-	assert.Same(t, param, param.withThresholds(thresholds))
-	assert.Equal(t, []string{"a > 2", "b > 3"}, param.Thresholds["foo"])
-	assert.Equal(t, []string{"c > 1", "d > 0"}, param.Thresholds["bar"])
-	assert.Len(t, param.Thresholds, 2)
+	require.Same(t, param, param.withThresholds(thresholds))
+	require.Equal(t, []string{"a > 2", "b > 3"}, param.Thresholds["foo"])
+	require.Equal(t, []string{"c > 1", "d > 0"}, param.Thresholds["bar"])
+	require.Len(t, param.Thresholds, 2)
 
 	ext := new(extension)
 
@@ -392,7 +391,7 @@ func Test_paramData_With(t *testing.T) {
 
 	ext.SetThresholds(thresholds)
 
-	assert.Equal(t, param, ext.param)
+	require.Equal(t, param, ext.param)
 }
 
 func Test_paramData_withTags(t *testing.T) {
@@ -400,6 +399,6 @@ func Test_paramData_withTags(t *testing.T) {
 
 	param := new(paramData)
 
-	assert.Same(t, param, param.withTags([]string{"foo", "bar"}))
-	assert.Equal(t, []string{"foo", "bar"}, param.Tags)
+	require.Same(t, param, param.withTags([]string{"foo", "bar"}))
+	require.Equal(t, []string{"foo", "bar"}, param.Tags)
 }

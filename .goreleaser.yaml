@@ -1,7 +1,4 @@
-# SPDX-FileCopyrightText: 2023 Raintank, Inc. dba Grafana Labs
-#
-# SPDX-License-Identifier: AGPL-3.0-only
-
+version: 2
 project_name: k6-web-dashboard
 before:
   hooks:
@@ -20,22 +17,13 @@ source:
 
 archives:
   - id: bundle
-    format: tar.gz
+    formats: ["tar.gz"]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: ["zip"]
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
 
 snapshot:
-  name_template: "{{ incpatch .Version }}-next+{{.ShortCommit}}{{if .IsGitDirty}}.dirty{{else}}{{end}}"
-
-changelog:
-  sort: asc
-  abbrev: -1
-  filters:
-    exclude:
-      - "^chore:"
-      - "^docs:"
-      - "^test:"
+  version_template: "{{ incpatch .Version }}-next+{{.ShortCommit}}{{if .IsGitDirty}}.dirty{{else}}{{end}}"

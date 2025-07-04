@@ -21,28 +21,21 @@ go install github.com/grafana/xk6-dashboard/cmd/k6-web-dashboard@latest
 ```
 
 ## Usage
-<!-- begin:cli -->
+<!-- #region cli -->
 ## k6-web-dashboard
 
-Offline k6 web dashboard management
-
-### Synopsis
+**Offline k6 web dashboard management**
 
 k6 web dashboard management that does not require running k6 (recording playback, creating a report from a recording, etc.).
 
-### Options
-
-```
-  -h, --help   help for k6-web-dashboard
-```
-
-### SEE ALSO
+### Commands
 
 * [k6-web-dashboard aggregate](#k6-web-dashboard-aggregate)	 - Convert saved json output to recorded dashboard events
 * [k6-web-dashboard replay](#k6-web-dashboard-replay)	 - Load the recorded dashboard events and replay it for the UI
 * [k6-web-dashboard report](#k6-web-dashboard-report)	 - Create report from a recorded event file
 
 ---
+
 ## k6-web-dashboard aggregate
 
 Convert saved json output to recorded dashboard events
@@ -52,11 +45,13 @@ Convert saved json output to recorded dashboard events
 The aggregate command converts the file saved by json output to dashboard format events file.
 The files will be automatically compressed/decompressed if the file extension is .gz
 
-```
+### Usage
+
+```bash
 k6-web-dashboard aggregate input-file output-file [flags]
 ```
 
-### Options
+### Flags
 
 ```
       --period 1m      Event emitting frequency, example: 1m (default 10s)
@@ -69,30 +64,7 @@ k6-web-dashboard aggregate input-file output-file [flags]
 * [k6-web-dashboard](#k6-web-dashboard)	 - Offline k6 web dashboard management
 
 ---
-## k6-web-dashboard help
 
-Help about any command
-
-### Synopsis
-
-Help provides help for any command in the application.
-Simply type k6-web-dashboard help [path to command] for full details.
-
-```
-k6-web-dashboard help [command] [flags]
-```
-
-### Options
-
-```
-  -h, --help   help for help
-```
-
-### SEE ALSO
-
-* [k6-web-dashboard](#k6-web-dashboard)	 - Offline k6 web dashboard management
-
----
 ## k6-web-dashboard replay
 
 Load the recorded dashboard events and replay it for the UI
@@ -102,11 +74,13 @@ Load the recorded dashboard events and replay it for the UI
 The replay command load the recorded dashboard events (NDJSON format) and replay it for the dashboard UI.
 The compressed file will be automatically decompressed if the file extension is .gz
 
-```
+### Usage
+
+```bash
 k6-web-dashboard replay file [flags]
 ```
 
-### Options
+### Flags
 
 ```
       --export string   Report file location (default: '', no report)
@@ -121,6 +95,7 @@ k6-web-dashboard replay file [flags]
 * [k6-web-dashboard](#k6-web-dashboard)	 - Offline k6 web dashboard management
 
 ---
+
 ## k6-web-dashboard report
 
 Create report from a recorded event file
@@ -130,7 +105,9 @@ Create report from a recorded event file
 The report command loads recorded dashboard events (NDJSON format) and creates a report.
 The compressed events file will be automatically decompressed if the file extension is .gz
 
-```
+### Usage
+
+```bash
 k6-web-dashboard report events-file report-file [flags]
 ```
 
@@ -151,7 +128,7 @@ $ k6 run --out web-dashboard=record=test_result.ndjson script.js
 $ k6-web-dashboard report test_result.ndjson test_result_report.html
 ```
 
-### Options
+### Flags
 
 ```
       --open   Open browser window with generated report
@@ -162,4 +139,4 @@ $ k6-web-dashboard report test_result.ndjson test_result_report.html
 
 * [k6-web-dashboard](#k6-web-dashboard)	 - Offline k6 web dashboard management
 
-<!-- end:cli -->
+<!-- #endregion cli -->

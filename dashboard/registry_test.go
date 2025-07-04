@@ -9,7 +9,7 @@ package dashboard
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.k6.io/k6/metrics"
 )
 
@@ -18,9 +18,9 @@ func Test_newRegistry(t *testing.T) {
 
 	reg := newRegistry()
 
-	assert.NotNil(t, reg)
-	assert.NotNil(t, reg.Registry)
-	assert.NotNil(t, reg.names)
+	require.NotNil(t, reg)
+	require.NotNil(t, reg.Registry)
+	require.NotNil(t, reg.names)
 }
 
 func Test_registry_getOrNew(t *testing.T) {
@@ -30,26 +30,26 @@ func Test_registry_getOrNew(t *testing.T) {
 
 	met, err := reg.getOrNew("foo", metrics.Counter, metrics.Data, nil)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, met)
-	assert.Equal(t, []string{"foo"}, reg.names)
+	require.NoError(t, err)
+	require.NotNil(t, met)
+	require.Equal(t, []string{"foo"}, reg.names)
 
 	met2, err := reg.getOrNew("foo", metrics.Counter, metrics.Data, nil)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, met)
-	assert.Same(t, met, met2)
-	assert.Equal(t, []string{"foo"}, reg.names)
+	require.NoError(t, err)
+	require.NotNil(t, met)
+	require.Same(t, met, met2)
+	require.Equal(t, []string{"foo"}, reg.names)
 
 	met3, err := reg.getOrNew("bar", metrics.Counter, metrics.Data, nil)
 
-	assert.NoError(t, err)
-	assert.NotNil(t, met3)
-	assert.Equal(t, []string{"foo", "bar"}, reg.names)
+	require.NoError(t, err)
+	require.NotNil(t, met3)
+	require.Equal(t, []string{"foo", "bar"}, reg.names)
 
 	_, err = reg.getOrNew("", metrics.Counter, metrics.Data, nil)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 
-	assert.Panics(t, func() { reg.mustGetOrNew("", metrics.Counter, metrics.Data, nil) })
+	require.Panics(t, func() { reg.mustGetOrNew("", metrics.Counter, metrics.Data, nil) })
 }
