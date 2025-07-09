@@ -62,7 +62,8 @@ coverage: test
 doc: 
 	@(\
 		mdcode update;\
-		go run -tags docsme ./tools/docsme -r cli -o cmd/k6-web-dashboard/README.md;\
+		# See tools/docsme/main.txt;\
+		# go run -tags docsme ./tools/docsme -r cli -o cmd/k6-web-dashboard/README.md;\
 	)
 
 # Update image metadata
