@@ -1,5 +1,9 @@
 //go:build docsme
 
+// Disabled because the spf13/cobra version in k6 is too old
+// The k6-web-dashboard README.md documentation needs to be updated manually!
+// See also: https://github.com/grafana/xk6-dashboard/issues/217
+
 // Package main contains a build-time documentation generation tool.
 // This tool generates the README.md file based on the CLI help.
 package main
