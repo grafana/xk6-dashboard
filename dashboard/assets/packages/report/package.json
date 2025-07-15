@@ -23,8 +23,8 @@
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
     "round-to": "^6.0.0",
-    "uplot": "^1.6.24",
-    "uplot-react": "^1.1.4"
+    "uplot": "^1.6.32",
+    "uplot-react": "^1.2.2"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
