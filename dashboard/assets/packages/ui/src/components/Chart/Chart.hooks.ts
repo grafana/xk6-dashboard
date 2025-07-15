@@ -41,10 +41,21 @@ export const useOptions = ({ plot, theme, width }: CreateOptionsProps): Options 
     }
   }
 
-  const hooks = {
+  const handleRemoveTimeLegend = (uplot: uPlot) => {
+    const legendTable = uplot.root.querySelector('.u-legend')
+    if (legendTable) {
+      const firstRow = legendTable.querySelector('tr')
+      if (firstRow) {
+        firstRow.style.display = 'none'
+      }
+    }
+  }
+
+  const hooks: uPlot.Hooks.Arrays = {
     setCursor: [handleCursorEvent],
     // setData: [(x) => console.log("setData", x)],
     // setScale: [(x) => console.log("setScale", x)],
+    ready: [handleRemoveTimeLegend],
     setSelect: [handleSelectEvent],
     setSeries: [setSeries]
     // setSize: [(x) => console.log("setSize", x)]
