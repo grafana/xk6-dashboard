@@ -70,7 +70,7 @@ export const createOptions = ({ plot, width }: CreateOptionsProps): Options => {
     width: width,
     height: 250,
     cursor: { sync: { key: sync.key } },
-    legend: { live: false },
+    legend: { live: true },
     series: plot.series as Series[],
     axes: axes,
     plugins: [tooltipPlugin(common.white)]
