@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { style } from "@vanilla-extract/css"
+import { globalStyle, style } from "@vanilla-extract/css"
 import { vars } from "theme"
 
 export const container = style({
@@ -13,4 +13,8 @@ export const container = style({
 
 export const main = style({
   padding: vars.sizes.size6
+})
+
+globalStyle('.u-legend', {
+  height: '55px',
 })
