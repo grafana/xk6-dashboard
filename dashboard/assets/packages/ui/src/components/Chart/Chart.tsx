@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import React, { Fragment } from "react"
-import { useElementSize } from "usehooks-ts"
+import React, { Fragment, useRef } from "react"
+import { useResizeObserver } from "usehooks-ts"
 import "uplot/dist/uPlot.min.css"
 import uPlot, { type AlignedData } from "uplot"
 import UplotReact from "uplot-react"
@@ -30,7 +30,8 @@ interface ChartProps {
 export default function Chart({ panel, container }: ChartProps) {
   const digest = useDigest()
   const { theme } = useTheme()
-  const [ref, { width }] = useElementSize()
+  const ref = useRef<HTMLDivElement>(null)
+  const { width } = useResizeObserver({ ref })
 
   const plot = new SeriesPlot(digest, panel, createColorScheme(theme)) as SeriesPlotWithDefinedSeries
   const hasData = !plot.empty && plot.data[0].length > 1
