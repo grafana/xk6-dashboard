@@ -86,7 +86,7 @@ export const createOptions = ({ height = CHART_HEIGHT, hooks, plot, scales, them
     height,
     hooks,
     cursor: { sync: { key: sync.key } },
-    legend: { live: false },
+    legend: { live: true } ,
     scales,
     series: plot.series as Series[],
     axes,

@@ -23,8 +23,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-popper": "^2.3.0",
-    "uplot": "^1.6.24",
-    "uplot-react": "1.1.4",
+    "uplot": "^1.6.32",
+    "uplot-react": "1.2.2",
     "usehooks-ts": "^2.9.1",
     "vite-plugin-svgr": "^3.2.0"
   },
@@ -48,7 +48,7 @@
     "prettier": "3.0.2",
     "rollup-plugin-visualizer": "^5.9.2",
     "typescript": "^5.2.2",
-    "vite": "^4.4.11",
+    "vite": "^4.5.14",
     "vite-tsconfig-paths": "^4.2.1"
   }
 }
