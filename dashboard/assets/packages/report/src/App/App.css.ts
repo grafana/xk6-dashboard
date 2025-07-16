@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-only
 
-import { style } from "@vanilla-extract/css"
+import { globalStyle, style } from "@vanilla-extract/css"
 
 import { vars } from "theme"
 import { sizes } from "theme/sizes.css"
@@ -19,4 +19,8 @@ export const main = style({
 export const usage = style({
   color: vars.colors.text.secondary,
   fontStyle: "italic"
+})
+
+globalStyle('.u-legend', {
+  height: '55px',
 })

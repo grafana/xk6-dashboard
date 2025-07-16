@@ -204,7 +204,7 @@ declare class Param implements Record<string, unknown> {
     [x: string]: unknown;
 }
 declare class Thresholds implements Record<string, Array<string>> {
-    constructor(from?: Record<string, string[]>);
+    constructor(from?: Record<string, Array<string>>);
     [x: string]: Array<string>;
 }
 declare class Digest implements EventListenerObject {
@@ -238,4 +238,4 @@ declare class Digest implements EventListenerObject {
     private onThreshold;
 }
 
-export { Aggregate, AggregateType, Config, DashboardEvent, Digest, EventType, Metric, MetricType, Metrics, Param, Query, SampleVector, SampleVectorInit, Samples, SamplesView, Summary, SummaryRow, SummaryView, UnitType, ValueType };
+export { type Aggregate, AggregateType, Config, type DashboardEvent, Digest, EventType, type Metric, MetricType, Metrics, Param, Query, SampleVector, type SampleVectorInit, Samples, SamplesView, Summary, SummaryRow, SummaryView, UnitType, ValueType };

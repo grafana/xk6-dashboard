@@ -19,7 +19,7 @@
     "numeral": "^2.0.6",
     "pretty-bytes": "^6.1.1",
     "pretty-ms": "^8.0.0",
-    "uplot": "^1.6.25"
+    "uplot": "^1.6.32"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.7.2",
