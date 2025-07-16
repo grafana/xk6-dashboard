@@ -12,7 +12,7 @@ export type Theme = "light" | "dark"
 interface ThemeContextProps {
   theme: Theme
   themeClassName: string
-  setTheme: Dispatch<SetStateAction<Theme>>
+  setTheme: Dispatch<SetStateAction<Theme | undefined>>
 }
 
 const ThemeContext = createContext<Partial<ThemeContextProps>>({})
@@ -23,12 +23,18 @@ interface ThemeProviderProps {
 
 function ThemeProvider({ children }: ThemeProviderProps) {
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)")
-  const [theme, setTheme] = useSessionStorage<Theme>("theme", isDarkMode ? "dark" : "light")
+  const [theme, setTheme] = useSessionStorage<Theme | undefined>("theme", undefined)
 
   const context = {
-    theme,
-    themeClassName: theme === "light" ? lightTheme : darkTheme,
+    theme: getThemeName(),
+    themeClassName: getThemeName() === "light" ? lightTheme : darkTheme,
     setTheme
+  }
+
+  // if no theme has been selected, default to OS preference until a theme is set by the user
+  function getThemeName() {
+    if (theme) return theme
+    return isDarkMode ? "dark" : "light"
   }
 
   return <ThemeContext.Provider value={context}>{children}</ThemeContext.Provider>
