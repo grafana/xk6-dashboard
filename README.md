@@ -170,7 +170,7 @@ You can read more about how the extension works [here](docs/how-it-works.md).
 
 ## Contribute
 
-If you want to contribute or help with the development of xk6-dashboard, start by reading [CONTRIBUTING.md](docs/CONTRIBUTING.md). Before you start coding, it might be a good idea to first discuss your plans and implementation details with the xk6-dashboard maintainers—especially when it comes to big changes and features. You can do this in the [GitHub issue](https://github.com/grafana/k6/issues) for the problem you're solving (create one if it doesn't exist).
+If you want to contribute or help with the development of xk6-dashboard, start by reading [CONTRIBUTING.md](CONTRIBUTING.md). Before you start coding, it might be a good idea to first discuss your plans and implementation details with the xk6-dashboard maintainers—especially when it comes to big changes and features. You can do this in the [GitHub issue](https://github.com/grafana/k6/issues) for the problem you're solving (create one if it doesn't exist).
 
 ## Support
 
