@@ -83,6 +83,79 @@ All the tools used for development are free and open-source, so you can install 
 
 The version numbers of tools used in GitHub workflows are defined as [repository variables](https://github.com/grafana/xk6-dashboard/settings/variables/actions). The version numbers of tools used in the *Development Containers* are only defined in the `.devcontainer/devcontainer.json` file. The version numbers should be updated carefully to be consistent.
 
+## Frontend Development
+
+If you want to work on the frontend components without using devcontainers, you can run the frontend development servers directly. The project uses [Lerna](https://lerna.js.org/) to manage multiple packages in the `dashboard/assets` directory.
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (version 18 or higher)
+- [Yarn](https://yarnpkg.com/) package manager
+- [Go](https://golang.org/) (for backend server)
+
+### Running the Frontend
+
+1. **Install dependencies** (only needed once):
+   ```bash
+   cd dashboard/assets
+   yarn install
+   ```
+
+2. **Start the development servers**:
+
+   **Option 1: Use Lerna to run dev scripts across all packages**
+   ```bash
+   # From the dashboard/assets directory
+   npx lerna run dev --parallel
+   ```
+   
+   This will start development servers for all packages that have a `dev` script (UI, Report, Model, and View packages).
+
+   **Option 2: Run individual packages**
+   ```bash
+   # Start the UI development server (typically on http://localhost:5173)
+   cd packages/ui
+   yarn dev
+   
+   # In another terminal, start the Report development server (typically on http://localhost:5174)
+   cd packages/report
+   yarn dev
+   ```
+
+### Running the Backend Server
+
+To test the frontend with real data, you can run the backend server using the provided sample dataset:
+
+   **Option 1: Build and run the CLI tool**:
+   ```bash
+   # Build k6-web-dashboard
+   go build -o k6-web-dashboard ./cmd/k6-web-dashboard
+   # Replay the sample test data
+   ./k6-web-dashboard replay dashboard/testdata/result.ndjson.gz
+   ```
+   
+   This will start the backend server (typically on http://localhost:8080) and serve the dashboard with the sample test data.
+
+   **Option 2: Use Go run directly**:
+   ```bash
+   go run ./cmd/k6-web-dashboard replay dashboard/testdata/result.ndjson.gz
+   ```
+
+### Development Workflow
+
+1. Start the frontend development servers
+2. Start the backend server with sample data
+3. Make changes to the frontend code - they will automatically reload
+4. The frontend will connect to the backend server automatically to display real metrics data
+
+### Available Frontend Packages
+
+- **UI Package** (`packages/ui`): Main dashboard interface with charts, tables, and interactive components
+- **Report Package** (`packages/report`): Static report generation for sharing results
+- **Model Package** (`packages/model`): TypeScript types and data models
+- **Config Package** (`packages/config`): Configuration management
+- **View Package** (`packages/view`): Chart rendering utilities
+
 ## Tasks
 
 The usual contributor tasks can be performed using GNU make. The `Makefile` defines a target for each task. To execute a task, the name of the task must be specified as an argument to the make command.
