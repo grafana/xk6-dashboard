@@ -12,5 +12,10 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "resolutions": {
+    "vite": "^4.5.14",
+    "esbuild": "^0.25.0",
+    "tmp": "^0.2.4"
+  }
 }
