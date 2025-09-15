@@ -19,8 +19,8 @@ jobs:
       id-token: write
     with:
       go-version: "1.24.x"
-      go-versions: '["1.24.x", "1.23.x"]'
+      go-versions: '["1.24.x","1.25.x"]'
       golangci-lint-version: "v2.1.6"
       platforms: '["ubuntu-latest", "windows-latest", "macos-latest"]'
-      k6-versions: '["v1.0.0","v0.58.0"]'
-      xk6-version: "1.0.1"
+      k6-versions: '["v1.2.3", "v1.0.0"]'
+      xk6-version: "1.1.4"

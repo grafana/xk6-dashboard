@@ -14,7 +14,7 @@ jobs:
       contents: write
     with:
       go-version: "1.24.x"
-      k6-version: "v1.0.0"
-      xk6-version: "1.0.1"
-      os: '["linux","windows","darwin"]'
-      arch: '["amd64","arm64"]'
+      os: '["linux", "windows", "darwin"]'
+      arch: '["amd64", "arm64"]'
+      k6-version: "v1.2.3"
+      xk6-version: "1.1.4"
