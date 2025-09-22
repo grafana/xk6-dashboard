@@ -342,6 +342,15 @@ rm -rf ./k6 ./coverage.txt ./build ./dashboard/assets/node_modules ./bun.lockb
 
 [clean]: #clean---clean-the-working-directory
 
+### schema - Convert the schema to JSON
+
+The source of the JSON schema is `docs/registry.schema.yaml`, after its modification, the schema should be converted into JSON format and saved in `docs/registry.schema.json`.
+
+```bash
+yq -o=json -P docs/dashboard.schema.yaml > docs/dashboard.schema.json
+```
+
+
 ### all - Run all
 
 Performs the most important tasks. It can be used to check whether the CI workflow will run successfully.
