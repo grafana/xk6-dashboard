@@ -1,0 +1,361 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "description": "JSON schema defining the structure of events sent to the k6 web dashboard via Server-Sent Events (SSE). This schema includes definitions for various event types, parameter data, configuration data, metric definitions, sample data, and threshold data used in the dashboard.\n",
+  "$id": "dashboard-schema.yaml",
+  "$ref": "#/$defs/DashboardEvent",
+  "$defs": {
+    "ParamData": {
+      "description": "Parameter data object containing test run information including script file name, update period, test duration, and thresholds.\n",
+      "type": "object",
+      "properties": {
+        "thresholds": {
+          "description": "Maps metric names to their corresponding threshold expressions.\nThis object corresponds to the test script `thresholds` configuration option.\n",
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "scenarios": {
+          "description": "A list of scenario names involved in the test run.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endOffset": {
+          "description": "The duration of the test run in milliseconds. A value of 0 indicates an indefinite run.\n",
+          "type": "integer"
+        },
+        "period": {
+          "description": "The update period in milliseconds for refreshing the dashboard data. Default is 10000 ms (10 seconds).\n",
+          "type": "integer"
+        },
+        "tags": {
+          "description": "A list of precomputed metric tag name(s) (default: \"group\").\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scriptPath": {
+          "description": "The file path of the script being executed in the test run.\n",
+          "type": "string"
+        },
+        "aggregates": {
+          "description": "A mapping of metric types to their corresponding aggregation functions.\nThese arrays play an important role in the encoding of aggregates in `snapshot` and `cumulative` events. The order of the aggregates here determines the order in the arrays in the events the individual aggregated values appear.\n",
+          "type": "object",
+          "examples": [
+            {
+              "counter": [
+                "count",
+                "rate"
+              ],
+              "gauge": [
+                "value"
+              ],
+              "rate": [
+                "rate"
+              ],
+              "trend": [
+                "avg",
+                "max",
+                "med",
+                "min",
+                "p(90)",
+                "p(95)",
+                "p(99)"
+              ]
+            }
+          ],
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "endOffset",
+        "period",
+        "scriptPath"
+      ]
+    },
+    "ConfigData": {
+      "description": "Dashboard UI configuration data containing tab and graph definitions. This data is used to configure the dashboard interface layout and appearance.\n",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "MetricData": {
+      "description": "A mapping of metric names to their definitions.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/MetricDef"
+      }
+    },
+    "AggregateData": {
+      "description": "Aggregated metric data organized by metric name. Contains arrays of numerical values representing metric aggregates ordered lexicographically by metric name.\n",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "ThresholdData": {
+      "description": "Threshold violation data mapping metric names to arrays of crossed threshold expressions. Generated when one or more thresholds are violated during test execution.\n",
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "MetricDef": {
+      "description": "Metric definition containing the metric type and optional value type specification. Defines the characteristics of a metric used in the test run.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/MetricType"
+        },
+        "contains": {
+          "$ref": "#/$defs/ValueType",
+          "default": "default"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "MetricType": {
+      "description": "The type of metric being measured (counter, gauge, rate, trend).\n",
+      "type": "string",
+      "enum": [
+        "counter",
+        "gauge",
+        "rate",
+        "trend"
+      ]
+    },
+    "ValueType": {
+      "description": "The type of value contained in the metric (data, time, or default). Indicates what unit or format the metric values represent.\n",
+      "type": "string",
+      "enum": [
+        "data",
+        "time",
+        "default"
+      ]
+    },
+    "EventType": {
+      "description": "The type of SSE event being sent from the dashboard server to clients. Defines the structure and purpose of the event data.\n",
+      "type": "string",
+      "enum": [
+        "start",
+        "stop",
+        "config",
+        "param",
+        "metric",
+        "threshold",
+        "snapshot",
+        "cumulative"
+      ]
+    },
+    "ConfigEvent": {
+      "description": "Event containing dashboard UI configuration data. Sent as the initial SSE stream event with dashboard layout and appearance settings.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"config\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "config"
+        },
+        "data": {
+          "description": "Dashboard configuration data including tab and graph definitions.\n",
+          "$ref": "#/$defs/ConfigData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "ParamEvent": {
+      "description": "Event containing parameter data for dashboard configuration.\nSent as the first SSE stream event with test run parameters.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"param\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "param"
+        },
+        "data": {
+          "description": "The data associated with the event, containing test run parameters.\n",
+          "$ref": "#/$defs/ParamData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "MetricEvent": {
+      "description": "Event defining one or more metrics and their characteristics. Sent before metrics are first used to establish metric definitions for the client.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"metric\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "metric"
+        },
+        "data": {
+          "description": "Metric definitions mapping metric names to their type and value specifications.\n",
+          "$ref": "#/$defs/MetricData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "ThresholdEvent": {
+      "description": "Event indicating threshold violations for one or more metrics. Generated when thresholds are crossed during test execution.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"threshold\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "threshold"
+        },
+        "data": {
+          "description": "Threshold violation data mapping metric names to crossed threshold expressions.\n",
+          "$ref": "#/$defs/ThresholdData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "StartEvent": {
+      "description": "Event marking the beginning of a test run. Contains the test start time as a Unix timestamp in milliseconds.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"start\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "start"
+        },
+        "data": {
+          "description": "Start time data containing the test start timestamp in milliseconds.\n",
+          "$ref": "#/$defs/AggregateData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "StopEvent": {
+      "description": "Event marking the end of a test run. Contains the test end time as a Unix timestamp in milliseconds.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"stop\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "stop"
+        },
+        "data": {
+          "description": "Stop time data containing the test end timestamp in milliseconds.\n",
+          "$ref": "#/$defs/AggregateData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "SnapshotEvent": {
+      "description": "Event containing metric aggregates for a specific time interval. Provides aggregated metric data calculated during the current period.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"snapshot\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "snapshot"
+        },
+        "data": {
+          "description": "Snapshot aggregate data for metrics during the current time period.\n",
+          "$ref": "#/$defs/AggregateData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "CumulativeEvent": {
+      "description": "Event containing cumulative metric aggregates from test start to current time. Provides aggregated metric data calculated from the beginning of the test run.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of the event, which is always \"cumulative\" for this event.\n",
+          "$ref": "#/$defs/EventType",
+          "const": "cumulative"
+        },
+        "data": {
+          "description": "Cumulative aggregate data for metrics from test start to current time.\n",
+          "$ref": "#/$defs/AggregateData"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "DashboardEvent": {
+      "description": "A union of all possible event types that can be sent to the dashboard.\n",
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/EventType"
+        },
+        "data": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ConfigData"
+            },
+            {
+              "$ref": "#/$defs/ParamData"
+            },
+            {
+              "$ref": "#/$defs/MetricData"
+            },
+            {
+              "$ref": "#/$defs/ThresholdData"
+            },
+            {
+              "$ref": "#/$defs/AggregateData"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    }
+  }
+}
