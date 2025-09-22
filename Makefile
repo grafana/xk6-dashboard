@@ -21,6 +21,7 @@ __help__:
 	@echo '  makefile Generate the Makefile'
 	@echo '  replay   Replay test from recorded JSON file'
 	@echo '  run      Run test script'
+	@echo '  schema   Convert the schema to JSON'
 	@echo '  security Run security and vulnerability checks'
 	@echo '  test     Run the tests'
 	@echo '  testdata Record test results for testing'
@@ -129,6 +130,13 @@ run:
 		--quiet --no-summary --no-usage-report \;\
 		--out "dashboard=export=$${REPORT}&record=$${RECORD}" \;\
 		--out json="$${RESULT}";\
+	)
+
+# Convert the schema to JSON
+.PHONY: schema
+schema: 
+	@(\
+		yq -o=json -P docs/dashboard.schema.yaml > docs/dashboard.schema.json;\
 	)
 
 # Run security and vulnerability checks
