@@ -80,17 +80,17 @@ For more build options and how to use xk6, check out the [xk6 documentation]([xk
 Without parameters the dashboard will be accessible on port `5665` with any web browser: http://127.0.0.1:5665
 
 ```plain
-$ ./k6 run --out dashboard script.js
+$ ./k6 run --out web-dashboard script.js
 
-          /\      |‾‾| /‾‾/   /‾‾/   
-     /\  /  \     |  |/  /   /  /    
-    /  \/    \    |     (   /   ‾‾\  
-   /          \   |  |\  \ |  (‾)  | 
-  / __________ \  |__| \__\ \_____/ .io
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
 
-  execution: local
-     script: script.js
-     output: dashboard http://127.0.0.1:5665
+     execution: local
+        script: script.js
+ web dashboard: http://127.0.0.1:5665
 ```
 
 The k6 process waits to exit as long as there is at least one open browser window for the dashboard extension. In this way, the report can be downloaded, for example, even after the test has been completed.
@@ -102,7 +102,7 @@ In certain environments, it is not allowed that the k6 process does not exit aft
 The output extension accepts parameters in a standard query string format:
 
 ```
-k6 run --out 'dashboard=param1=value1&param2=value2&param3=value3'
+k6 run --out 'web-dashboard=param1=value1&param2=value2&param3=value3'
 ```
 
 > Note the apostrophes (`'`) around the `--out` parameter! You should use it to escape `&` characters from the shell (or use backslash before `&`).
@@ -138,7 +138,7 @@ K6_WEB_DASHBOARD_TAG       | Precomputed metric tag name(s) (default: "group"), 
 The test run report can be exported to a responsive self-contained HTML file. For export, the file name must be specified in the `export` parameter. If the file name ends with `.gz`, the HTML report will automatically be gzip compressed.
 
 ```plain
-k6 run --out dashboard=export=test-report.html script.js
+k6 run --out web-dashboard=export=test-report.html script.js
 ```
 
 The exported HTML report file does not contain external dependencies, so it can be displayed even without an Internet connection. Graphs can be zoomed by selecting a time interval. If necessary, the report can be printed or converted to PDF format.
