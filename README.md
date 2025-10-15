@@ -1,3 +1,25 @@
+> [!WARNING]
+> This branch is a proof of concept, demonstrates k6 subcommand extension.
+
+
+Build k6 with `dashboard` subcommand extension using [xk6](https://github.com/grafana/xk6):
+
+```bash
+xk6 build --k6-version subcommand-p1 --with github.com/grafana/xk6-dashboard@subcommand-p1
+```
+
+**Usage**
+
+Once built, you can use the `dashboard` subcommand:
+
+```bash
+./k6 dashboard --help
+```
+
+
+---
+
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/grafana/xk6-dashboard)](https://goreportcard.com/report/github.com/grafana/xk6-dashboard)
 [![GitHub Actions](https://github.com/grafana/xk6-dashboard/actions/workflows/validate.yml/badge.svg)](https://github.com/grafana/xk6-dashboard/actions/workflows/validate.yml)
 ![GitHub Downloads](https://img.shields.io/github/downloads/grafana/xk6-dashboard/total)
