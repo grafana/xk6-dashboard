@@ -23,7 +23,7 @@
     "@typescript-eslint/parser": "6.21.0",
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-prettier": "5.5.1",
+    "eslint-plugin-prettier": "5.5.4",
     "prettier": "3.6.2",
     "tsup": "8.5.0",
     "typescript": "5.8.3"
