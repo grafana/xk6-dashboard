@@ -27,18 +27,18 @@
     "uplot-react": "^1.2.2"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.5.0",
-    "@typescript-eslint/eslint-plugin": "^6.7.5",
-    "@typescript-eslint/parser": "^6.7.5",
-    "@vanilla-extract/vite-plugin": "^3.9.0",
-    "eslint": "^8.51.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "rollup-plugin-visualizer": "^5.9.2",
-    "sass": "^1.65.1",
-    "vite": "^5.0.0",
-    "vite-plugin-handlebars": "^1.6.0",
-    "vite-plugin-singlefile": "^0.13.5",
-    "vite-tsconfig-paths": "^4.2.1"
+    "@preact/preset-vite": "2.10.2",
+    "@typescript-eslint/eslint-plugin": "6.21.0",
+    "@typescript-eslint/parser": "6.21.0",
+    "@vanilla-extract/vite-plugin": "3.9.5",
+    "eslint": "8.57.1",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.5.1",
+    "rollup-plugin-visualizer": "5.14.0",
+    "sass": "1.89.2",
+    "vite": "5.4.20",
+    "vite-plugin-handlebars": "1.6.0",
+    "vite-plugin-singlefile": "0.13.5",
+    "vite-tsconfig-paths": "4.3.2"
   }
 }
