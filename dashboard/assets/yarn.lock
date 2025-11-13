@@ -6962,12 +6962,7 @@ update-browserslist-db@^1.1.3:
     escalade "^3.2.0"
     picocolors "^1.1.1"
 
-uplot-react@1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/uplot-react/-/uplot-react-1.2.2.tgz#b5d10abb77b442f634f2967f7a232056120eba81"
-  integrity sha512-fCe48HsE0sJmHVUs4TC49roTK3FYNXfCxA44g8pe20TMZ8GD3OT/mtXN/S0gJ8bYVOUcheOZ5u7f1Vw09JbTrw==
-
-uplot-react@^1.2.2:
+uplot-react@1.2.4, uplot-react@^1.2.2:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/uplot-react/-/uplot-react-1.2.4.tgz#52c69a35343da98b200cfd30730a2cd493bdec7f"
   integrity sha512-mDe/mqD9KtXeHDR8llSJaUFpDcEJvYpHNS+cyUhJ2qvkbT9GPKod1BVXG+hNegRqYiV1ldsFBlI5+OKSi/yPNA==
