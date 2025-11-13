@@ -1,6 +1,6 @@
 {
   "name": "xk6-dashboard",
-  "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
   "forwardPorts": [5665],
   "customizations": {
     "vscode": {
