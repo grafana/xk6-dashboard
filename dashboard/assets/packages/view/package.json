@@ -18,7 +18,7 @@
     "@xk6-dashboard/model": "0.0.1",
     "numeral": "^2.0.6",
     "pretty-bytes": "^6.1.1",
-    "pretty-ms": "^8.0.0",
+    "pretty-ms": "^9.0.0",
     "uplot": "^1.6.32"
   },
   "devDependencies": {
