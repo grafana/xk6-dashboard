@@ -28,8 +28,8 @@
   },
   "devDependencies": {
     "@preact/preset-vite": "2.10.2",
-    "@typescript-eslint/eslint-plugin": "6.21.0",
-    "@typescript-eslint/parser": "6.21.0",
+    "@typescript-eslint/eslint-plugin": "8.46.4",
+    "@typescript-eslint/parser": "8.46.4",
     "@vanilla-extract/vite-plugin": "3.9.5",
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.2",
