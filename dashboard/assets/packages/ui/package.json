@@ -34,7 +34,7 @@
     "@typescript-eslint/eslint-plugin": "6.21.0",
     "@typescript-eslint/parser": "6.21.0",
     "@vanilla-extract/vite-plugin": "3.9.5",
-    "@vitejs/plugin-react-swc": "3.10.2",
+    "@vitejs/plugin-react-swc": "4.2.1",
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.2",
     "eslint-config-standard": "17.1.0",
