@@ -7033,12 +7033,12 @@ vite-plugin-handlebars@1.6.0:
     handlebars "^4.7.6"
     vite "^2.0.0"
 
-vite-plugin-singlefile@0.13.5:
-  version "0.13.5"
-  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-0.13.5.tgz#9465dbb0b06afb2a73600a50fcce4b51c8d10999"
-  integrity sha512-y/aRGh8qHmw2f1IhaI/C6PJAaov47ESYDvUv1am1YHMhpY+19B5k5Odp8P+tgs+zhfvak6QB1ykrALQErEAo7g==
+vite-plugin-singlefile@2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/vite-plugin-singlefile/-/vite-plugin-singlefile-2.3.0.tgz#71f7d8f8958cc019295e159355284ca3ecca97f1"
+  integrity sha512-DAcHzYypM0CasNLSz/WG0VdKOCxGHErfrjOoyIPiNxTPTGmO6rRD/te93n1YL/s+miXq66ipF1brMBikf99c6A==
   dependencies:
-    micromatch "^4.0.5"
+    micromatch "^4.0.8"
 
 vite-plugin-svgr@^3.2.0:
   version "3.3.0"
