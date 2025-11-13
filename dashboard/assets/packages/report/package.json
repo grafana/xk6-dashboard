@@ -34,7 +34,7 @@
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.2",
     "eslint-plugin-prettier": "5.5.4",
-    "rollup-plugin-visualizer": "5.14.0",
+    "rollup-plugin-visualizer": "6.0.5",
     "sass": "1.89.2",
     "vite": "5.4.21",
     "vite-plugin-handlebars": "1.6.0",
