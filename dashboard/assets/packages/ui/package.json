@@ -26,7 +26,7 @@
     "uplot": "^1.6.32",
     "uplot-react": "1.2.4",
     "usehooks-ts": "^3.0.0",
-    "vite-plugin-svgr": "^3.2.0"
+    "vite-plugin-svgr": "^4.0.0"
   },
   "devDependencies": {
     "@types/react": "18.3.26",
