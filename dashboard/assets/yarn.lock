@@ -1044,10 +1044,10 @@
     "@prefresh/utils" "^1.2.1"
     "@rollup/pluginutils" "^4.2.1"
 
-"@rolldown/pluginutils@1.0.0-beta.27":
-  version "1.0.0-beta.27"
-  resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.27.tgz#47d2bf4cef6d470b22f5831b420f8964e0bf755f"
-  integrity sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==
+"@rolldown/pluginutils@1.0.0-beta.46":
+  version "1.0.0-beta.46"
+  resolved "https://registry.yarnpkg.com/@rolldown/pluginutils/-/pluginutils-1.0.0-beta.46.tgz#fa457cfa15ed4438ef47f6d5ff18fdc24b6a6bb3"
+  integrity sha512-xMNwJo/pHkEP/mhNVnW+zUiJDle6/hxrwO0mfSJuEVRbBfgrJFuUSRoZx/nYUw5pCjrysl9OkNXCkAdih8GCnA==
 
 "@rollup/pluginutils@^4.1.1", "@rollup/pluginutils@^4.2.1":
   version "4.2.1"
@@ -1365,7 +1365,7 @@
   resolved "https://registry.yarnpkg.com/@swc/core-win32-x64-msvc/-/core-win32-x64-msvc-1.15.1.tgz#ae48e151b5230abc3015af4063c8f7a7a79b5f48"
   integrity sha512-n3Ppn0LSov/IdlANq+8kxHqENuJRX5XtwQqPgQsgwKIcFq22u17NKfDs9vL5PwRsEHY6Xd67pnOqQX0h4AvbuQ==
 
-"@swc/core@^1.12.11":
+"@swc/core@^1.13.5":
   version "1.15.1"
   resolved "https://registry.yarnpkg.com/@swc/core/-/core-1.15.1.tgz#57eec6c405518875b30062861e6f4a93292b51b5"
   integrity sha512-s9GN3M2jA32k+StvuS9uGe4ztf5KVGBdlJMMC6LR6Ah23Lq/CWKVcC3WeQi8qaAcLd+DiddoNCNMUWymLv+wWQ==
@@ -1653,13 +1653,13 @@
     "@vanilla-extract/compiler" "^0.3.1"
     "@vanilla-extract/integration" "^8.0.4"
 
-"@vitejs/plugin-react-swc@3.11.0":
-  version "3.11.0"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react-swc/-/plugin-react-swc-3.11.0.tgz#d82cc307d530197a77b50238860cf319890ffc17"
-  integrity sha512-YTJCGFdNMHCMfjODYtxRNVAYmTWQ1Lb8PulP/2/f/oEEtglw8oKxKIZmmRkyXrVrHfsKOaVkAc3NT9/dMutO5w==
+"@vitejs/plugin-react-swc@4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react-swc/-/plugin-react-swc-4.2.1.tgz#f547a339ac64a536449e4a4d192261dd99be47d6"
+  integrity sha512-SIZ/XxeS2naLw4L2vVvpTyujM2OY+Rf+y6nWETqfoBrZpI3SFdyNJof3nQ8HbLhXJ1Eh9e9c0JGYC8GYPhLkCw==
   dependencies:
-    "@rolldown/pluginutils" "1.0.0-beta.27"
-    "@swc/core" "^1.12.11"
+    "@rolldown/pluginutils" "1.0.0-beta.46"
+    "@swc/core" "^1.13.5"
 
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"
