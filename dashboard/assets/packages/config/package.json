@@ -17,7 +17,7 @@
     "@xk6-dashboard/view": "0.0.1"
   },
   "devDependencies": {
-    "eslint": "8.57.1",
+    "eslint": "9.39.1",
     "eslint-config-prettier": "9.1.2",
     "eslint-config-standard": "17.1.0",
     "eslint-plugin-import": "2.32.0",
