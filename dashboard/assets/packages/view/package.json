@@ -17,18 +17,18 @@
     "@types/numeral": "^2.0.2",
     "@xk6-dashboard/model": "0.0.1",
     "numeral": "^2.0.6",
-    "pretty-bytes": "^6.1.1",
-    "pretty-ms": "^8.0.0",
+    "pretty-bytes": "^7.0.0",
+    "pretty-ms": "^9.0.0",
     "uplot": "^1.6.32"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "6.21.0",
-    "@typescript-eslint/parser": "6.21.0",
-    "eslint": "8.57.1",
-    "eslint-config-prettier": "9.1.2",
+    "@typescript-eslint/eslint-plugin": "8.46.4",
+    "@typescript-eslint/parser": "8.46.4",
+    "eslint": "9.39.1",
+    "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
     "prettier": "3.6.2",
-    "tsup": "8.5.0",
-    "typescript": "5.8.3"
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
   }
 }

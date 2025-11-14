@@ -8,14 +8,14 @@
     "build": "lerna run build"
   },
   "devDependencies": {
-    "lerna": "8.2.4"
+    "lerna": "9.0.0"
   },
   "workspaces": [
     "packages/*"
   ],
   "resolutions": {
-    "vite": "^5.0.0",
-    "esbuild": "^0.25.0",
+    "vite": "^7.0.0",
+    "esbuild": "^0.27.0",
     "tmp": "^0.2.4",
     "tsup": "^8.0.0"
   }

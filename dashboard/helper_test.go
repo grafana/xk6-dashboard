@@ -48,7 +48,7 @@ func newTestAssets(t *testing.T) *assets {
 func helper(t *testing.T) *testHelper {
 	t.Helper()
 
-	gs := state.NewGlobalState(context.Background())
+	gs := state.NewGlobalState(t.Context())
 
 	proc := &process{
 		logger: gs.Logger,
@@ -113,7 +113,7 @@ func readSSE(t *testing.T, nlines int, loc string) []string {
 
 	require.NoError(t, err)
 
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
 	req = req.WithContext(ctx)

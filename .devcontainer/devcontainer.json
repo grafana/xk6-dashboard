@@ -1,6 +1,6 @@
 {
   "name": "xk6-dashboard",
-  "image": "mcr.microsoft.com/devcontainers/base:1-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/base:2-bookworm",
   "forwardPorts": [5665],
   "customizations": {
     "vscode": {
@@ -23,10 +23,10 @@
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
     "ghcr.io/devcontainers/features/go:1": {
-      "version": "1.24",
+      "version": "1.25",
       "golangciLintVersion": "2.1.6"
     },
-    "ghcr.io/devcontainers/features/node:1": { "version": "22" },
+    "ghcr.io/devcontainers/features/node:1": { "version": "24" },
     "ghcr.io/devcontainers-extra/features/apt-packages:1": {
       "packages": "libimage-exiftool-perl"
     },
