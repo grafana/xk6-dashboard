@@ -22,7 +22,7 @@
     "preact": "^10.16.0",
     "react": "npm:@preact/compat",
     "react-dom": "npm:@preact/compat",
-    "round-to": "^6.0.0",
+    "round-to": "^7.0.0",
     "uplot": "^1.6.32",
     "uplot-react": "^1.2.2"
   },
