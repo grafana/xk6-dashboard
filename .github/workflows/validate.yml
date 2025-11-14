@@ -18,7 +18,7 @@ jobs:
       pages: write
       id-token: write
     with:
-      go-version: "1.24.5"
+      go-version: "1.25.x"
       go-versions: '["1.24.x","1.25.x"]'
       golangci-lint-version: "v2.1.6"
       platforms: '["ubuntu-latest", "windows-latest", "macos-latest"]'
