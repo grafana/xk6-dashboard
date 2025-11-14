@@ -7,7 +7,6 @@
 package dashboard
 
 import (
-	"context"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -19,7 +18,7 @@ import (
 func TestNewCommand(t *testing.T) {
 	t.Parallel()
 
-	gs := state.NewGlobalState(context.Background())
+	gs := state.NewGlobalState(t.Context())
 
 	cmd := NewCommand(gs)
 
@@ -43,7 +42,7 @@ func TestNewCommand(t *testing.T) {
 func TestNewCommand_reply(t *testing.T) {
 	t.Parallel()
 
-	gs := state.NewGlobalState(context.Background())
+	gs := state.NewGlobalState(t.Context())
 
 	cmd := NewCommand(gs)
 
@@ -65,7 +64,7 @@ func TestNewCommand_reply(t *testing.T) {
 func TestNewCommand_reply_error(t *testing.T) {
 	t.Parallel()
 
-	gs := state.NewGlobalState(context.Background())
+	gs := state.NewGlobalState(t.Context())
 
 	cmd := NewCommand(gs)
 
@@ -87,7 +86,7 @@ func TestNewCommand_reply_error(t *testing.T) {
 func TestNewCommand_report(t *testing.T) {
 	t.Parallel()
 
-	gs := state.NewGlobalState(context.Background())
+	gs := state.NewGlobalState(t.Context())
 
 	cmd := NewCommand(gs)
 
@@ -107,7 +106,7 @@ func TestNewCommand_report(t *testing.T) {
 func TestNewCommand_aggregate(t *testing.T) {
 	t.Parallel()
 
-	gs := state.NewGlobalState(context.Background())
+	gs := state.NewGlobalState(t.Context())
 
 	cmd := NewCommand(gs)
 

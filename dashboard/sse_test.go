@@ -23,7 +23,7 @@ func Test_sendEvent(t *testing.T) {
 	src := newEventEmitter("events", logrus.StandardLogger())
 	rec := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1/events", nil)
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithCancel(t.Context())
 
 	req = req.WithContext(ctx)
 
@@ -67,7 +67,7 @@ func Test_send_earlier_events(t *testing.T) {
 
 	rec := httptest.NewRecorder()
 	req, err := http.NewRequest(http.MethodGet, "http://127.0.0.1/events", nil)
-	ctx, cancel := context.WithCancel(context.TODO())
+	ctx, cancel := context.WithCancel(t.Context())
 
 	req = req.WithContext(ctx)
 
