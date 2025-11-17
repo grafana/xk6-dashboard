@@ -8,7 +8,7 @@
     "build": "lerna run build"
   },
   "devDependencies": {
-    "lerna": "9.0.0"
+    "lerna": "9.0.1"
   },
   "workspaces": [
     "packages/*"
