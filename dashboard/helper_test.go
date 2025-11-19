@@ -10,6 +10,7 @@ import (
 	"bufio"
 	"context"
 	"embed"
+	"io/fs"
 	"net/http"
 	"testing"
 	"time"
@@ -28,6 +29,15 @@ type testHelper struct {
 	assets *assets
 }
 
+func assetDir(dirname string, parent fs.FS) fs.FS {
+	subfs, err := fs.Sub(parent, dirname)
+	if err != nil {
+		panic(err)
+	}
+
+	return subfs
+}
+
 func newTestAssets(t *testing.T) *assets {
 	t.Helper()
 
@@ -38,9 +48,14 @@ func newTestAssets(t *testing.T) *assets {
 		panic(err)
 	}
 
+	report, err := testdata.ReadFile(prefix + "report/dist/index.html")
+	if err != nil {
+		panic(err)
+	}
+
 	return &assets{
 		ui:     assetDir(prefix+"ui/dist", testdata),
-		report: assetDir(prefix+"report/dist", testdata),
+		report: report,
 		config: config,
 	}
 }
