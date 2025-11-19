@@ -8,21 +8,11 @@ package dashboard
 
 import (
 	"encoding/json"
+	"io/fs"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
-
-func Test_assetDir(t *testing.T) {
-	t.Parallel()
-
-	fs := assetDir("hu", testdata)
-
-	require.NotNil(t, fs)
-	require.Panics(t, func() {
-		assetDir("..", testdata)
-	})
-}
 
 func Test_newAssets(t *testing.T) {
 	t.Parallel()
@@ -37,23 +27,13 @@ func assertAssets(t *testing.T, assets *assets) {
 
 	require.NotNil(t, assets.ui)
 
-	file, err := assets.ui.Open("index.html")
+	contents, err := fs.ReadFile(assets.ui, "index.html")
 
 	require.NoError(t, err)
-	require.NotNil(t, file)
+	require.NotEmpty(t, contents)
 
-	require.NoError(t, file.Close())
-
-	require.NotNil(t, assets.report)
-
-	file, err = assets.report.Open("index.html")
-
-	require.NoError(t, err)
-	require.NotNil(t, file)
-
-	require.NoError(t, file.Close())
-
-	require.NotNil(t, assets.config)
+	require.NotEmpty(t, assets.report)
+	require.NotEmpty(t, assets.config)
 
 	conf := map[string]interface{}{}
 

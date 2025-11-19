@@ -131,13 +131,7 @@ func Test_briefer_inject_error(t *testing.T) {
 
 	rep := newReporter("", th.assets, th.proc)
 
-	file, err := th.assets.report.Open("index.html")
-
-	require.NoError(t, err)
-
-	html, err := io.ReadAll(file)
-
-	require.NoError(t, err)
+	html := th.assets.report
 
 	out := newErrorWriter(t)
 
@@ -145,8 +139,8 @@ func Test_briefer_inject_error(t *testing.T) {
 		_, _ = rep.inject(out, []byte{}, []byte(dataTag), nil)
 	})
 
-	_, err = rep.inject(out, html, []byte(dataTag), func(out io.Writer) error {
-		_, err = out.Write([]byte("Hello, World!"))
+	_, err := rep.inject(out, html, []byte(dataTag), func(out io.Writer) error {
+		_, err := out.Write([]byte("Hello, World!"))
 
 		return err
 	})
