@@ -75,6 +75,11 @@ For more build options and how to use xk6, check out the [xk6 documentation]([xk
 
 </details>
 
+## Requirements
+
+> [!IMPORTANT]
+> xk6-dashboard v0.9.0 and later requires k6 v1.5.0 or newer.
+
 ## Usage
 
 Without parameters the dashboard will be accessible on port `5665` with any web browser: http://127.0.0.1:5665
@@ -160,9 +165,46 @@ See [sample HTML report](screenshot/k6-dashboard-html-report.html) or try the [o
 
 </details>
 
+
+
 ## Command Line
 
 The CLI tool called [k6-web-dashboard](cmd/k6-web-dashboard/README.md) enables the use of subcommands related to dashboard management (recording playback, creating a report from a recording, etc.) that do not require running k6.
+
+### Using as k6 subcommand
+
+Starting with k6 `v1.5.0`, xk6-dashboard registers itself as a subcommand extension, allowing you to use its CLI features through the standard k6 command interface.
+
+**When using xk6-dashboard as an extension:**
+
+```bash
+k6 x dashboard [subcommand] [flags]
+```
+
+The subcommand name is `dashboard`:
+
+```bash
+# Replay a previously recorded session
+k6 x dashboard replay --export report.html test-result.json
+
+# Generate a report from JSON results
+k6 x dashboard report --export report.html test-result.json
+
+# Aggregate multiple test results
+k6 x dashboard aggregate --export report.html result1.json result2.json
+```
+
+**When xk6-dashboard subcommand is enabled in k6:**
+
+Once the xk6-dashboard subcommand registration is enabled in k6's built-in version (future release), the subcommand will be available as `web-dashboard`:
+
+```bash
+# Future usage when subcommand is enabled in k6
+k6 web-dashboard replay --export report.html test-result.json
+```
+
+> [!TIP]
+> For a complete reference of available subcommands and their options, see the [CLI documentation](cmd/k6-web-dashboard/README.md).
 
 ## How it works
 
