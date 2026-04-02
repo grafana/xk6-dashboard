@@ -1,6 +1,6 @@
 module github.com/grafana/xk6-dashboard
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/grafana/xk6-dashboard-assets v0.1.2
@@ -10,7 +10,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
-	go.k6.io/k6 v1.6.1
+	go.k6.io/k6 v1.7.1
 )
 
 require (
